@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "ad-ip-acg"
+version = "0.1.0"
+description = "Python module to take control over external access to your Amazon Workspaces."
+authors = ["Thom Rommens"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+cookiecutter = "^2.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

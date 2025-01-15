@@ -8,6 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+ad-ip-acg/var/
 build/
 develop-eggs/
 dist/
