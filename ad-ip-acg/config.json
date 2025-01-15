@@ -1,0 +1,6 @@
+{
+    "ip_addresses": {
+        "allowed_in_aws_directory": [],
+        "invalid_user_input": []
+    } 
+}

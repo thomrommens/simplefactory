@@ -26,6 +26,11 @@ An in-depth paragraph about your project and overview of use.
 code blocks for commands
 ```
 
+## Documentation reference
+Substack blog: [simplefactory.substack.com](https://simplefactory.substack.com)
+(specify blog)
+
+
 ## Help
 
 Any advise for common problems or issues.
@@ -35,7 +40,4 @@ command to run if program contains helper info
 
 ## Authors
 
-Contributors names and contact info
-
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
+Thom Rommens, [Simplefactory](https://simplefactory.substack.com)
