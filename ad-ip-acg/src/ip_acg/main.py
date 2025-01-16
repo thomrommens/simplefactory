@@ -15,21 +15,31 @@ from ip_acgs import delete, describe
     default="dry_run", 
     help="Which action?"
 )
-def main(action):
+@click.option(
+    "--debug", 
+    type=click.Choice(
+        ["false", "true"], 
+        case_sensitive=False
+    ), 
+    default="false", 
+    help="Enable debug mode?"
+)
+def main(action, debug):
     """
     Integrate program.
     :param action: action requested by user on command line.
     """
     logger = setup_logger("ip_acg_logger")
+    logger.info(f"{'=' * 70}")
+    logger.info(f"START MODULE: AMAZON WORKSPACES IP ACG")
 
-    click.echo(f"Action selected: {action}")
-
-    logger.info(f"Selected route: [{action}]", extra={'depth': 1})
+    logger.info(f"Selected action: [{action}]", extra={'depth': 1})
+    logger.info(f"Debug mode enabled: [{debug}]", extra={'depth': 1})
 
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
     # ------------------------------------------------------------------------   
-    ip_acgs = describe()
+    # ip_acgs = describe()
     
     
     # ------------------------------------------------------------------------   
@@ -56,6 +66,9 @@ def main(action):
 
     else:
         raise SomeException("Unexpected error")
+    
+    logger.info(f"FINISH MODULE: AMAZON WORKSPACES IP ACG")
+    logger.info(f"{'=' * 70}")
       
 
 if __name__ == "__main__":

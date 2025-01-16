@@ -7,12 +7,12 @@ log_level = logging.INFO
 
 
 class DepthFormatter(logging.Formatter):
-    def __init__(self, fmt=None, datefmt=None, style='%'):
+    def __init__(self, fmt=None, datefmt=None, style="%"):
         super().__init__(fmt, datefmt, style)
 
     def format(self, record):
-        pipes = '|' * getattr(record, 'depth', 0)
-        record.msg = f'{pipes} {record.msg}'
+        pipes = "|" * getattr(record, "depth", 0)
+        record.msg = f"{pipes}{' ' if pipes else ''}{record.msg}"
         return super().format(record)
 
 
@@ -24,7 +24,7 @@ def setup_logger(name, level=log_level):
     ch.setLevel(level)
 
     formatter = DepthFormatter(
-        '[%(asctime)s] [%(levelname)s] %(message)s', "%Y-%m-%d %H:%M:%S"
+        "[%(asctime)s] [%(levelname)s] %(message)s", "%Y-%m-%d %H:%M:%S"
     )
     ch.setFormatter(formatter)
 
