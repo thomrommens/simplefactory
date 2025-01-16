@@ -3,6 +3,8 @@ import logging
 
 workspaces = boto3.client("workspaces", region_name="eu-west-1")
 
+log_level = logging.INFO
+
 
 class DepthFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, style='%'):
@@ -14,7 +16,7 @@ class DepthFormatter(logging.Formatter):
         return super().format(record)
 
 
-def setup_logger(name, level=logging.INFO):
+def setup_logger(name, level=log_level):
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
@@ -22,7 +24,7 @@ def setup_logger(name, level=logging.INFO):
     ch.setLevel(level)
 
     formatter = DepthFormatter(
-        '[%(asctime)s] [%(levelname)s] - %(message)s', "%Y-%m-%d %H:%M:%S"
+        '[%(asctime)s] [%(levelname)s] %(message)s', "%Y-%m-%d %H:%M:%S"
     )
     ch.setFormatter(formatter)
 

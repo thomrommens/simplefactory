@@ -39,6 +39,8 @@ def sanitize_rules():
         "ruleDesc": "value__desc_from_rule_in_yaml"
     }
 
+    target_rules = "blablab"
+
     target_rules_sorted = sorted(
         target_rules,
         key=lambda target_rules: target_rules["ipRule"]

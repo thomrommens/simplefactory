@@ -1,8 +1,8 @@
-from dataclasses import dataclass
 from config import workspaces
+from models import IP_ACG, Directory
 
 
-def describe():
+def describe() -> list[IP_ACG]:
     response = workspaces.describe_ip_groups()
     ip_acgs = []
     for item in response.get("Result"):
@@ -11,13 +11,14 @@ def describe():
             name=item.get("groupName"),
             desc=""
         )
+    return ip_acgs
 
 
-def create():
+def create(ip_acg: IP_ACG, tags: dict) -> str:
     response = workspaces.create_ip_group(
-        GroupName=name,
-        GroupDesc=desc,
-        UserRules=rules,
+        GroupName=ip_acg.id,
+        GroupDesc=ip_acg.desc,
+        UserRules=ip_acg.rules,
         Tags=[{"Key": k, "Value": v} for k, v in tags.items()]
     )    
     ip_acg_id = response.get('GroupId')
@@ -25,31 +26,31 @@ def create():
     return ip_acg_id
 
 
-def associate():
+def update_rules(ip_acg: IP_ACG):
+    response = workspaces.update_rules_of_ip_group(
+        GroupId=ip_acg.id,
+        UserRules=ip_acg.rules
+    )
+
+
+def associate(ip_acgs: list[IP_ACG], directory: Directory):
     response = workspaces.associate_ip_groups(
         DirectoryId=directory.id,
-        GroupIds=group_id
+        GroupIds=ip_acgs.id
     )
 
 
-def update_rules():
-    response = workspaces.update_rules_of_ip_group(
-        GroupId=group_id,
-        UserRules=rules
-    )
-    pass
-
-
-def disassociate():
+def disassociate(ip_acgs: list[IP_ACG], directory: Directory):
     response = workspaces.disassociate_ip_groups(
         DirectoryId=directory.id,
-        GroupIds=group_ids
+        GroupIds=ip_acgs.id  # TODO: for comprehension
     )
 
 
-def delete():
+def delete(ip_acg: IP_ACG):
     """
-    default: deletes all!
+    default: deletes all IP ACGs from directory!
     """
-    # check if any exists
-    workspaces.delete_ip_group(GroupId=group_id)
+    # check with a describe if any exists
+    # TODO: check single/multi delete
+    workspaces.delete_ip_group(GroupId=ip_acg.id)

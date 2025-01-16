@@ -1,4 +1,7 @@
 from config import workspaces
+from exceptions import SomeException
+from models import Directory
+
 
 def get_directories():
     # if value in work_instruction for Directory, follow

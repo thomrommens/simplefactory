@@ -27,6 +27,7 @@ def read_validation_baseline():
         }
     }
 
+
 def read_work_instruction():
     # yaml-dict to dataclasses
     # -> work_instruction_raw = WorkInstruction()

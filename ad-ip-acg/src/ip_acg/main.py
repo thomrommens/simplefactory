@@ -1,39 +1,8 @@
 import click
+
 from config import setup_logger
-from dataclasses import dataclass
-import logging
-
-
-class SomeException(Exception):
-    # TODO
-    pass
-
-
-@dataclass
-class Rule:
-    """Rule = IP address, or range of IP addresses"""
-    pass
-
-
-@dataclass
-class IP_ACG:
-    name: str
-    desc: str
-    origin: str
-    rules: list[Rule]
-
-
-@dataclass
-class Directory:
-    id: str
-    name: str
-    type: str
-
-
-@dataclass
-class WorkInstruction:
-    ip_acgs: list[IP_ACG]
-    directories: list[Directory]
+from exceptions import SomeException
+from ip_acgs import delete, describe
 
 
 @click.command()
@@ -51,7 +20,7 @@ def main(action):
     Integrate program.
     :param action: action requested by user on command line.
     """
-    logger = setup_logger("my_logger", logging.DEBUG)
+    logger = setup_logger("ip_acg_logger")
 
     click.echo(f"Action selected: {action}")
 
@@ -60,7 +29,7 @@ def main(action):
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
     # ------------------------------------------------------------------------   
-    # describe directories/present IP ACGs
+    ip_acgs = describe()
     
     
     # ------------------------------------------------------------------------   
@@ -80,9 +49,10 @@ def main(action):
             pass
 
     elif action in ("delete"):
-        # disassociate
-        # delete
-        pass
+        if ip_acgs:
+            # disassociate
+            # delete()
+            pass
 
     else:
         raise SomeException("Unexpected error")
