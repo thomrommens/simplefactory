@@ -1,39 +1,46 @@
 # ============================================================================
 # IP ACCESS CONTROL GROUPS
-# CONFIG
+# Settings
 # ============================================================================
+
 # ````````````````````````````````````````````````````````````````````````````
 # ip_acgs
-#
+
+# - `rule_set`
+#    - specify a maximum of 10 rules.
+#    - a single rule can be a *single* IP address (prefix /32),
+#        or a *range* of IP addresses (prefix lower than /32). 
+#    - if no prefix is set, each rule will be automatically appended with 
+#       the prefix for a single IP address, i.e.,`/32`. 
+#    - set rules smartly using a prefix if you want to 
+#       cover multiple IP addresses within one group, e.g., add `/27`.
+#       - use https://www.cidr.xyz for a quick insight.
+
 # - Update properties of the suggested IP ACGs that you want to apply 
 #   to each AWS directory, below.
 # - Add extra ACGs by copy-pasting the suggested items:
 #   - each ACG is a new dictionary, indicated by a hyphen, 
 #     in the list of `ip_acgs`;
 #   - use the same properties as the suggested IP ACGs;
-#   - enclose all string values with double quotes.
+#   - enclose all content with double quotes.
 
 # ````````````````````````````````````````````````````````````````````````````
-
 ip_acgs:
 
-- name: "IP ACG 1"
-  desc: "Control inbound IP addresses from ACG 1"
+- name: "Domain A"
+  desc: "Allowed inbound IP addresses from Domain A"
+  origin: "This Department"
+  rule_set: 
+  - "123.456.789.012": "This trusted single host"
+  - "345.678.901.234/27": "That trusted series of hosts"
+
+- name: "Domain B"
+  desc: "Allowed inbound IP addresses from Domain B"
   origin: "That Department"
   rule_set: 
-  - 123.456.789.012
-  - 345.678.901.234
-  rule_set_last_modfied: "2025-01-01--12-00-00"
-
-- name: "IP ACG 2"
-  desc: "Control inbound IP addresses from ACG 2"
-  origin: "That Other Department"
-  rule_set: 
-  - 567.890.123.456
-  - 789.012.345.678
-  - 901.234.567.890
-  rule_set_last_modfied: "2025-01-02--12-00-00"
-
+  - "567.890.123.456/30": "This trusted series of hosts"
+  - "789.012.345.678": "That trusted host"
+  - "901.234.567.890": "Yet another trusted host"
 
 # ````````````````````````````````````````````````````````````````````````````
 # tags
@@ -42,11 +49,10 @@ ip_acgs:
 # - Add new tags:
 #   - each key: value pair is a new dictionary item;
 #   - do not use a hyphen for a new key: value pair;
-#   - enclose all string values with double quotes.
+#   - enclose all content with double quotes.
 # - At runtime, `placeholder` values will be replaced with actual values.
 
 # ````````````````````````````````````````````````````````````````````````````
-
 tags:
 
   IPACGName: "placeholder"
@@ -76,14 +82,14 @@ tags:
 #       - each workspace_directory is a new dictionary, indicated by a hyphen, 
 #         in the list of `workspace_directories`;
 #       - use the same properties as the suggested workspace_directory below;
-#       - enclose all string values with double quotes.
+#       - enclose all content with double quotes.
 
 # ````````````````````````````````````````````````````````````````````````````
-
 workspace_directories:
 
 - id: 
   name: 
+
 
 # ````````````````````````````````````````````````````````````````````````````
 # user_input_validation
@@ -91,44 +97,43 @@ workspace_directories:
 # [!] Do not touch if you're not sure what you are doing.
 
 # ````````````````````````````````````````````````````````````````````````````
-
 user_input_validation:  
 
   ip_address:
 
     # ````````````````````````````````````````````````````````````````````````
-    # prefix
-    # 
-    # - The prefix (e.g., `/32` in `123.456.789/012/32`) 
-    #   specifies the number of IP addresses within a base IP. 
-    # - Here, the prefix is capped in order to prevent a user to open up the
-    #   WorkSpace directory to an unexpectedly large set of IP addresses.
-    # - Play around with it: https://www.cidr.xyz
-    # - Update pre-set values.
-
-    # ````````````````````````````````````````````````````````````````````````
-    
-    prefix:
-      default: 32  # that is, 1 IP address in your CIDR Base IP
-      min: 27  # that is, 32 IP addresses in your CIDR Base IP
-    
-    # ````````````````````````````````````````````````````````````````````````
     # invalid
     # 
+    # - Some values do not make sense for IP addresses in IP ACGs.
     # - Update suggested values.
     # - Add new invalid IP addresses:
     #   - each key: value pair is a new dictionary item;
     #   - do not use a hyphen for a new key: value pair;
-    #   - enclose all string values with double quotes.
+    #   - enclose all content with double quotes.
+    #
+    # ````````````````````````````````````````````````````````````````````````
+    invalid:
+      "0.0.0.0": "Open to all",
+      "10.91.0.0": "Private subnet",
+      "127.0.0.1": "Localhost",
+      "255.255.255.0": "Subnet mask"
 
     # ````````````````````````````````````````````````````````````````````````
+    # prefix
+    # 
+    # - The prefix (e.g., `/32` in `123.456.789.012/32`) 
+    #   specifies the number of IP addresses within 
+    #   a base IP (e.g., `123.456.789.012` in `123.456.789.012/32`) 
+    # - Here, the prefix is capped in order to prevent a user to open up the
+    #   WorkSpace directory to an unexpectedly large set of IP addresses.
+    # - Play around with it: https://www.cidr.xyz
+    # - Update pre-set values.
+    # 
+    # ````````````````````````````````````````````````````````````````````````
+    prefix:
+      default: 32  # that is, 1 IP address in your CIDR Base IP
+      min: 27  # that is, 32 IP addresses in your CIDR Base IP
     
-    invalid:
-      0.0.0.0: "Open to all",
-      10.91.0.0: "Private subnet",
-      127.0.0.1: "Localhost",
-      255.255.255.0: "Subnet mask"
-
 
   # ``````````````````````````````````````````````````````````````````````````
   # ip_acg_properties
@@ -141,7 +146,7 @@ user_input_validation:
   ``````````````````````````````````````````````````````````````````````````
   ip_acg_properties: 
 
-    ip_acg_name_char_length:
+    name_char_length:
       max: 50    
-    ip_rules_in_acg_amount:
+    rules_amt:
       max: 10
