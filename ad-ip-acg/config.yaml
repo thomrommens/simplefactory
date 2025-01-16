@@ -2,15 +2,18 @@
 # IP ACCESS CONTROL GROUPS
 # CONFIG
 # ============================================================================
+# ````````````````````````````````````````````````````````````````````````````
+# ip_acgs
+#
+# - Update properties of the suggested IP ACGs that you want to apply 
+#   to each AWS directory, below.
+# - Add extra ACGs by copy-pasting the suggested items:
+#   - each ACG is a new dictionary, indicated by a hyphen, 
+#     in the list of `ip_acgs`;
+#   - use the same properties as the suggested IP ACGs;
+#   - enclose all string values with double quotes.
 
-# ----------------------------------------------------------------------------
-# IP ACGS
-# ----------------------------------------------------------------------------
-
-# - Update properties of the IP ACG(s) that you want to apply 
-#   to each AWS directory.
-# - Add extra ACGs (each ACG a dictionary item, indicated by a hyphen) 
-#   by copy-pasting. Use the same properties as a previous item.
+# ````````````````````````````````````````````````````````````````````````````
 
 ip_acgs:
 
@@ -20,7 +23,7 @@ ip_acgs:
   rule_set: 
   - 123.456.789.012
   - 345.678.901.234
-  rule_set_last_modfied: 2025-01-01--12-00-00
+  rule_set_last_modfied: "2025-01-01--12-00-00"
 
 - name: "IP ACG 2"
   desc: "Control inbound IP addresses from ACG 2"
@@ -31,12 +34,22 @@ ip_acgs:
   - 901.234.567.890
   rule_set_last_modfied: "2025-01-02--12-00-00"
 
-# - Update suggested tags, and/or add new tags.
+
+# ````````````````````````````````````````````````````````````````````````````
+# tags
+#
+# - Update suggested tag keys and values.
+# - Add new tags:
+#   - each key: value pair is a new dictionary item;
+#   - do not use a hyphen for a new key: value pair;
+#   - enclose all string values with double quotes.
 # - At runtime, `placeholder` values will be replaced with actual values.
+
+# ````````````````````````````````````````````````````````````````````````````
 
 tags:
 
-- IPACGName: "placeholder"
+  IPACGName: "placeholder"
   Application: "WorkSpacesEnv"
   Environment: "test"
   Department: "ThatDepartment"
@@ -47,55 +60,88 @@ tags:
   RuleSetLastApplied: "placeholder"
 
 
-# ----------------------------------------------------------------------------
-# WORKSPACE DIRECTORIES
-# ----------------------------------------------------------------------------
-# - Do you want to apply IP ACGs to all your Active & Registered 
-# -  WorkSpace directories?
-#    - if yes: leave this setting as-is.
-#    - if no:
-#      - update the placeholder directory below.
-#      - if you have more than one directory, add additional directories, 
-#        by copy-pasting. Use the same properties as a previous item.
+# ````````````````````````````````````````````````````````````````````````````
+# workspace_directories
+#
+# - Do you want to apply IP ACGs to *all* of the Active & Registered 
+#   WorkSpace directories in your AWS account?
+#
+#   - if yes: leave this setting as-is.
+#
+#   - if no:
+#
+#     - update the placeholder directory below.
+#     - if you have more than one directory, add additional directories
+#       by copy-pasting the suggested item:
+#       - each workspace_directory is a new dictionary, indicated by a hyphen, 
+#         in the list of `workspace_directories`;
+#       - use the same properties as the suggested workspace_directory below;
+#       - enclose all string values with double quotes.
+
+# ````````````````````````````````````````````````````````````````````````````
 
 workspace_directories:
+
 - id: 
   name: 
 
+# ````````````````````````````````````````````````````````````````````````````
+# user_input_validation
+# 
+# [!] Do not touch if you're not sure what you are doing.
 
-# ----------------------------------------------------------------------------
-# APP CONSTRAINTS (ADVANCED)
-# ----------------------------------------------------------------------------
+# ````````````````````````````````````````````````````````````````````````````
 
-# Behaviour of the app.
-# - do not touch if you're not sure what you are doing.
+user_input_validation:  
 
+  ip_address:
 
-input_validation:
-# ref: https://www.cidr.xyz for a quick check of impact of `default` and `min`.
-- ip_address_prefix:
-  default: 32  # that is, 1 IP address in your CIDR Base IP
-  min: 27  # that is, 32 IP addresses in your CIDR Base IP
+    # ````````````````````````````````````````````````````````````````````````
+    # prefix
+    # 
+    # - The prefix (e.g., `/32` in `123.456.789/012/32`) 
+    #   specifies the number of IP addresses within a base IP. 
+    # - Here, the prefix is capped in order to prevent a user to open up the
+    #   WorkSpace directory to an unexpectedly large set of IP addresses.
+    # - Play around with it: https://www.cidr.xyz
+    # - Update pre-set values.
 
-
-- invalid_user_input:
-    0.0.0.0: "Open to all",
-    10.91.0.0: "Private subnet",
-    127.0.0.1: "Localhost",
-    255.255.255.0: "Subnet mask"
-
-
-# AWS implied limits. 
-# Only update when AWS updates limits.
-# ref: https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces-ip-access-control-groups.html
-resource_limits:
-  # number of characters
-  - ip_acg_name_length:
-    max: 50
+    # ````````````````````````````````````````````````````````````````````````
     
-  # number of IP addresses (rules)
-  - ip_rules_in_acg_amount:
-    max: 10
+    prefix:
+      default: 32  # that is, 1 IP address in your CIDR Base IP
+      min: 27  # that is, 32 IP addresses in your CIDR Base IP
+    
+    # ````````````````````````````````````````````````````````````````````````
+    # invalid
+    # 
+    # - Update suggested values.
+    # - Add new invalid IP addresses:
+    #   - each key: value pair is a new dictionary item;
+    #   - do not use a hyphen for a new key: value pair;
+    #   - enclose all string values with double quotes.
 
-vpcs_prespecified
+    # ````````````````````````````````````````````````````````````````````````
+    
+    invalid:
+      0.0.0.0: "Open to all",
+      10.91.0.0: "Private subnet",
+      127.0.0.1: "Localhost",
+      255.255.255.0: "Subnet mask"
 
+
+  # ``````````````````````````````````````````````````````````````````````````
+  # ip_acg_properties
+  # 
+  # - Name length, as well as the number of IP addresses (rules) allowed to
+  #   store in a single IP ACGs, are limited by AWS.
+  # - Only update suggested values when AWS updates limits.
+  #   - ref: https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces-ip-access-control-groups.html 
+  # 
+  ``````````````````````````````````````````````````````````````````````````
+  ip_acg_properties: 
+
+    ip_acg_name_char_length:
+      max: 50    
+    ip_rules_in_acg_amount:
+      max: 10
