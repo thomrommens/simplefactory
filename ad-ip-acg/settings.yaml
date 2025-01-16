@@ -6,7 +6,7 @@
 # ````````````````````````````````````````````````````````````````````````````
 # ip_acgs
 
-# - `rule_set`
+# - `rules`
 #    - specify a maximum of 10 rules.
 #    - a single rule can be a *single* IP address (prefix /32),
 #        or a *range* of IP addresses (prefix lower than /32). 
@@ -30,14 +30,14 @@ ip_acgs:
 - name: "Domain A"
   desc: "Allowed inbound IP addresses from Domain A"
   origin: "This Department"
-  rule_set: 
+  rules: 
   - "123.456.789.012": "This trusted single host"
   - "345.678.901.234/27": "That trusted series of hosts"
 
 - name: "Domain B"
   desc: "Allowed inbound IP addresses from Domain B"
   origin: "That Department"
-  rule_set: 
+  rules: 
   - "567.890.123.456/30": "This trusted series of hosts"
   - "789.012.345.678": "That trusted host"
   - "901.234.567.890": "Yet another trusted host"
@@ -67,7 +67,7 @@ tags:
 
 
 # ````````````````````````````````````````````````````````````````````````````
-# workspace_directories
+# directories
 #
 # - Do you want to apply IP ACGs to *all* of the Active & Registered 
 #   WorkSpace directories in your AWS account?
@@ -79,13 +79,13 @@ tags:
 #     - update the placeholder directory below.
 #     - if you have more than one directory, add additional directories
 #       by copy-pasting the suggested item:
-#       - each workspace_directory is a new dictionary, indicated by a hyphen, 
-#         in the list of `workspace_directories`;
-#       - use the same properties as the suggested workspace_directory below;
+#       - each directory is a new dictionary, indicated by a hyphen, 
+#         in the list of `directories`;
+#       - use the same properties as the suggested directory below;
 #       - enclose all content with double quotes.
 
 # ````````````````````````````````````````````````````````````````````````````
-workspace_directories:
+directories:
 
 - id: 
   name: 
@@ -104,7 +104,7 @@ user_input_validation:
     # ````````````````````````````````````````````````````````````````````````
     # invalid
     # 
-    # - Some values do not make sense for IP addresses in IP ACGs.
+    # - Some values do not make sense in IP ACGs.
     # - Update suggested values.
     # - Add new invalid IP addresses:
     #   - each key: value pair is a new dictionary item;
@@ -138,8 +138,9 @@ user_input_validation:
   # ``````````````````````````````````````````````````````````````````````````
   # ip_acg_properties
   # 
-  # - Name length, as well as the number of IP addresses (rules) allowed to
-  #   store in a single IP ACGs, are limited by AWS.
+  # - Name length, as well as the number of rules 
+  #   (IP addresses / address ranges) allowed to store in a single IP ACGs, 
+  #   have been limited by AWS.
   # - Only update suggested values when AWS updates limits.
   #   - ref: https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces-ip-access-control-groups.html 
   # 

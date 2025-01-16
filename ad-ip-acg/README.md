@@ -35,3 +35,7 @@ command to run if program contains helper info
 ## Authors
 
 Thom Rommens, [Simplefactory](https://simplefactory.substack.com)
+
+
+## Misc add
+directory = always WorkSpace directory here

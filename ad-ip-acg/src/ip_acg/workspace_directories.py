@@ -1,8 +1,10 @@
-def get_workspace_directories():
-    # if value in work_instruction for WorkSpaceDirectory, follow
+from config import workspaces
+
+def get_directories():
+    # if value in work_instruction for Directory, follow
     # else, get from AWS boto3
 
-    response = workspaces.describe_workspace_directories()
+    response = workspaces.describe_directories()
 
     if response["Directories"]:
         return response
@@ -13,19 +15,19 @@ def get_workspace_directories():
     # logger.debug(Raw info)
 
 
-def select_workspace_directories():
+def select_directories():
     # Required? Perhaps do anyway
     pass
 
 
-def select_workspace_directory_info(workspace_directories):
-    workspace_directories = []
-    for workspace_directory in workspace_directories["Directories"]:
-        workspace_directories.append(
-            WorkSpaceDirectory(
-                id=workspace_directory["DirectoryId"],
-                name=workspace_directory["DirectoryName"],
-                type=workspace_directory["DirectoryType"]
+def select_directory_info(directories):
+    directories = []
+    for directory in directories["Directories"]:
+        directories.append(
+            Directory(
+                id=directory["DirectoryId"],
+                name=directory["DirectoryName"],
+                type=directory["DirectoryType"]
             )
         )
-    return workspace_directories
+    return directories

@@ -39,12 +39,12 @@ def sanitize_rules():
         "ruleDesc": "value__desc_from_rule_in_yaml"
     }
 
-    target_rule_set_sorted = sorted(
-        target_rule_set,
-        key=lambda target_rule_set: target_rule_set["ipRule"]
+    target_rules_sorted = sorted(
+        target_rules,
+        key=lambda target_rules: target_rules["ipRule"]
     )
 
-    # validate if any content in target_rule_set
+    # validate if any content in target_rules
     # validate if not larger than max number of IP rules
     pass
 
@@ -64,7 +64,7 @@ def sanitize_work_instruction():
     # WorkInstructionRaw to WorkInstruction
     # -> work_instruction = WorkInstruction()
     #   -> ip_acg_raw = IP_ACG()
-    #   -> workspace_directory_raw = WorkSpaceDirectory()
+    #   -> directory_raw = Directory()
 
     # logger.debug("Sanitized work_instruction:")
 

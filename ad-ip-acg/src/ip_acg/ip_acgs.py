@@ -1,3 +1,7 @@
+from dataclasses import dataclass
+from config import workspaces
+
+
 def describe():
     response = workspaces.describe_ip_groups()
     ip_acgs = []
@@ -42,6 +46,10 @@ def disassociate():
         GroupIds=group_ids
     )
 
+
 def delete():
+    """
+    default: deletes all!
+    """
     # check if any exists
     workspaces.delete_ip_group(GroupId=group_id)

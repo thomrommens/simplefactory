@@ -1,6 +1,7 @@
 CONFIG_FILE = ""
 
-def read_config():
+
+def read_settings():
     # yaml to dict
     # yaml.safe_load(file)
     pass

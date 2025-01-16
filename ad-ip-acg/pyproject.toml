@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 boto3 = "^1.36.0"
+click = "^8.1.8"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+import click
 from config import setup_logger
+from dataclasses import dataclass
 import logging
 
 
@@ -13,15 +14,17 @@ class Rule:
     """Rule = IP address, or range of IP addresses"""
     pass
 
+
 @dataclass
 class IP_ACG:
     name: str
     desc: str
     origin: str
-    rule_set: list
+    rules: list[Rule]
+
 
 @dataclass
-class WorkSpaceDirectory:
+class Directory:
     id: str
     name: str
     type: str
@@ -30,35 +33,60 @@ class WorkSpaceDirectory:
 @dataclass
 class WorkInstruction:
     ip_acgs: list[IP_ACG]
-    workspace_directories: list[WorkSpaceDirectory]
+    directories: list[Directory]
 
 
-def main():
-    logger = setup_logger('my_logger', logging.DEBUG)
+@click.command()
+@click.option(
+    "--action", 
+    type=click.Choice(
+        ["dry_run", "create", "update", "delete"], 
+        case_sensitive=False
+    ), 
+    default="dry_run", 
+    help="Which action?"
+)
+def main(action):
+    """
+    Integrate program.
+    :param action: action requested by user on command line.
+    """
+    logger = setup_logger("my_logger", logging.DEBUG)
+
+    click.echo(f"Action selected: {action}")
+
+    logger.info(f"Selected route: [{action}]", extra={'depth': 1})
+
+    # ------------------------------------------------------------------------   
+    # COMMON ROUTE (applied for all routes)   
+    # ------------------------------------------------------------------------   
+    # describe directories/present IP ACGs
     
-    # Get user defined arguments from click 
-    # - https://click.palletsprojects.com/en/stable/
-
-    # Validate cmd line arguments
-    # route unrecognized; raise error
     
-    # Pick route for action = create/update/delete
-    # create/update:
-    #   - parse yaml
-    #   - create/overwrite
-    # delete:
-    #   - default: deletes all!
-    #   - disassociate
-    #   - delete
-    # check if IP ACG already exists, at any route; switch route accordingly
+    # ------------------------------------------------------------------------   
+    # SPECIFIC ROUTE
+    # ------------------------------------------------------------------------   
+    if action == "dry_run":
+        # report on described directories/present IP ACGs
+        # do not parse yaml
+        pass
+        
+    elif action in ("create, update"):
+        # parse yaml
+        # create/overwrite
 
+        if action == "create":
+            # associate
+            pass
 
-    # TODO if modify route, apply tag ModifiedBy
-    # TODO add dryrun (describe)?
-    # TODO: consistent naming 'rule' vs ip address
-    # TODO: 'workspace_directory' -> 'directory'
-    pass
+    elif action in ("delete"):
+        # disassociate
+        # delete
+        pass
 
+    else:
+        raise SomeException("Unexpected error")
+      
 
 if __name__ == "__main__":
     main()
