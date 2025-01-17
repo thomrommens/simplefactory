@@ -5,6 +5,8 @@ workspaces = boto3.client("workspaces", region_name="eu-west-1")
 
 log_level = logging.INFO
 
+HR = "=" * 60
+
 
 class DepthFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, style="%"):

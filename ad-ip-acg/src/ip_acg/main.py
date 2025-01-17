@@ -1,6 +1,6 @@
 import click
 
-from config import setup_logger
+from config import HR, setup_logger
 from exceptions import SomeException
 from ip_acgs import delete, describe
 
@@ -9,37 +9,56 @@ from ip_acgs import delete, describe
 @click.option(
     "--action", 
     type=click.Choice(
-        ["dry_run", "create", "update", "delete"], 
+        ["create", "update", "delete"], 
         case_sensitive=False
     ), 
-    default="dry_run", 
-    help="Which action?"
+    default="create", 
+    help="Which IP ACG action would you like to do??"
+)
+@click.option(
+    "--dryrun", 
+    type=click.Choice(
+        ["true", "false"], 
+        case_sensitive=False
+    ), 
+    default="true", 
+    help=(
+        "Enable dryrun mode? "
+        "This only shows the plan or inventory, " 
+        "and does not actually apply anything in AWS."
+    )
 )
 @click.option(
     "--debug", 
     type=click.Choice(
-        ["false", "true"], 
+        ["true", "false"], 
         case_sensitive=False
     ), 
     default="false", 
     help="Enable debug mode?"
 )
-def main(action, debug):
+def main(action, dryrun, debug):
     """
     Integrate program.
     :param action: action requested by user on command line.
     """
     logger = setup_logger("ip_acg_logger")
-    logger.info(f"{'=' * 70}")
+
+    logger.info(HR)
     logger.info(f"START MODULE: AMAZON WORKSPACES IP ACG")
 
-    logger.info(f"Selected action: [{action}]", extra={'depth': 1})
-    logger.info(f"Debug mode enabled: [{debug}]", extra={'depth': 1})
+    logger.info(f"Selected action:      [{action}]", extra={'depth': 1})
+    logger.info(f"Dry run mode enabled: [{dryrun}]", extra={'depth': 1})
+    logger.info(f"Debug mode enabled:   [{debug}]", extra={'depth': 1})
 
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
     # ------------------------------------------------------------------------   
+    directories = {}
+
     # ip_acgs = describe()
+    ip_acgs = {}
+
     
     
     # ------------------------------------------------------------------------   
@@ -50,7 +69,7 @@ def main(action, debug):
         # do not parse yaml
         pass
         
-    elif action in ("create, update"):
+    if action in ("create, update"):
         # parse yaml
         # create/overwrite
 
@@ -68,7 +87,7 @@ def main(action, debug):
         raise SomeException("Unexpected error")
     
     logger.info(f"FINISH MODULE: AMAZON WORKSPACES IP ACG")
-    logger.info(f"{'=' * 70}")
+    logger.info(HR)
       
 
 if __name__ == "__main__":

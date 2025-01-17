@@ -2,6 +2,9 @@
 # IP ACCESS CONTROL GROUPS
 # Settings
 # ============================================================================
+# This settings document only has effect on `create` and `update` actions
+#  of this IP-ACG program.
+# The `delete` action is unaffected by this settings document.
 
 # ````````````````````````````````````````````````````````````````````````````
 # ip_acgs
