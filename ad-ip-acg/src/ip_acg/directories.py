@@ -7,38 +7,45 @@ from models import Directory
 
 
 def get_directories():
+    """
     # if value in work_instruction for Directory, follow
-    # else, get from AWS boto3
-
-    response = workspaces.describe_directories()
+    # else, get from AWS
+    """
+    response = workspaces.describe_workspace_directories()
+    # print(f"describe_workspace_directories - response: {response}")
 
     if response["Directories"]:
-        return response
+        return response["Directories"]
     else:
         raise SomeException()
 
-    # collect raw info
-    # logger.debug(Raw info)
 
-
-def select_directories():
-    # Required? Perhaps do anyway
-    pass
-
-
-def select_directory_info(directories):
+def sel_directories(directories_received: dict) -> list[Directory]:
+    """
+    There might currently be no IP ACG in a directory.
+    Then, for that directory, the key `ipGroupIds`
+    is not present in the response.
+    """
     directories = []
-    for directory in directories["Directories"]:
-        directories.append(
-            Directory(
-                id=directory["DirectoryId"],
-                name=directory["DirectoryName"],
-                type=directory["DirectoryType"]
-            )
+
+    for directory_received in directories_received:
+        directory = Directory(
+            id=directory_received.get("DirectoryId"),
+            name=directory_received.get("DirectoryName"),
+            type=directory_received.get("DirectoryType"),
+            state=directory_received.get("State"),
+            ip_acgs=directory_received.get("ipGroupIds"),
+            # TODO "ipGroupIds" not showing in response
+            # workspace_directory_name=directory_received.get("WorkspaceDirectoryName"),
+            # workspace_directory_desc=directory_received.get("WorkspaceDirectoryDescription"),
+            # workspace_type=directory_received.get("WorkspaceType"),
+            # error_message=directory_received.get("ErrorMessage"),
+            # TODO: definitively remove
         )
+    directories.append(directory)
+
     return directories
 
-# ---
 
 def report_directory_info():
 

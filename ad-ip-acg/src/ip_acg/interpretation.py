@@ -1,13 +1,17 @@
-CONFIG_FILE = ""
+import yaml
+
+from config import SETTINGS_FILE_PATH
 
 
-def read_settings():
-    # yaml to dict
-    # yaml.safe_load(file)
-    pass
+def get_settings():
+
+    with open(SETTINGS_FILE_PATH, "r") as settings_file:
+        settings = yaml.safe_load(settings_file)
+
+    return settings
 
 
-def read_validation_baseline():
+def set_validation_baseline():
     # yaml-dict to dict (select)
     return {
         "ip_address": {

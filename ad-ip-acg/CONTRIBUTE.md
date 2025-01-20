@@ -3,3 +3,5 @@
 
 - delete a specified set of IP ACGs
 (now, all are deleted)
+
+- add paginator - now smaller scale assumed 

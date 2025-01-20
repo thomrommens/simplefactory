@@ -1,11 +1,20 @@
+import os
 import boto3
 import logging
+from pathlib import Path
 
 workspaces = boto3.client("workspaces", region_name="eu-west-1")
 
 log_level = logging.INFO
 
-HR = "=" * 60
+HR = "=" * 88
+
+SETTINGS_FILE = "settings.yaml"
+SETTINGS_FILE_PATH = os.path.join(
+    Path().resolve(), 
+    "ad-ip-acg", 
+    SETTINGS_FILE
+)
 
 
 class DepthFormatter(logging.Formatter):

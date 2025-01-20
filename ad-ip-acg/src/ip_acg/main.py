@@ -1,8 +1,11 @@
 import click
+import prettyprinter as pp
 
 from config import HR, setup_logger
+from interpretation import get_settings
 from exceptions import SomeException
-from ip_acgs import delete, describe
+from directories import get_directories, sel_directories
+from ip_acgs import get_ip_acgs, sel_ip_acgs
 
 
 @click.command()
@@ -46,7 +49,6 @@ def main(action, dryrun, debug):
 
     logger.info(HR)
     logger.info(f"START MODULE: AMAZON WORKSPACES IP ACG")
-
     logger.info(f"Selected action:      [{action}]", extra={'depth': 1})
     logger.info(f"Dry run mode enabled: [{dryrun}]", extra={'depth': 1})
     logger.info(f"Debug mode enabled:   [{debug}]", extra={'depth': 1})
@@ -54,34 +56,41 @@ def main(action, dryrun, debug):
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
     # ------------------------------------------------------------------------   
-    directories = {}
-
-    # ip_acgs = describe()
-    ip_acgs = {}
-
     
-    
+    directories_received = get_directories()
+    directories = sel_directories(directories_received)
+    pp.pprint(directories, width=1)
+
+    ip_acgs_received = get_ip_acgs()
+    ip_acgs = sel_ip_acgs(ip_acgs_received)
+    pp.pprint(ip_acgs, width=1)
+
+    settings = get_settings()
+
     # ------------------------------------------------------------------------   
     # SPECIFIC ROUTE
     # ------------------------------------------------------------------------   
-    if action == "dry_run":
-        # report on described directories/present IP ACGs
-        # do not parse yaml
-        pass
         
     if action in ("create, update"):
-        # parse yaml
-        # create/overwrite
+        # I would do this: ...
 
-        if action == "create":
-            # associate
-            pass
+        if not dryrun:
+            # I do this: ...
+            
+            # create/overwrite
+            if action == "create":
+                # associate
+                pass
 
     elif action in ("delete"):
         if ip_acgs:
+            # I would do this: ...
+
+            if not dryrun:
+            # I do this: ...
             # disassociate
             # delete()
-            pass
+                pass
 
     else:
         raise SomeException("Unexpected error")
@@ -92,3 +101,9 @@ def main(action, dryrun, debug):
 
 if __name__ == "__main__":
     main()
+
+
+# TODO: directories vs workspace_directories: consistent
+# TODO: integrate logger across module
+# TODO: Ruff checker
+# TODO: remove prints

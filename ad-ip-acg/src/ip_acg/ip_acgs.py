@@ -1,16 +1,43 @@
 from config import workspaces
-from models import IP_ACG, Directory
+from exceptions import SomeException
+from models import IP_ACG, Directory, Rule
 
 
-def describe() -> list[IP_ACG]:
+def get_ip_acgs() -> list[IP_ACG]:
+    """
+    xx
+    """
     response = workspaces.describe_ip_groups()
+    # print(f"describe_ip_groups - response: {response}")
+
+    if response["Result"]:
+        return response["Result"]
+    else:
+        raise SomeException()
+
+
+def sel_ip_acgs(ip_acgs_received: dict) -> list[IP_ACG]:
+    """
+    xx
+    """
     ip_acgs = []
-    for item in response.get("Result"):
+
+    for ip_acg_received in ip_acgs_received:
         ip_acg = IP_ACG(            
-            id=item.get("groupId"),
-            name=item.get("groupName"),
-            desc=""
+            id=ip_acg_received.get("groupId"),
+            name=ip_acg_received.get("groupName"),
+            desc=ip_acg_received.get("groupDesc"),
+            rules=[
+                Rule(
+                    ip=rule.get("ipRule"),
+                    desc=rule.get("ruleDesc")
+                )
+                for rule 
+                in ip_acg_received.get("userRules")
+            ]
         )
+    ip_acgs.append(ip_acg)
+
     return ip_acgs
 
 

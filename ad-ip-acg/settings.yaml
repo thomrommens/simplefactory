@@ -2,32 +2,32 @@
 # IP ACCESS CONTROL GROUPS
 # Settings
 # ============================================================================
-# This settings document only has effect on `create` and `update` actions
+# This settings document only has effect on 'create' and 'update' actions
 #  of this IP-ACG program.
-# The `delete` action is unaffected by this settings document.
+# The 'delete' action is unaffected by this settings document.
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # ip_acgs
 
-# - `rules`
+# - 'rules'
 #    - specify a maximum of 10 rules.
 #    - a single rule can be a *single* IP address (prefix /32),
 #        or a *range* of IP addresses (prefix lower than /32). 
 #    - if no prefix is set, each rule will be automatically appended with 
-#       the prefix for a single IP address, i.e.,`/32`. 
+#       the prefix for a single IP address, i.e.,'/32'. 
 #    - set rules smartly using a prefix if you want to 
-#       cover multiple IP addresses within one group, e.g., add `/27`.
+#       cover multiple IP addresses within one group, e.g., add '/27'.
 #       - use https://www.cidr.xyz for a quick insight.
 
 # - Update properties of the suggested IP ACGs that you want to apply 
 #   to each AWS directory, below.
 # - Add extra ACGs by copy-pasting the suggested items:
 #   - each ACG is a new dictionary, indicated by a hyphen, 
-#     in the list of `ip_acgs`;
+#     in the list of 'ip_acgs';
 #   - use the same properties as the suggested IP ACGs;
 #   - enclose all content with double quotes.
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ip_acgs:
 
 - name: "Domain A"
@@ -45,7 +45,7 @@ ip_acgs:
   - "789.012.345.678": "That trusted host"
   - "901.234.567.890": "Yet another trusted host"
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # tags
 #
 # - Update suggested tag keys and values.
@@ -53,9 +53,9 @@ ip_acgs:
 #   - each key: value pair is a new dictionary item;
 #   - do not use a hyphen for a new key: value pair;
 #   - enclose all content with double quotes.
-# - At runtime, `placeholder` values will be replaced with actual values.
+# - At runtime, 'placeholder' values will be replaced with actual values.
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 tags:
 
   IPACGName: "placeholder"
@@ -69,7 +69,7 @@ tags:
   RuleSetLastApplied: "placeholder"
 
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # directories
 #
 # - Do you want to apply IP ACGs to *all* of the Active & Registered 
@@ -83,28 +83,28 @@ tags:
 #     - if you have more than one directory, add additional directories
 #       by copy-pasting the suggested item:
 #       - each directory is a new dictionary, indicated by a hyphen, 
-#         in the list of `directories`;
+#         in the list of 'directories';
 #       - use the same properties as the suggested directory below;
 #       - enclose all content with double quotes.
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 directories:
 
 - id: 
   name: 
 
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # user_input_validation
 # 
 # [!] Do not touch if you're not sure what you are doing.
 
-# ````````````````````````````````````````````````````````````````````````````
+# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 user_input_validation:  
 
   ip_address:
 
-    # ````````````````````````````````````````````````````````````````````````
+    # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     # invalid
     # 
     # - Some values do not make sense in IP ACGs.
@@ -114,31 +114,31 @@ user_input_validation:
     #   - do not use a hyphen for a new key: value pair;
     #   - enclose all content with double quotes.
     #
-    # ````````````````````````````````````````````````````````````````````````
+    # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     invalid:
-      "0.0.0.0": "Open to all",
-      "10.91.0.0": "Private subnet",
-      "127.0.0.1": "Localhost",
+      "0.0.0.0": "Open to all"
+      "10.91.0.0": "Private subnet"
+      "127.0.0.1": "Localhost"
       "255.255.255.0": "Subnet mask"
 
-    # ````````````````````````````````````````````````````````````````````````
+    # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     # prefix
     # 
-    # - The prefix (e.g., `/32` in `123.456.789.012/32`) 
+    # - The prefix (e.g., '/32' in '123.456.789.012/32') 
     #   specifies the number of IP addresses within 
-    #   a base IP (e.g., `123.456.789.012` in `123.456.789.012/32`) 
+    #   a base IP (e.g., '123.456.789.012' in '123.456.789.012/32') 
     # - Here, the prefix is capped in order to prevent a user to open up the
     #   WorkSpace directory to an unexpectedly large set of IP addresses.
     # - Play around with it: https://www.cidr.xyz
     # - Update pre-set values.
     # 
-    # ````````````````````````````````````````````````````````````````````````
+    # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     prefix:
       default: 32  # that is, 1 IP address in your CIDR Base IP
       min: 27  # that is, 32 IP addresses in your CIDR Base IP
     
 
-  # ``````````````````````````````````````````````````````````````````````````
+  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # ip_acg_properties
   # 
   # - Name length, as well as the number of rules 
@@ -147,7 +147,7 @@ user_input_validation:
   # - Only update suggested values when AWS updates limits.
   #   - ref: https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces-ip-access-control-groups.html 
   # 
-  ``````````````````````````````````````````````````````````````````````````
+  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   ip_acg_properties: 
 
     name_char_length:

@@ -4,15 +4,17 @@ from dataclasses import dataclass
 @dataclass
 class Rule:
     """Rule = IP address, or range of IP addresses"""
-    pass
+    ip: str
+    desc: str
 
 
 @dataclass
 class IP_ACG:
+    id: str
     name: str
     desc: str
-    origin: str
     rules: list[Rule]
+    origin: str = None # TODO keep?
 
 
 @dataclass
@@ -20,6 +22,8 @@ class Directory:
     id: str
     name: str
     type: str
+    state: str
+    ip_acgs: list[IP_ACG]
 
 
 @dataclass
