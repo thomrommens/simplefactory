@@ -1,5 +1,6 @@
+from dataclasses import asdict
+import json
 import click
-import prettyprinter as pp
 
 from config import HR, setup_logger
 from interpretation import get_settings, get_validation_baseline, get_work_instruction
@@ -45,13 +46,13 @@ def main(action, dryrun, debug):
     Integrate program.
     :param action: action requested by user on command line.
     """
-    logger = setup_logger("ip_acg_logger")
+    logger = setup_logger("ip_acg_logger", debug)
 
     logger.info(HR)
     logger.info(f"START MODULE: AMAZON WORKSPACES IP ACG")
-    logger.info(f"Selected action:      [{action}]", extra={'depth': 1})
-    logger.info(f"Dry run mode enabled: [{dryrun}]", extra={'depth': 1})
-    logger.info(f"Debug mode enabled:   [{debug}]", extra={'depth': 1})
+    logger.info(f"Selected action:      [{action}]", extra={"depth": 1})
+    logger.info(f"Dry run mode enabled: [{dryrun}]", extra={"depth": 1})
+    logger.info(f"Debug mode enabled:   [{debug}]", extra={"depth": 1})
 
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
@@ -59,24 +60,45 @@ def main(action, dryrun, debug):
     # Directories
     directories_received = get_directories()
     directories = sel_directories(directories_received)
-    pp.pprint(directories, width=1)
+    directories_as_dict = [asdict(directory) for directory in directories]
+    logger.debug(
+        f"Directories parsed:\n{json.dumps(directories_as_dict, indent=4)}", 
+        extra={"depth": 1}
+    )
 
     # IP ACGs
     ip_acgs_received = get_ip_acgs()
     ip_acgs = sel_ip_acgs(ip_acgs_received)
-    pp.pprint(ip_acgs, width=1)
+    ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
+    logger.debug(
+        f"IP ACGs parsed:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
+        extra={"depth": 1}
+    )   
     
     # Settings
     settings = get_settings()
+    logger.debug(
+        f"Settings retrieved from YAML file:\n{json.dumps(settings, indent=4)}", 
+        extra={"depth": 1}
+    )
     
+    # TODO: make pretty print for debug (pprint/format does not work)
     # - validation
     validation_baseline = get_validation_baseline(settings)
-    pp.pprint(validation_baseline, width=1)
+    logger.debug(
+        f"Validation baseline parsed:\n{json.dumps(asdict(validation_baseline), indent=4)}", 
+        extra={"depth": 1}
+    )   
 
+    # TODO: make pretty print for debug (pprint/format does not work)
     # - work instruction
     work_instruction = get_work_instruction(settings)
-    pp.pprint(work_instruction, width=1)
+    logger.debug(
+        f"Work instruction parsed:\n{json.dumps(asdict(work_instruction), indent=4)}", 
+        extra={"depth": 1}
+    )   
 
+ 
     
     # ------------------------------------------------------------------------   
     # SPECIFIC ROUTE

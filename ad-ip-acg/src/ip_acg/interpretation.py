@@ -31,9 +31,8 @@ def get_work_instruction(settings: dict):
 
     return WorkInstruction(
         directories=[
-            Directory(id=id, name=name)
+            Directory(id=directory["id"], name=directory["name"])
             for directory in settings["directories"]
-            for id, name in directory.items()
         ],
         ip_acgs=[
             IP_ACG(

@@ -5,8 +5,6 @@ from pathlib import Path
 
 workspaces = boto3.client("workspaces", region_name="eu-west-1")
 
-log_level = logging.INFO
-
 HR = "=" * 88
 
 SETTINGS_FILE = "settings.yaml"
@@ -27,8 +25,13 @@ class DepthFormatter(logging.Formatter):
         return super().format(record)
 
 
-def setup_logger(name, level=log_level):
+def setup_logger(name, debug):
     logger = logging.getLogger(name)
+
+    level = logging.INFO
+    if debug == "true":  # TODO: convert to actual bool
+        level = logging.DEBUG
+
     logger.setLevel(level)
 
     ch = logging.StreamHandler()

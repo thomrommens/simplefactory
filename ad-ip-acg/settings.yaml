@@ -81,7 +81,7 @@ tags:
 # - Do you want to apply IP ACGs to *all* of the Active & Registered 
 #   WorkSpace directories in your AWS account?
 #
-#   - if yes: leave this setting as-is.
+#   - if yes: leave 'id' and 'name' to None.
 #
 #   - if no:
 #
@@ -96,8 +96,8 @@ tags:
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 directories:
 
-- id: 
-  name: 
+- id: None
+  name: None
 
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
