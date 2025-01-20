@@ -40,16 +40,16 @@ ip_acgs:
   desc: "Allowed inbound IP addresses from Domain A"
   origin: "This Department"
   rules: 
-  - "123.456.789.012": "This trusted single host"
-  - "345.678.901.234/27": "That trusted series of hosts"
+  - "104.27.176.150": "This trusted single host"
+  - "203.0.113.55/27": "That trusted series of hosts"
 
 - name: "Domain B"
   desc: "Allowed inbound IP addresses from Domain B"
   origin: "That Department"
   rules: 
-  - "567.890.123.456/30": "This trusted series of hosts"
-  - "789.012.345.678": "That trusted host"
-  - "901.234.567.890": "Yet another trusted host"
+  - "198.51.100.77/30": "This trusted series of hosts"
+  - "45.33.32.156": "That trusted host"
+  - "67.207.82.32": "Yet another trusted host"
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # tags

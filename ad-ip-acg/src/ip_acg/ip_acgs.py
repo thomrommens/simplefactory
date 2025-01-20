@@ -54,6 +54,20 @@ def create(ip_acg: IP_ACG, tags: dict) -> str:
 
 
 def update_rules(ip_acg: IP_ACG):
+
+    #  target_rule = {
+    #     "ipRule": "key",
+    #     "ruleDesc": "value__desc_from_rule_in_yaml"
+    # }
+
+    # target_rules = []
+
+    # target_rules_sorted = sorted(
+    #     target_rules,
+    #     key=lambda target_rules: target_rules["ipRule"]
+    # )
+
+
     response = workspaces.update_rules_of_ip_group(
         GroupId=ip_acg.id,
         UserRules=ip_acg.rules

@@ -46,3 +46,11 @@ directory = always WorkSpace directory here
 #   - if you update existing IP ACGs, technically the existing IP ACG
 #     will be disassciated from the directory, and deleted, before
 #     a new IP ACG will be created.
+# -> at update possible to keep, right?
+
+# dry run for validating settings.yaml
+
+
+IP Access Control Groups per Directory: You can associate up to 25 IP access control groups with a single directory
+
+IP Access Control Groups per Region: You can create up to 100 IP access control groups per AWS region

@@ -3,10 +3,15 @@ import json
 import click
 
 from config import HR, setup_logger
-from interpretation import get_settings, get_validation_baseline, get_work_instruction
+from interpretation import (
+    get_settings, 
+    get_validation_baseline, 
+    get_work_instruction
+)
 from exceptions import SomeException
 from directories import get_directories, sel_directories
 from ip_acgs import get_ip_acgs, sel_ip_acgs
+from validation import validate_work_instruction
 
 
 @click.command()
@@ -62,7 +67,7 @@ def main(action, dryrun, debug):
     directories = sel_directories(directories_received)
     directories_as_dict = [asdict(directory) for directory in directories]
     logger.debug(
-        f"Directories parsed:\n{json.dumps(directories_as_dict, indent=4)}", 
+        f"Directories found in AWS:\n{json.dumps(directories_as_dict, indent=4)}", 
         extra={"depth": 1}
     )
 
@@ -71,7 +76,7 @@ def main(action, dryrun, debug):
     ip_acgs = sel_ip_acgs(ip_acgs_received)
     ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
     logger.debug(
-        f"IP ACGs parsed:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
+        f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
         extra={"depth": 1}
     )   
     
@@ -81,25 +86,27 @@ def main(action, dryrun, debug):
         f"Settings retrieved from YAML file:\n{json.dumps(settings, indent=4)}", 
         extra={"depth": 1}
     )
-    
-    # TODO: make pretty print for debug (pprint/format does not work)
-    # - validation
+
+    # - validation baseline
     validation_baseline = get_validation_baseline(settings)
     logger.debug(
-        f"Validation baseline parsed:\n{json.dumps(asdict(validation_baseline), indent=4)}", 
+        f"Validation baseline parsed from YAML file:\n{json.dumps(asdict(validation_baseline), indent=4)}", 
         extra={"depth": 1}
     )   
 
-    # TODO: make pretty print for debug (pprint/format does not work)
     # - work instruction
-    work_instruction = get_work_instruction(settings)
+    work_instruction_raw = get_work_instruction(settings)
     logger.debug(
-        f"Work instruction parsed:\n{json.dumps(asdict(work_instruction), indent=4)}", 
+        f"Work instruction parsed from YAML file:\n{json.dumps(asdict(work_instruction_raw), indent=4)}", 
         extra={"depth": 1}
     )   
 
- 
-    
+    # Validation
+    work_instruction = validate_work_instruction(work_instruction_raw)
+    print("Work instruction after:")
+    print(json.dumps(asdict(work_instruction), indent=4))
+
+     
     # ------------------------------------------------------------------------   
     # SPECIFIC ROUTE
     # ------------------------------------------------------------------------   
@@ -112,6 +119,7 @@ def main(action, dryrun, debug):
             
             # create/overwrite
             if action == "create":
+                # create
                 # associate
                 pass
 
@@ -131,6 +139,8 @@ def main(action, dryrun, debug):
     logger.info(f"FINISH MODULE: AMAZON WORKSPACES IP ACG")
     logger.info(HR)
       
+
+# ============================================================================
 
 if __name__ == "__main__":
     main()
