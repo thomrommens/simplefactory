@@ -2,7 +2,7 @@ import click
 import prettyprinter as pp
 
 from config import HR, setup_logger
-from interpretation import get_settings
+from interpretation import get_settings, get_validation_baseline, get_work_instruction
 from exceptions import SomeException
 from directories import get_directories, sel_directories
 from ip_acgs import get_ip_acgs, sel_ip_acgs
@@ -56,17 +56,28 @@ def main(action, dryrun, debug):
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
     # ------------------------------------------------------------------------   
-    
+    # Directories
     directories_received = get_directories()
     directories = sel_directories(directories_received)
     pp.pprint(directories, width=1)
 
+    # IP ACGs
     ip_acgs_received = get_ip_acgs()
     ip_acgs = sel_ip_acgs(ip_acgs_received)
     pp.pprint(ip_acgs, width=1)
-
+    
+    # Settings
     settings = get_settings()
+    
+    # - validation
+    validation_baseline = get_validation_baseline(settings)
+    pp.pprint(validation_baseline, width=1)
 
+    # - work instruction
+    work_instruction = get_work_instruction(settings)
+    pp.pprint(work_instruction, width=1)
+
+    
     # ------------------------------------------------------------------------   
     # SPECIFIC ROUTE
     # ------------------------------------------------------------------------   

@@ -10,9 +10,9 @@ log_level = logging.INFO
 HR = "=" * 88
 
 SETTINGS_FILE = "settings.yaml"
+
 SETTINGS_FILE_PATH = os.path.join(
-    Path().resolve(), 
-    "ad-ip-acg", 
+    Path().resolve().parent.parent, 
     SETTINGS_FILE
 )
 

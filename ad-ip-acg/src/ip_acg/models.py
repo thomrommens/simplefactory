@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -10,23 +11,32 @@ class Rule:
 
 @dataclass
 class IP_ACG:
-    id: str
     name: str
     desc: str
     rules: list[Rule]
-    origin: str = None # TODO keep?
+    id: Optional[str] = None  # TODO keep?
+    origin: Optional[str] = None # TODO keep?
 
 
 @dataclass
 class Directory:
     id: str
     name: str
-    type: str
-    state: str
-    ip_acgs: list[IP_ACG]
+    ip_acgs: Optional[list[IP_ACG]] = None
+    type: Optional[str] = None
+    state: Optional[str] = None
+
+
+@dataclass
+class Validation:
+    invalid_rules: list[Rule]
+    prefix_default: str 
+    prefix_min: str
 
 
 @dataclass
 class WorkInstruction:
-    ip_acgs: list[IP_ACG]
     directories: list[Directory]
+    ip_acgs: list[IP_ACG]
+    tags: dict
+    

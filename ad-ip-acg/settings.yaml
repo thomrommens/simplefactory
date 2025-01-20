@@ -21,6 +21,12 @@
 
 # - Update properties of the suggested IP ACGs that you want to apply 
 #   to each AWS directory, below.
+#   - An IP ACG id is never specified;
+#     - at creation of new IP ACGs, you do not know it upfront;
+#     - at update of existing IP ACGs, technically the configuration in this
+#       document will just be recreated (not actually updated), with new
+#       IP ACG ids.
+
 # - Add extra ACGs by copy-pasting the suggested items:
 #   - each ACG is a new dictionary, indicated by a hyphen, 
 #     in the list of 'ip_acgs';
@@ -116,10 +122,10 @@ user_input_validation:
     #
     # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     invalid:
-      "0.0.0.0": "Open to all"
-      "10.91.0.0": "Private subnet"
-      "127.0.0.1": "Localhost"
-      "255.255.255.0": "Subnet mask"
+    - "0.0.0.0": "Open to all"
+    - "10.91.0.0": "Private subnet"
+    - "127.0.0.1": "Localhost"
+    - "255.255.255.0": "Subnet mask"
 
     # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     # prefix
@@ -139,7 +145,7 @@ user_input_validation:
     
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # ip_acg_properties
+  # ip_acg
   # 
   # - Name length, as well as the number of rules 
   #   (IP addresses / address ranges) allowed to store in a single IP ACGs, 
@@ -148,7 +154,7 @@ user_input_validation:
   #   - ref: https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces-ip-access-control-groups.html 
   # 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  ip_acg_properties: 
+  ip_acg: 
 
     name_char_length:
       max: 50    

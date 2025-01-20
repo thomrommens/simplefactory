@@ -39,3 +39,10 @@ Thom Rommens, [Simplefactory](https://simplefactory.substack.com)
 
 ## Misc add
 directory = always WorkSpace directory here
+
+
+#   - if you *create* IP ACGs, you don't know the 'id' yet.
+#     Leave "placeholder" as is.
+#   - if you update existing IP ACGs, technically the existing IP ACG
+#     will be disassciated from the directory, and deleted, before
+#     a new IP ACG will be created.
