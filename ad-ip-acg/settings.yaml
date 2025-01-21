@@ -43,11 +43,7 @@ ip_acgs:
   origin: "This Department"
   rules: 
   - "104.27.176.150": "This trusted single host"
-  - "203.0.113.55/32": "That trusted series of hosts"
-  - "203.1.113.55": "That trusted series of hosts2"
-  - "203.2.113.55": "That trusted series of hosts2"
-  - "203.3.113.55": "That trusted series of hosts2"
-  - "203.4.113.55": "That trusted series of hosts2"
+  - "203.0.113.55/31": "That trusted series of hosts"
 
 - name: "Domain D"
   desc: "Allowed inbound IP addresses from Domain B"

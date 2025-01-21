@@ -1,6 +1,9 @@
 import logging
+
+import pandas as pd
+from tabulate import tabulate
 from config import workspaces
-from exceptions import SomeException
+from exceptions import IPACGNoneFoundException
 from models import IP_ACG, Directory, Rule
 
 
@@ -20,7 +23,11 @@ def get_ip_acgs() -> list[IP_ACG]:
     if response["Result"]:
         return response["Result"]
     else:
-        raise SomeException()
+        raise IPACGNoneFoundException(
+            "No Workspace directories found. "
+            "Make sure to have at least 1 directory available with which "
+            "an IP ACG can be associated."
+        )
 
 
 def sel_ip_acgs(ip_acgs_received: dict) -> list[IP_ACG]:
@@ -46,6 +53,36 @@ def sel_ip_acgs(ip_acgs_received: dict) -> list[IP_ACG]:
     ip_acgs.append(ip_acg)
 
     return ip_acgs
+
+
+def show_ip_acgs(ip_acgs: list[IP_ACG]):
+    
+    if ip_acgs:
+        i = 0
+        for ip_acg in ip_acgs:
+            i += 1
+            row = {
+                "id": ip_acg.id,
+                "name": ip_acg.name,
+                "description": ip_acg.desc,
+            }
+            data = [(row)]
+            df = pd.DataFrame(data)
+            df.index += i
+            df = df.rename_axis("IP ACG #", axis="index")
+            print(f"{tabulate(df, headers='keys', tablefmt='fancy_grid')}")  # TODO deal with wide strings with rules
+            print(f"Rules of [IP ACG #{i} - {ip_acg.name}]:")
+            print("-------")
+            for rule in ip_acg.rules:
+                print(f"- {rule.ip} - {rule.desc}")
+            print("-------")
+            print("\n")
+            # TODO: prettify, also print with tabulate?
+
+            # TODO: plans with tablefmt=psql; realized styles with fancy_grid
+    else:
+        print("(No IP ACGs found)")
+
 
 
 def create(ip_acg: IP_ACG, tags: dict) -> str:

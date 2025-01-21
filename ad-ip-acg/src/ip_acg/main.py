@@ -3,14 +3,14 @@ import json
 import click
 
 from config import HR, setup_logger
+from exceptions import UnexpectedException
 from interpretation import (
     get_settings, 
     get_validation_baseline, 
     get_work_instruction
 )
-from exceptions import SomeException
-from directories import get_directories, sel_directories
-from ip_acgs import get_ip_acgs, sel_ip_acgs
+from directories import get_directories, sel_directories, show_directories
+from ip_acgs import get_ip_acgs, sel_ip_acgs, show_ip_acgs
 from validation import validate_work_instruction
 
 
@@ -62,42 +62,45 @@ def main(action, dryrun, debug):
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
     # ------------------------------------------------------------------------   
-    # # Directories
-    # directories_received = get_directories()
-    # directories = sel_directories(directories_received)
-    # directories_as_dict = [asdict(directory) for directory in directories]
-    # logger.debug(
-    #     f"Directories found in AWS:\n{json.dumps(directories_as_dict, indent=4)}", 
-    #     extra={"depth": 1}
-    # )
+    # Directories
+    directories_received = get_directories()
+    directories = sel_directories(directories_received)
+    directories_as_dict = [asdict(directory) for directory in directories]
+    logger.debug(
+        f"Directories found in AWS:\n{json.dumps(directories_as_dict, indent=4)}", 
+        extra={"depth": 1}
+    )
 
-    # # IP ACGs
-    # ip_acgs_received = get_ip_acgs()
-    # ip_acgs = sel_ip_acgs(ip_acgs_received)
-    # ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
-    # logger.debug(
-    #     f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
-    #     extra={"depth": 1}
-    # )   
+    # IP ACGs
+    ip_acgs_received = get_ip_acgs()
+    ip_acgs = sel_ip_acgs(ip_acgs_received)
+    ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
+    logger.debug(
+        f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
+        extra={"depth": 1}
+    )   
     
     # Settings retrieval
     settings = get_settings()
     logger.debug(
-        f"Settings retrieved from YAML file:\n{json.dumps(settings, indent=4)}", 
+        "Settings retrieved from YAML file:\n"
+        f"{json.dumps(settings, indent=4)}", 
         extra={"depth": 1}
     )
 
     # - validation baseline
     validation_baseline = get_validation_baseline(settings)
     logger.debug(
-        f"Validation baseline parsed from YAML file:\n{json.dumps(asdict(validation_baseline), indent=4)}", 
+        "Validation baseline parsed from YAML file:\n"
+        f"{json.dumps(asdict(validation_baseline), indent=4)}", 
         extra={"depth": 1}
     )   
 
     # - work instruction
     work_instruction_raw = get_work_instruction(settings)
     logger.debug(
-        f"Work instruction parsed from YAML file:\n{json.dumps(asdict(work_instruction_raw), indent=4)}", 
+        "Work instruction parsed from YAML file:\n"
+        f"{json.dumps(asdict(work_instruction_raw), indent=4)}", 
         extra={"depth": 1}
     )   
 
@@ -109,17 +112,30 @@ def main(action, dryrun, debug):
     )
     logger.debug(
         json.dumps(asdict(work_instruction), indent=4))
+    
+    # Before - status
+    logger.info("Current directories (before action):", extra={"depth": 1})
+    show_directories(directories)
 
+    logger.info("Current IP ACGs (before action):", extra={"depth": 1})
+    show_ip_acgs(ip_acgs)
      
     # ------------------------------------------------------------------------   
     # SPECIFIC ROUTE
     # ------------------------------------------------------------------------   
         
     if action in ("create, update"):
-        # I would do this: ...
+        logger.info(
+            "These IP ACGs "
+            f"{'would' if dryrun == 'true' else 'will'} "
+            f"be created:", 
+            extra={"depth": 1}
+        )
+        show_ip_acgs(work_instruction.ip_acgs)
 
         if not dryrun:
             # I do this: ...
+            # After - status
             
             # create/overwrite
             if action == "create":
@@ -129,7 +145,7 @@ def main(action, dryrun, debug):
 
     elif action in ("delete"):
         if ip_acgs:
-            # I would do this: ...
+            # After - would be status (dryrun)
 
             if not dryrun:
             # I do this: ...
@@ -138,7 +154,7 @@ def main(action, dryrun, debug):
                 pass
 
     else:
-        raise SomeException("Unexpected error")
+        raise UnexpectedException("Unexpected error")
     
     logger.info(f"FINISH MODULE: AMAZON WORKSPACES IP ACG")
     logger.info(HR)
@@ -151,7 +167,5 @@ if __name__ == "__main__":
 
 
 # TODO: directories vs workspace_directories: consistent
-# TODO: integrate logger across module
 # TODO: Ruff checker
-# TODO: remove prints
 # TODO: consistent: rule vs ip rule

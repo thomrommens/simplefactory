@@ -1,6 +1,4 @@
-# TODO: include Exceptions
-
-class SomeException(Exception):
+class DirectoryNoneFoundException(Exception):
     pass
 
 
@@ -29,4 +27,12 @@ class IPACGNameLengthException(Exception):
 
 
 class IPACGDescriptionLengthException(Exception):
+    pass
+
+
+class IPACGNoneFoundException(Exception):
+    pass
+
+
+class UnexpectedException(Exception):
     pass
