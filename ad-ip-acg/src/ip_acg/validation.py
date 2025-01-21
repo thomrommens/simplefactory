@@ -162,7 +162,7 @@ def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
         )
 
     logger.debug(
-        f"| Finish: validate IP rules of settings.yaml...", 
+        f"Finish: validate IP rules of settings.yaml...", 
         extra={"depth": 1}
         )
     return work_instruction
@@ -175,14 +175,18 @@ def validate_group_name(ip_acg):
     """
     Validate if IP ACG name not longer than name length.
     """
-    logger.debug(f"| | | Validate that the IP ACG name length is not longer than 50 characters...") # TODO dynamic
+    logger.debug(
+        "Validate that the IP ACG name length "
+        "is not longer than 50 characters...",
+        extra={"depth": 3}
+    ) # TODO dynamic
     len_group_name = len(ip_acg.name)
     if not len_group_name <= 50:
         raise IPACGNameLengthException(
             "The IP ACG group name contains "
             f"[{len_group_name}] characters; "
             "more than the [50] characters AWS allows. "   # TODO dynamic
-            f"{STD_INSTRUCTION}"
+            f"{STD_INSTRUCTION}",
         ) 
 
 
@@ -190,7 +194,11 @@ def validate_group_desc(ip_acg):
     """
     Validate if IP ACG description not longer than description length.
     """
-    logger.debug(f"| | | Validate that the IP ACG description is not longer than 255 characters...") # TODO check + include in settings.json + dynamic
+    logger.debug(
+        "Validate that the IP ACG description "
+        "is not longer than 255 characters...",
+        extra={"depth": 3}
+    ) # TODO check + include in settings.json + dynamic
     len_group_desc = len(ip_acg.desc)
     if not len(ip_acg.desc) <= 255:
         raise IPACGDescriptionLengthException(
@@ -203,10 +211,16 @@ def validate_group_desc(ip_acg):
 # ----------------------------------------------------------------------------
 
 def validate_ip_acgs(work_instruction_raw):
-    logger.debug(f"| Start: validate IP ACG properties of settings.yaml...")
+    logger.debug(
+        "Start: validate IP ACG properties of settings.yaml...",
+        extra={"depth": 1}
+        )
     
     for ip_acg in work_instruction_raw.ip_acgs: 
-        logger.debug(f"| | Start: IP ACG [{ip_acg.name}]...")
+        logger.debug(
+            f"Start: IP ACG [{ip_acg.name}]...",
+            extra={"depth": 2}
+        )
         
         validate_group_name(ip_acg)
         validate_group_desc(ip_acg)

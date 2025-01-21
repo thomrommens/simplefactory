@@ -22,7 +22,7 @@ class DepthFormatter(logging.Formatter):
         super().__init__(fmt, datefmt, style)
 
     def format(self, record):
-        pipes = "|" * getattr(record, "depth", 0)
+        pipes = " |" * getattr(record, "depth", 0)
         record.msg = f"{pipes}{' ' if pipes else ''}{record.msg}"
         return super().format(record)
 
