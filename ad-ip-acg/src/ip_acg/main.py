@@ -3,14 +3,14 @@ import json
 import click
 
 from config import HR, setup_logger
-from exceptions import UnexpectedException
+from exceptions import IPACGNoneSpecifiedForDeleteException, UnexpectedException
 from interpretation import (
     get_settings, 
     get_validation_baseline, 
     get_work_instruction
 )
 from directories import get_directories, sel_directories, show_directories
-from ip_acgs import get_ip_acgs, sel_ip_acgs, show_ip_acgs
+from ip_acgs import associate_ip_acg, create_ip_acg, delete_ip_acg, disassociate_ip_acg, get_ip_acgs, sel_ip_acgs, show_ip_acgs, update_rules
 from validation import validate_work_instruction
 
 
@@ -27,7 +27,7 @@ from validation import validate_work_instruction
 @click.option(
     "--dryrun", 
     type=click.Choice(
-        ["true", "false"], 
+        ["true", "false"],  # TODO make type bool? https://click.palletsprojects.com/en/stable/options/
         case_sensitive=False
     ), 
     default="true", 
@@ -46,7 +46,13 @@ from validation import validate_work_instruction
     default="false", 
     help="Enable debug mode?"
 )
-def main(action, dryrun, debug):
+@click.option(
+    "--delete_list", 
+    multiple=True, 
+    default=[]
+    help="Specify ids (e.g., wsipg-abc12d34e) of IP ACGs that should be deleted."
+)
+def main(action, dryrun, debug, delete_list):
     """
     Integrate program.
     :param action: action requested by user on command line.
@@ -123,8 +129,9 @@ def main(action, dryrun, debug):
     # ------------------------------------------------------------------------   
     # SPECIFIC ROUTE
     # ------------------------------------------------------------------------   
-        
-    if action in ("create, update"):
+    # Create a brand new ACG
+    if action == "create":
+
         logger.info(
             "These IP ACGs "
             f"{'would' if dryrun == 'true' else 'will'} "
@@ -134,24 +141,48 @@ def main(action, dryrun, debug):
         show_ip_acgs(work_instruction.ip_acgs)
 
         if not dryrun:
-            # I do this: ...
-            # After - status
-            
-            # create/overwrite
-            if action == "create":
-                # create
-                # associate
-                pass
+            tags = work_instruction.tags
 
-    elif action in ("delete"):
-        if ip_acgs:
-            # After - would be status (dryrun)
+            ip_acgs_created = []
+            for ip_acg in work_instruction.ip_acgs:
+                ip_acg_created = create_ip_acg(ip_acg, tags)
+                ip_acgs_created.append(ip_acg_created)      
 
-            if not dryrun:
-            # I do this: ...
-            # disassociate
-            # delete()
-                pass
+            for directory in directories:
+                associate_ip_acg(ip_acgs_created, directory)
+
+    # Update rules of an existing ACG (keeps associated)
+    elif action == "update":
+
+        if not dryrun:
+
+            for ip_acg in work_instruction.ip_acgs:
+                update_rules(ip_acg)
+
+
+    # Delete group (disassociate to-delete-group from directory first)
+    elif action == "delete":
+
+        # TODO rephrase delete_list
+        if delete_list:
+            logger.info(
+                "These IP ACGs "
+                f"{'would' if dryrun == 'true' else 'will'} "
+                f"be deleted: {delete_list}", 
+                extra={"depth": 1}
+            )
+        else:
+            raise IPACGNoneSpecifiedForDeleteException(
+                    "You requested to delete IP ACGs, but you have not specified "
+                    "any IP ACG id (e.g., wsipg-abc12d34e) to delete." 
+            )
+
+        if not dryrun:
+
+                for directory in directories:
+                    disassociate_ip_acg(delete_list)
+                for ip_acg_id in delete_list:
+                    delete_ip_acg(ip_acg_id)
 
     else:
         raise UnexpectedException("Unexpected error")
@@ -169,3 +200,8 @@ if __name__ == "__main__":
 # TODO: directories vs workspace_directories: consistent
 # TODO: Ruff checker
 # TODO: consistent: rule vs ip rule
+# TODO: consistent with arguments
+# TODO: logs consistent language, debug also
+# TODO: order of functions
+# TODO: add default AWS exceptions?
+# TODO: integrate main parts with extra layer?

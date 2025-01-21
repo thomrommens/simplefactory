@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 import pandas as pd
@@ -56,6 +57,9 @@ def sel_ip_acgs(ip_acgs_received: dict) -> list[IP_ACG]:
 
 
 def show_ip_acgs(ip_acgs: list[IP_ACG]):
+    """
+    xx
+    """
     
     if ip_acgs:
         i = 0
@@ -84,58 +88,121 @@ def show_ip_acgs(ip_acgs: list[IP_ACG]):
         print("(No IP ACGs found)")
 
 
+def format_rules(ip_acg: IP_ACG):
+    """
+    Fit rules in request syntax format.
+    Sort rules for user friendliness.
+    """
+    rules = [
+        {"ipRule": rule.ip, "ruleDesc": rule.desc}
+        for rule in ip_acg.rules
+    ]
+    rules_sorted = sorted(
+        rules,
+        key=lambda rules: rules["ipRule"]
+    )
+    return rules_sorted
 
-def create(ip_acg: IP_ACG, tags: dict) -> str:
+
+def update_tags(tags: dict, ip_acg: IP_ACG):
+    """
+    Replace placeholders
+    """
+    timestamp = datetime.now().isoformat()
+
+    tags["IPACGName"] = ip_acg.name
+    tags["Created"] = timestamp
+    tags["RulesLastApplied"] = timestamp
+
+    return tags
+
+
+def format_tags(tags: dict):
+    return [{"Key": k, "Value": v} for k, v in tags.items()]
+
+
+def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> str:
+    """
+    By default, error if exists already.
+    :return: updated IP ACG
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/create_ip_group.html
+    """
+    tags_updated = update_tags(tags, ip_acg)
+    tags_formatted = format_tags(tags_updated)
+
+    rules_formatted = format_rules(ip_acg)
+    
     response = workspaces.create_ip_group(
-        GroupName=ip_acg.id,
+        GroupName=ip_acg.name,
         GroupDesc=ip_acg.desc,
-        UserRules=ip_acg.rules,
-        Tags=[{"Key": k, "Value": v} for k, v in tags.items()]
-    )    
-    ip_acg_id = response.get('GroupId')
+        UserRules=rules_formatted,
+        Tags=tags_formatted
+    )
+    logger.debug(
+        f"create_ip_group - response: {response}", 
+        extra={"depth": 1}
+    )
+    ip_acg.id = response.get("GroupId")
 
-    return ip_acg_id
+    logger.info(
+        f"Created IP ACG [{ip_acg.name}] with id: [{ip_acg.id}]", 
+        extra={"depth": 1}
+    )
+    return ip_acg
 
 
 def update_rules(ip_acg: IP_ACG):
-
-    #  target_rule = {
-    #     "ipRule": "key",
-    #     "ruleDesc": "value__desc_from_rule_in_yaml"
-    # }
-
-    # target_rules = []
-
-    # target_rules_sorted = sorted(
-    #     target_rules,
-    #     key=lambda target_rules: target_rules["ipRule"]
-    # )
-
+    """
+    xx
+    """
+    rules_formatted = format_rules(ip_acg)
 
     response = workspaces.update_rules_of_ip_group(
         GroupId=ip_acg.id,
-        UserRules=ip_acg.rules
+        UserRules=rules_formatted
+    )
+    logger.debug(
+        f"update_rules_of_ip_group - response: {response}", 
+        extra={"depth": 1}
     )
 
 
-def associate(ip_acgs: list[IP_ACG], directory: Directory):
+def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory):
+    """
+    xx
+    """
     response = workspaces.associate_ip_groups(
         DirectoryId=directory.id,
-        GroupIds=ip_acgs.id
+        GroupIds=[ip_acg.id for ip_acg in ip_acgs]
+    )
+    logger.debug(
+        f"associate_ip_acg - response: {response}",
+        extra={"depth": 1}
     )
 
 
-def disassociate(ip_acgs: list[IP_ACG], directory: Directory):
+def disassociate_ip_acg(delete_list: list, directory: Directory):
+    """
+    xx
+    """
     response = workspaces.disassociate_ip_groups(
         DirectoryId=directory.id,
-        GroupIds=ip_acgs.id  # TODO: for comprehension
+        GroupIds=delete_list
+    )
+    logger.debug(
+        f"disassociate_ip_acg - response: {response}",
+        extra={"depth": 1}
     )
 
 
-def delete(ip_acg: IP_ACG):
+def delete_ip_acg(ip_acg_id: str):
     """
-    default: deletes all IP ACGs from directory!
+    needs disassociate first.
+    Unrelated to settings.yaml
     """
-    # check with a describe if any exists
-    # TODO: check single/multi delete
-    workspaces.delete_ip_group(GroupId=ip_acg.id)
+    response = workspaces.delete_ip_group(GroupId=ip_acg_id)
+
+    logger.debug(
+        f"delete_ip_acg - response: {response}",
+        extra={"depth": 1}
+    )

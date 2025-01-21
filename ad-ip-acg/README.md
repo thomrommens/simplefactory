@@ -54,3 +54,6 @@ directory = always WorkSpace directory here
 IP Access Control Groups per Directory: You can associate up to 25 IP access control groups with a single directory
 
 IP Access Control Groups per Region: You can create up to 100 IP access control groups per AWS region
+
+
+python script_name.py --delete-list d-1234567890 d-0987654321 d-1122334455

@@ -34,5 +34,9 @@ class IPACGNoneFoundException(Exception):
     pass
 
 
+class IPACGNoneSpecifiedForDeleteException(Exception):
+    pass
+
+
 class UnexpectedException(Exception):
     pass
