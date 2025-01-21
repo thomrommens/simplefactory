@@ -14,6 +14,8 @@ SETTINGS_FILE_PATH = os.path.join(
     SETTINGS_FILE
 )
 
+STD_INSTRUCTION = "Please revise settings.yaml."
+
 
 class DepthFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, style="%"):

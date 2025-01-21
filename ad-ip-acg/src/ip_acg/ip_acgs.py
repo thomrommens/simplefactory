@@ -1,6 +1,10 @@
+import logging
 from config import workspaces
 from exceptions import SomeException
 from models import IP_ACG, Directory, Rule
+
+
+logger = logging.getLogger("ip_acg_logger")
 
 
 def get_ip_acgs() -> list[IP_ACG]:
@@ -8,7 +12,10 @@ def get_ip_acgs() -> list[IP_ACG]:
     xx
     """
     response = workspaces.describe_ip_groups()
-    # print(f"describe_ip_groups - response: {response}")
+    logger.debug(
+        f"describe_ip_groups - response: {response}", 
+        extra={"depth": 1}
+    )
 
     if response["Result"]:
         return response["Result"]

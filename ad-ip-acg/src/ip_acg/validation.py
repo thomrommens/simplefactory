@@ -1,7 +1,8 @@
-from dataclasses import asdict
-import json
+from collections import Counter
+import logging
 import re
 
+from config import STD_INSTRUCTION
 from exceptions import (
     IPACGAmtRulesException, 
     IPACGDescriptionLengthException, 
@@ -11,43 +12,18 @@ from exceptions import (
     RuleIPV4FormatInvalidException, 
     RuleLinebreakException
 )
-from models import IP_ACG, Directory, Rule, WorkInstruction
+from models import WorkInstruction
 
-
-# ****************************************************************************
-# Input
-# ****************************************************************************
-
-work_instruction_raw = WorkInstruction(
-    
-    directories=[Directory(id='None', name='None', ip_acgs=None, type=None, state=None)], 
-    
-    ip_acgs=[
-        IP_ACG(
-            name='Domain A', 
-            desc='Allowed inbound IP addresses from Domain A', 
-            rules=[
-                Rule(
-                    ip='222.204.240.123', 
-                    desc='This trusted single host'
-                ), 
-                Rule(ip='254.254.253.251/27', desc='That trusted series of hosts'), Rule(ip='1.1.1.1/30', desc='This trusted series of hosts'), Rule(ip='2.2.2.2', desc='That trusted host'), Rule(ip='3.4.5.6', desc='Yet another trusted host')], 
-            id=None, origin='This Department'), 
-        IP_ACG(
-            name='Domain B', desc='Allowed inbound IP addresses from Domain B', rules=[Rule(ip='5.6.7.8', desc='This trusted single host'), Rule(ip='99.77.66.55/27', desc='That trusted series of hosts'), Rule(ip='12.34.56.78/30', desc='This trusted series of hosts'), Rule(ip='77.88.99.67', desc='That trusted host'), Rule(ip='2.3.4.5', desc='Yet another trusted host')], id=None, origin='That Department')], 
-    
-    tags={'IPACGName': 'placeholder', 'Application': 'WorkSpacesEnv', 'Environment': 'test', 'Department': 'ThatDepartment', 'CostCenter': 'ThatCostCenter', 'CreatedBy': 'IP ACG module', 'ModifiedBy': 'IP ACG module', 'Created': 'placeholder', 'RuleSetLastApplied': 'placeholder'})
-
-
-print("Work instruction before:")
-print(json.dumps(asdict(work_instruction_raw), indent=4))
-
+logger = logging.getLogger("ip_acg_logger")
 
 # ****************************************************************************
 # Validate RULE level
 # ****************************************************************************
 
 def split_base_ip_and_prefix(rule: str):
+    """
+    Split
+    """
 
     fwd_slash = rule.ip.find("/")
 
@@ -63,13 +39,13 @@ def split_base_ip_and_prefix(rule: str):
 
 
 def remove_whitespaces(rule):
-    print(f"| | | | Remove whitespaces if any...")
+    logger.debug(f"Remove whitespaces if any...", extra={"depth": 4})
     return rule.ip.replace(" ", "")
 
 
 def validate_linebreaks_absent(rule) -> bool:
 
-    print(f"| | | | Validate if no linebreaks are found...")
+    logger.debug(f"Validate if no linebreaks...", extra={"depth": 4})
     if "\n" in rule.ip:
         raise RuleLinebreakException("Line break found in IP rule [{rule}].")
     
@@ -79,37 +55,92 @@ def validate_ipv4_format(base_ip: str) -> bool:
     Ref regex pattern: https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp?page=1&tab=scoredesc#tab-top
     Checks for population?
     """       
-    print(f"| | | | Validate IPv4 format for base_ip [{base_ip}]...")
+    logger.debug(
+        f"Validate IPv4 format for base_ip [{base_ip}]...", 
+        extra={"depth": 4}
+    )
     
     pattern = r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$"
 
     if not re.match(pattern, base_ip):
         raise RuleIPV4FormatInvalidException(
-            f"Base IP address is invalid. Please revise settings.yaml."
+            f"Base IP address is invalid. {STD_INSTRUCTION}"
         )
         # TODO: check if populated included?
 
 
 def validate_prefix(prefix) -> bool:
-    print(f"| | | | Validate prefix [{prefix}]...")
+    logger.debug(
+        f"Validate prefix [{prefix}]...", 
+        extra={"depth": 4}
+    )
     if not 27 <= prefix <= 32:  # TODO replace with dynamic values
         raise RulePrefixInvalidException(
-            f"Prefix [{prefix}] is invalid. Please revise settings.yaml."
+            f"Prefix [{prefix}] is invalid. {STD_INSTRUCTION}"
         )
     
 # TODO: limit of rule description length?
+
+def validate_no_dup_rules(rule_list: str):
+    """
+    Validate no duplicate rules in rule list per IP ACG.
+
+    :param rule_list: list with updated rules (i.e., added /32 at default)
+    """
+    logger.debug(
+        f"Validate that there are no duplicate rules within the IP ACG...", 
+        extra={"depth": 4}
+    )
+    logger.debug(f"Rule list: {rule_list}", extra={"depth": 4})
+
+    duplicates = [k for k,v in Counter(rule_list).items() if v > 1]
+        
+    if len(duplicates) > 0:        
+        raise IPACGDuplicateRulesException(
+            f"Duplicate rule(s) found: {duplicates}. "
+            "Note, this might also been due to the program's addition "
+            "of /32 for a single IP address. "
+            f"{STD_INSTRUCTION}"
+        )
+    
+
+def validate_amt_rules(rule_list):
+    """
+    Validate if not larger than max number of IP rules.
+    """
+    logger.debug(
+        f"Validate that the maximum number of IP rules is 10 or less...", # TODO dynamic
+        extra={"depth": 3}
+    ) 
+    amt_rules = len(rule_list)
+    if not amt_rules <= 10:
+        raise IPACGAmtRulesException(
+            f"The IP ACG contains [{amt_rules}] rules; "
+            "more than the [10] IP rules AWS allows per IP ACG."   # TODO dynamic
+            f"{STD_INSTRUCTION}"
+        ) 
 
 # ----------------------------------------------------------------------------
 
 def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
     """
     """
-    print(f"| Start: validate IP rules of settings.yaml...")
-    for ip_acg in work_instruction.ip_acgs: 
+    logger.debug(
+        f"Start: validate IP rules of settings.yaml...", 
+        extra={"depth": 1}
+    )
+    for ip_acg in work_instruction.ip_acgs:         
+        logger.debug(
+            f"Start: IP ACG [{ip_acg.name}]...", 
+            extra={"depth": 2}
+        )
         
-        print(f"| | Start: IP ACG [{ip_acg.name}]...")
+        rule_list = []
         for rule in ip_acg.rules: 
-            print(f"| | | Start: Rule: IP address [{rule.ip}]; description [{rule.desc}]...")
+            logger.debug(
+                f"Start: Rule: IP address [{rule.ip}]; description [{rule.desc}]...", 
+                extra={"depth": 3}
+            )       
             
             rule.ip = remove_whitespaces(rule)
 
@@ -117,64 +148,66 @@ def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
 
             base_ip, _ = split_base_ip_and_prefix(rule)
             _, prefix = split_base_ip_and_prefix(rule)
+            
+            rule_list.append(f"{base_ip}/{prefix}")
 
             validate_ipv4_format(base_ip)
             validate_prefix(prefix)
-            print(f"| | Finish: IP ACG [{ip_acg.name}]...")
+            
+        validate_no_dup_rules(rule_list)
+        validate_amt_rules(rule_list)
+        logger.debug(
+            f"Finish: IP ACG [{ip_acg.name}]...", 
+            extra={"depth": 2}
+        )
 
-    print(f"| Finish: validate IP rules of settings.yaml...")
+    logger.debug(
+        f"| Finish: validate IP rules of settings.yaml...", 
+        extra={"depth": 1}
+        )
     return work_instruction
   
-
 # ****************************************************************************
 # Validate IP ACG level
 # ****************************************************************************
-
-def validate_no_dup_rules(ip_acg):
-    """
-    Validate no duplicate rules in rule list per IP ACG.
-    """
-    print(f"| | | Validate that there are no duplicate rules within the IP ACG...")
-    # if not len(ip_acg.rules) == len(set(ip_acg.rules)):  # TODO update walk through for set
-    #     raise IPACGDuplicateRulesException("XX")
-
-
-def validate_amt_rules(ip_acg):
-    """
-    Validate if not larger than max number of IP rules.
-    """
-    print(f"| | | Validate that the maximum number of IP rules is 10 or less...")  # TODO dynamic
-    if not len(ip_acg.rules) <= 10:
-        raise IPACGAmtRulesException("XX")
-
 
 def validate_group_name(ip_acg):
     """
     Validate if IP ACG name not longer than name length.
     """
-    print(f"| | | Validate that the IP ACG name length is not longer than 50 characters...") # TODO dynamic
-    if not len(ip_acg.name) <= 50:
-        raise IPACGNameLengthException("XX")
+    logger.debug(f"| | | Validate that the IP ACG name length is not longer than 50 characters...") # TODO dynamic
+    len_group_name = len(ip_acg.name)
+    if not len_group_name <= 50:
+        raise IPACGNameLengthException(
+            "The IP ACG group name contains "
+            f"[{len_group_name}] characters; "
+            "more than the [50] characters AWS allows. "   # TODO dynamic
+            f"{STD_INSTRUCTION}"
+        ) 
 
 
 def validate_group_desc(ip_acg):
     """
     Validate if IP ACG description not longer than description length.
     """
-    print(f"| | | Validate that the IP ACG description is not longer than 255 characters...") # TODO check + include in settings.json + dynamic
-    if not len(ip_acg.name) <= 255:
-        raise IPACGDescriptionLengthException("XX")
+    logger.debug(f"| | | Validate that the IP ACG description is not longer than 255 characters...") # TODO check + include in settings.json + dynamic
+    len_group_desc = len(ip_acg.desc)
+    if not len(ip_acg.desc) <= 255:
+        raise IPACGDescriptionLengthException(
+            "The IP ACG group description contains "
+            f"[{len_group_desc}] characters; "
+            "more than the [255] characters AWS allows. "   # TODO dynamic
+            f"{STD_INSTRUCTION}"
+        ) 
 
 # ----------------------------------------------------------------------------
 
 def validate_ip_acgs(work_instruction_raw):
-    print(f"| Start: validate IP ACG properties of settings.yaml...")
+    logger.debug(f"| Start: validate IP ACG properties of settings.yaml...")
     
     for ip_acg in work_instruction_raw.ip_acgs: 
-        print(f"| | Start: IP ACG [{ip_acg.name}]...")
-
-        validate_no_dup_rules(ip_acg)
-        validate_amt_rules(ip_acg)
+        logger.debug(f"| | Start: IP ACG [{ip_acg.name}]...")
+        
         validate_group_name(ip_acg)
         validate_group_desc(ip_acg)
 

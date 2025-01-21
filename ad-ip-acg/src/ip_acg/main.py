@@ -62,25 +62,25 @@ def main(action, dryrun, debug):
     # ------------------------------------------------------------------------   
     # COMMON ROUTE (applied for all routes)   
     # ------------------------------------------------------------------------   
-    # Directories
-    directories_received = get_directories()
-    directories = sel_directories(directories_received)
-    directories_as_dict = [asdict(directory) for directory in directories]
-    logger.debug(
-        f"Directories found in AWS:\n{json.dumps(directories_as_dict, indent=4)}", 
-        extra={"depth": 1}
-    )
+    # # Directories
+    # directories_received = get_directories()
+    # directories = sel_directories(directories_received)
+    # directories_as_dict = [asdict(directory) for directory in directories]
+    # logger.debug(
+    #     f"Directories found in AWS:\n{json.dumps(directories_as_dict, indent=4)}", 
+    #     extra={"depth": 1}
+    # )
 
-    # IP ACGs
-    ip_acgs_received = get_ip_acgs()
-    ip_acgs = sel_ip_acgs(ip_acgs_received)
-    ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
-    logger.debug(
-        f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
-        extra={"depth": 1}
-    )   
+    # # IP ACGs
+    # ip_acgs_received = get_ip_acgs()
+    # ip_acgs = sel_ip_acgs(ip_acgs_received)
+    # ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
+    # logger.debug(
+    #     f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
+    #     extra={"depth": 1}
+    # )   
     
-    # Settings
+    # Settings retrieval
     settings = get_settings()
     logger.debug(
         f"Settings retrieved from YAML file:\n{json.dumps(settings, indent=4)}", 
@@ -101,10 +101,14 @@ def main(action, dryrun, debug):
         extra={"depth": 1}
     )   
 
-    # Validation
+    # Settings validation
     work_instruction = validate_work_instruction(work_instruction_raw)
-    print("Work instruction after:")
-    print(json.dumps(asdict(work_instruction), indent=4))
+    logger.debug(
+        "Work instruction validated:",
+        extra={"depth": 1}
+    )
+    logger.debug(
+        json.dumps(asdict(work_instruction), indent=4))
 
      
     # ------------------------------------------------------------------------   
@@ -150,3 +154,4 @@ if __name__ == "__main__":
 # TODO: integrate logger across module
 # TODO: Ruff checker
 # TODO: remove prints
+# TODO: consistent: rule vs ip rule

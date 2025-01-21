@@ -18,6 +18,8 @@
 #    - set rules smartly using a prefix if you want to 
 #       cover multiple IP addresses within one group, e.g., add '/27'.
 #       - use https://www.cidr.xyz for a quick insight.
+#    - the program will append '/32' to a single IP address, if not done so
+#      also. Note that this can cause a duplicate.
 
 # - Update properties of the suggested IP ACGs that you want to apply 
 #   to each AWS directory, below.
@@ -36,14 +38,18 @@
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ip_acgs:
 
-- name: "Domain A"
+- name: "Domain C"
   desc: "Allowed inbound IP addresses from Domain A"
   origin: "This Department"
   rules: 
   - "104.27.176.150": "This trusted single host"
-  - "203.0.113.55/27": "That trusted series of hosts"
+  - "203.0.113.55/32": "That trusted series of hosts"
+  - "203.1.113.55": "That trusted series of hosts2"
+  - "203.2.113.55": "That trusted series of hosts2"
+  - "203.3.113.55": "That trusted series of hosts2"
+  - "203.4.113.55": "That trusted series of hosts2"
 
-- name: "Domain B"
+- name: "Domain D"
   desc: "Allowed inbound IP addresses from Domain B"
   origin: "That Department"
   rules: 
