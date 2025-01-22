@@ -1,7 +1,10 @@
 from datetime import datetime
 import logging
-
+from textwrap import indent
+from typing import Optional
+from botocore.exceptions import ClientError
 import pandas as pd
+
 from tabulate import tabulate
 from config import workspaces
 from exceptions import IPACGNoneFoundException
@@ -64,7 +67,11 @@ def show_ip_acgs(ip_acgs: list[IP_ACG]):
     if ip_acgs:
         i = 0
         for ip_acg in ip_acgs:
+            
+            # IP ACG
+
             i += 1
+            print(f"■ IP ACG {i}")
             row = {
                 "id": ip_acg.id,
                 "name": ip_acg.name,
@@ -73,17 +80,18 @@ def show_ip_acgs(ip_acgs: list[IP_ACG]):
             data = [(row)]
             df = pd.DataFrame(data)
             df.index += i
-            df = df.rename_axis("IP ACG #", axis="index")
-            print(f"{tabulate(df, headers='keys', tablefmt='fancy_grid')}")  # TODO deal with wide strings with rules
-            print(f"Rules of [IP ACG #{i} - {ip_acg.name}]:")
-            print("-------")
-            for rule in ip_acg.rules:
-                print(f"- {rule.ip} - {rule.desc}")
-            print("-------")
-            print("\n")
-            # TODO: prettify, also print with tabulate?
+            print(f"{tabulate(df, headers='keys', tablefmt='psql')}")
 
-            # TODO: plans with tablefmt=psql; realized styles with fancy_grid
+            # RULES          
+            print("\\")    
+            rules_formatted = format_rules(ip_acg)
+            rules_table = [["rule", "description"]] + [[item["ipRule"], item["ruleDesc"]] for item in rules_formatted]
+
+            rules_table_str = tabulate(rules_table, headers="firstrow", tablefmt="psql")
+            rules_table_indented = indent(rules_table_str, " " * 2)
+            print(rules_table_indented)
+            print("\n")
+            
     else:
         print("(No IP ACGs found)")
 
@@ -121,9 +129,9 @@ def format_tags(tags: dict):
     return [{"Key": k, "Value": v} for k, v in tags.items()]
 
 
-def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> str:
+def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
     """
-    By default, error if exists already.
+    Skip (not error out) at trying to create existing
     :return: updated IP ACG
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/create_ip_group.html
     """
@@ -132,23 +140,35 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> str:
 
     rules_formatted = format_rules(ip_acg)
     
-    response = workspaces.create_ip_group(
-        GroupName=ip_acg.name,
-        GroupDesc=ip_acg.desc,
-        UserRules=rules_formatted,
-        Tags=tags_formatted
-    )
+    try:
+        response = workspaces.create_ip_group(
+            GroupName=ip_acg.name,
+            GroupDesc=ip_acg.desc,
+            UserRules=rules_formatted,
+            Tags=tags_formatted
+        )
+
+        ip_acg.id = response.get("GroupId")
+
+        logger.info(
+            f"Created IP ACG [{ip_acg.name}] with id: [{ip_acg.id}]", 
+            extra={"depth": 1}
+        )
+        return ip_acg
+    
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
+            logger.info(
+                f"IP ACG [{ip_acg.name}] already exists. Skip creation...", 
+                extra={"depth": 1}
+            )
+        else:
+            logger.info(f"Client error: {e}", extra={"depth": 1})
+
     logger.debug(
         f"create_ip_group - response: {response}", 
         extra={"depth": 1}
     )
-    ip_acg.id = response.get("GroupId")
-
-    logger.info(
-        f"Created IP ACG [{ip_acg.name}] with id: [{ip_acg.id}]", 
-        extra={"depth": 1}
-    )
-    return ip_acg
 
 
 def update_rules(ip_acg: IP_ACG):

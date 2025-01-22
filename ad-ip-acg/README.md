@@ -57,3 +57,39 @@ IP Access Control Groups per Region: You can create up to 100 IP access control 
 
 
 python script_name.py --delete-list d-1234567890 d-0987654321 d-1122334455
+
+delete-list, to
+- keep delete separated from create/update, otherwise confusing
+- no accidental deletes
+- 
+
+
+use cases
+
+- generic
+
+    - keep settings yaml close to actuality
+
+- create
+
+    - from scratch, create new IP ACG
+        - just add IP ACGs in settings.yaml
+
+    - with keeping current IP ACG in place, add new IP ACG
+        - just add IP ACGs in settings.yaml (underneath existing)
+
+- update
+
+    - update rules of existing IP ACGs
+        - update rules in the settings.yaml
+
+- delete
+    
+    - all IP ACGs
+        - specify all in delete action
+        - remove them from settings.yaml
+
+    - some IP ACGs
+        - specify some in delete action
+        - remove applicable ones from settings.yaml
+

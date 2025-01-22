@@ -49,7 +49,7 @@ from validation import validate_work_instruction
 @click.option(
     "--delete_list", 
     multiple=True, 
-    default=[]
+    default=[],
     help="Specify ids (e.g., wsipg-abc12d34e) of IP ACGs that should be deleted."
 )
 def main(action, dryrun, debug, delete_list):
@@ -120,22 +120,21 @@ def main(action, dryrun, debug, delete_list):
         json.dumps(asdict(work_instruction), indent=4))
     
     # Before - status
-    logger.info("Current directories (before action):", extra={"depth": 1})
+    logger.info("Current directories (before execution of action):", extra={"depth": 1})  # TODO make logs more dynamic with actions in them
     show_directories(directories)
 
-    logger.info("Current IP ACGs (before action):", extra={"depth": 1})
+    logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
     show_ip_acgs(ip_acgs)
      
     # ------------------------------------------------------------------------   
     # SPECIFIC ROUTE
     # ------------------------------------------------------------------------   
-    # Create a brand new ACG
+
     if action == "create":
 
         logger.info(
             "These IP ACGs "
-            f"{'would' if dryrun == 'true' else 'will'} "
-            f"be created:", 
+            f"{'would' if dryrun == 'true' else 'will'} be created:", 
             extra={"depth": 1}
         )
         show_ip_acgs(work_instruction.ip_acgs)
@@ -146,24 +145,29 @@ def main(action, dryrun, debug, delete_list):
             ip_acgs_created = []
             for ip_acg in work_instruction.ip_acgs:
                 ip_acg_created = create_ip_acg(ip_acg, tags)
-                ip_acgs_created.append(ip_acg_created)      
+                
+                if ip_acg_created:
+                    ip_acgs_created.append(ip_acg_created)      
 
             for directory in directories:
                 associate_ip_acg(ip_acgs_created, directory)
 
-    # Update rules of an existing ACG (keeps associated)
     elif action == "update":
+
+        logger.info(
+            "Rules of these IP ACGs "
+            f"{'would' if dryrun == 'true' else 'will'} be updated:", 
+            extra={"depth": 1}
+        )
+        show_ip_acgs(work_instruction.ip_acgs)
 
         if not dryrun:
 
             for ip_acg in work_instruction.ip_acgs:
                 update_rules(ip_acg)
 
-
-    # Delete group (disassociate to-delete-group from directory first)
     elif action == "delete":
 
-        # TODO rephrase delete_list
         if delete_list:
             logger.info(
                 "These IP ACGs "
@@ -174,11 +178,12 @@ def main(action, dryrun, debug, delete_list):
         else:
             raise IPACGNoneSpecifiedForDeleteException(
                     "You requested to delete IP ACGs, but you have not specified "
-                    "any IP ACG id (e.g., wsipg-abc12d34e) to delete." 
+                    "any IP ACG id (e.g., wsipg-abc12d34e) to delete. " 
+                    "Please do so, when calling the app from the command line. "
+                    "See README for further instructions."
             )
 
         if not dryrun:
-
                 for directory in directories:
                     disassociate_ip_acg(delete_list)
                 for ip_acg_id in delete_list:
