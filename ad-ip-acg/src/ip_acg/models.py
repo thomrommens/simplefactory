@@ -28,6 +28,12 @@ class Directory:
 
 
 @dataclass
+class Inventory:
+    directories: list[Directory]
+    ip_acgs: list[IP_ACG]
+
+
+@dataclass
 class Validation:
     invalid_rules: list[Rule]
     prefix_default: str 
@@ -39,4 +45,10 @@ class WorkInstruction:
     directories: list[Directory]
     ip_acgs: list[IP_ACG]
     tags: dict
+
+
+@dataclass
+class Settings:
+    validation: Validation
+    work_instruction: Optional[WorkInstruction] = None
     

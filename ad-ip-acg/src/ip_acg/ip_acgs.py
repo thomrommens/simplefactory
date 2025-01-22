@@ -1,4 +1,6 @@
+from dataclasses import asdict
 from datetime import datetime
+import json
 import logging
 from textwrap import indent
 from typing import Optional
@@ -9,6 +11,8 @@ from tabulate import tabulate
 from config import workspaces
 from exceptions import IPACGNoneFoundException
 from models import IP_ACG, Directory, Rule
+
+# TODO: format file to logical order of functions
 
 
 logger = logging.getLogger("ip_acg_logger")
@@ -54,12 +58,12 @@ def sel_ip_acgs(ip_acgs_received: dict) -> list[IP_ACG]:
                 in ip_acg_received.get("userRules")
             ]
         )
-    ip_acgs.append(ip_acg)
+        ip_acgs.append(ip_acg)
 
     return ip_acgs
 
 
-def show_ip_acgs(ip_acgs: list[IP_ACG]):
+def report_ip_acgs(ip_acgs: list[IP_ACG]):
     """
     xx
     """
@@ -68,8 +72,8 @@ def show_ip_acgs(ip_acgs: list[IP_ACG]):
         i = 0
         for ip_acg in ip_acgs:
             
+            # TODO: abstract
             # IP ACG
-
             i += 1
             print(f"■ IP ACG {i}")
             row = {
@@ -94,6 +98,28 @@ def show_ip_acgs(ip_acgs: list[IP_ACG]):
             
     else:
         print("(No IP ACGs found)")
+
+
+def show_current_ip_acgs() -> list[IP_ACG]:
+    """
+    xx
+    """
+    logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
+
+    ip_acgs_received = get_ip_acgs()
+    ip_acgs = sel_ip_acgs(ip_acgs_received)
+    ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
+
+    report_ip_acgs(ip_acgs)
+
+    logger.debug(
+        f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
+        extra={"depth": 1}
+    )
+
+    return ip_acgs
+
+# ----------------------------------------------------------------------------
 
 
 def format_rules(ip_acg: IP_ACG):
@@ -147,6 +173,10 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             UserRules=rules_formatted,
             Tags=tags_formatted
         )
+        logger.debug(
+        f"create_ip_group - response: {response}", 
+        extra={"depth": 1}
+        )
 
         ip_acg.id = response.get("GroupId")
 
@@ -154,28 +184,24 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             f"Created IP ACG [{ip_acg.name}] with id: [{ip_acg.id}]", 
             extra={"depth": 1}
         )
+        
         return ip_acg
     
     except ClientError as e:
         if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
             logger.info(
-                f"IP ACG [{ip_acg.name}] already exists. Skip creation...", 
+                f"IP ACG [{ip_acg.name}] already exists. Skip creation.", 
                 extra={"depth": 1}
             )
         else:
             logger.info(f"Client error: {e}", extra={"depth": 1})
-
-    logger.debug(
-        f"create_ip_group - response: {response}", 
-        extra={"depth": 1}
-    )
 
 
 def update_rules(ip_acg: IP_ACG):
     """
     xx
     """
-    rules_formatted = format_rules(ip_acg)
+    rules_formatted = format_rules(ip_acg)  # CONT: need the NEW rules here; otherwise it will update itself with it's own old rules
 
     response = workspaces.update_rules_of_ip_group(
         GroupId=ip_acg.id,

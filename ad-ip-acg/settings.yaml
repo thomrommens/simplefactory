@@ -42,7 +42,7 @@ ip_acgs:
   desc: "Allowed inbound IP addresses from Domain A"
   origin: "This Department"
   rules: 
-  - "104.27.176.150": "This trusted single host"
+  - "104.27.176.160": "This trusted single host"
   - "203.0.113.55/31": "That trusted series of hosts"
 
 - name: "Domain D"
@@ -61,20 +61,15 @@ ip_acgs:
 #   - each key: value pair is a new dictionary item;
 #   - do not use a hyphen for a new key: value pair;
 #   - enclose all content with double quotes.
-# - At runtime, 'placeholder' values will be replaced with actual values.
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 tags:
-
-  IPACGName: "placeholder"
   Application: "WorkSpacesEnv"
   Environment: "test"
   Department: "ThatDepartment"
   CostCenter: "ThatCostCenter"
   CreatedBy: "IP ACG module"
   ModifiedBy: "IP ACG module"
-  Created: "placeholder"
-  RuleSetLastApplied: "placeholder"
 
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -87,7 +82,7 @@ tags:
 #
 #   - if no:
 #
-#     - update the placeholder directory below.
+#     - update the suggested directory below.
 #     - if you have more than one directory, add additional directories
 #       by copy-pasting the suggested item:
 #       - each directory is a new dictionary, indicated by a hyphen, 

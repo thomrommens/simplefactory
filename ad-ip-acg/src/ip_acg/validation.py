@@ -12,7 +12,7 @@ from exceptions import (
     RuleIPV4FormatInvalidException, 
     RuleLinebreakException
 )
-from models import WorkInstruction
+from models import Settings, WorkInstruction
 
 logger = logging.getLogger("ip_acg_logger")
 
@@ -39,6 +39,7 @@ def split_base_ip_and_prefix(rule: str):
 
 
 def remove_whitespaces(rule):
+
     logger.debug(f"Remove whitespaces if any...", extra={"depth": 5})
     return rule.ip.replace(" ", "")
 
@@ -67,6 +68,14 @@ def validate_ipv4_format(base_ip: str) -> bool:
             f"Base IP address is invalid. {STD_INSTRUCTION}"
         )
         # TODO: check if populated included?
+
+
+def validate_not_invalid(base_ip: str):
+    """Test against set of IP addresses that do not make sense"""
+    # TODO: other function name
+    # TODO: write validation
+    # TODO: also validate these settings themselves, for IPv4 format?
+    pass
 
 
 def validate_prefix(prefix) -> bool:
@@ -133,8 +142,7 @@ def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
         logger.debug(
             f"Start: IP ACG [{ip_acg.name}]...", 
             extra={"depth": 3}
-        )
-        
+        )        
         rule_list = []
         for rule in ip_acg.rules: 
             logger.debug(
@@ -152,6 +160,7 @@ def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
             rule_list.append(f"{base_ip}/{prefix}")
 
             validate_ipv4_format(base_ip)
+            validate_not_invalid(base_ip)
             validate_prefix(prefix)
             
         validate_no_dup_rules(rule_list)
@@ -210,18 +219,17 @@ def validate_group_desc(ip_acg):
 
 # ----------------------------------------------------------------------------
 
-def validate_ip_acgs(work_instruction_raw):
+def validate_ip_acgs(work_instruction):
     logger.debug(
         "Start: validate IP ACG properties of settings.yaml...",
         extra={"depth": 2}
         )
     
-    for ip_acg in work_instruction_raw.ip_acgs: 
+    for ip_acg in work_instruction.ip_acgs: 
         logger.debug(
             f"Start: IP ACG [{ip_acg.name}]...",
             extra={"depth": 3}
-        )
-        
+        )        
         validate_group_name(ip_acg)
         validate_group_desc(ip_acg)
 
@@ -230,24 +238,25 @@ def validate_ip_acgs(work_instruction_raw):
         extra={"depth": 2}
         )
 
-    return work_instruction_raw
+    return work_instruction
     
 
 # ****************************************************************************
 
-def validate_work_instruction(work_instruction_raw):
+def validate_work_instruction(settings: Settings):
+    """
+    xx
+    """
     logger.debug(
         "Start: validate settings.yaml...",
         extra={"depth": 1}
-    )
-    work_instruction_rules_validated = validate_rules(work_instruction_raw)
+    )    
+    work_instruction_rules_validated = validate_rules(settings.work_instruction)
     work_instruction_ip_acgs_validated = validate_ip_acgs(work_instruction_rules_validated)
+    
     logger.debug(
         "Finish: validate settings.yaml.",
         extra={"depth": 1}
     )
-
     return work_instruction_ip_acgs_validated
 
-
-# TODO: update work_instruction vs. work_instruction_raw

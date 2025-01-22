@@ -31,7 +31,7 @@ def setup_logger(name, debug):
     logger = logging.getLogger(name)
 
     level = logging.INFO
-    if debug == "true":  # TODO: convert to actual bool
+    if debug:
         level = logging.DEBUG
 
     logger.setLevel(level)

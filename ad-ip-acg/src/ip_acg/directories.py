@@ -1,3 +1,5 @@
+from dataclasses import asdict
+import json
 import logging
 import pandas as pd
 from tabulate import tabulate
@@ -53,7 +55,10 @@ def sel_directories(directories_received: dict) -> list[Directory]:
     return directories
 
 
-def show_directories(directories: list[Directory]):
+def report_directories(directories: list[Directory]):
+    """
+    xx
+    """
 
     data = []
     if directories: 
@@ -71,3 +76,23 @@ def show_directories(directories: list[Directory]):
         print(f"{tabulate(df, headers='keys', tablefmt='psql')}\n")
     else:
         print("(No directories found)")
+
+
+def show_current_directories() -> list[Directory]:
+    """
+    xx
+    """
+    logger.info("Current directories (before execution of action):", extra={"depth": 1})  # TODO make logs more dynamic with actions in them
+
+    directories_received = get_directories()
+    directories = sel_directories(directories_received)
+    directories_as_dict = [asdict(directory) for directory in directories]
+    
+    logger.debug(
+        f"Directories found in AWS:\n{json.dumps(directories_as_dict, indent=4)}", 
+        extra={"depth": 1}
+    )
+    
+    report_directories(directories)
+
+    return directories
