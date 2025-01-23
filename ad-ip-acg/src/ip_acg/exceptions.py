@@ -21,6 +21,9 @@ class IPACGDuplicateRulesException(Exception):
 class IPACGAmtRulesException(Exception):
     pass
 
+class IPACGNameDuplicateException(Exception):
+    pass
+
 
 class IPACGNameLengthException(Exception):
     pass

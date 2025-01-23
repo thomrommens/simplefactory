@@ -12,6 +12,8 @@
 # TODO: more try/catch approach to be able to skip and continue
 # TODO: try/except for responses
 # TODO: sort retrieved responses/dataclasses to consistently keep order in showing current vs. to be created
+# TODO: in work_instruction, also nest IP ACGs underneath directories? Currently None.
+# TODO: check indents in log
 
 import click
 
@@ -48,7 +50,7 @@ from feedback import msg
     default=[],
     help=msg["click_options"]["delete_list"]
 )
-def main(action, dryrun, debug, delete_list):
+def main(action: str, dryrun: bool, debug: bool, delete_list: list) -> None:
     """
     Integrate program.
     :param action: action requested by user on command line.

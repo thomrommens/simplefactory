@@ -9,8 +9,7 @@ import pandas as pd
 
 from tabulate import tabulate
 from config import workspaces
-from exceptions import IPACGNoneFoundException
-from models import IP_ACG, Directory, Rule
+from models import IP_ACG, Directory, Inventory, Rule, WorkInstruction
 
 # TODO: format file to logical order of functions
 
@@ -24,21 +23,20 @@ def get_ip_acgs() -> list[IP_ACG]:
     """
     response = workspaces.describe_ip_groups()
     logger.debug(
-        f"describe_ip_groups - response: {response}", 
+        f"describe_ip_groups - response: {json.dumps(response, indent=4)}",
         extra={"depth": 1}
     )
 
     if response["Result"]:
         return response["Result"]
     else:
-        raise IPACGNoneFoundException(
-            "No Workspace directories found. "
-            "Make sure to have at least 1 directory available with which "
-            "an IP ACG can be associated."
-        )
+        logger.debug(
+            f"No IP ACGs found in AWS. Skip describing.",
+            extra={"depth": 1}
+    )  # TODO: not displayed - inspect specific response at none
 
 
-def sel_ip_acgs(ip_acgs_received: dict) -> list[IP_ACG]:
+def sel_ip_acgs(ip_acgs_received: Optional[dict]) -> list[IP_ACG]:
     """
     xx
     """
@@ -100,24 +98,25 @@ def report_ip_acgs(ip_acgs: list[IP_ACG]):
         print("(No IP ACGs found)")
 
 
-def show_current_ip_acgs() -> list[IP_ACG]:
+def show_current_ip_acgs() -> Optional[list[IP_ACG]]:
     """
     xx
     """
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
     ip_acgs_received = get_ip_acgs()
-    ip_acgs = sel_ip_acgs(ip_acgs_received)
-    ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
+    if ip_acgs_received:
+        ip_acgs = sel_ip_acgs(ip_acgs_received)
+        ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
 
-    report_ip_acgs(ip_acgs)
+        report_ip_acgs(ip_acgs)
 
-    logger.debug(
-        f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
-        extra={"depth": 1}
-    )
+        logger.debug(
+            f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
+            extra={"depth": 1}
+        )
 
-    return ip_acgs
+        return ip_acgs
 
 # ----------------------------------------------------------------------------
 
@@ -146,12 +145,15 @@ def update_tags(tags: dict, ip_acg: IP_ACG):
 
     tags["IPACGName"] = ip_acg.name
     tags["Created"] = timestamp
-    tags["RulesLastApplied"] = timestamp
+    tags["RulesLastApplied"] = timestamp  #TODO: make sure to update as only tag at update route
 
     return tags
 
 
 def format_tags(tags: dict):
+    """
+    xx
+    """
     return [{"Key": k, "Value": v} for k, v in tags.items()]
 
 
@@ -174,7 +176,7 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             Tags=tags_formatted
         )
         logger.debug(
-        f"create_ip_group - response: {response}", 
+        f"create_ip_group - response: {json.dumps(response, indent=4)}",
         extra={"depth": 1}
         )
 
@@ -188,7 +190,7 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         return ip_acg
     
     except ClientError as e:
-        if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
+        if e.response["Error"]["Code"] == "ResourceAlreadyExistsException":
             logger.info(
                 f"IP ACG [{ip_acg.name}] already exists. Skip creation.", 
                 extra={"depth": 1}
@@ -197,21 +199,59 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             logger.info(f"Client error: {e}", extra={"depth": 1})
 
 
+def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> WorkInstruction:
+    """
+    1 - Get the current IP ACGs from the inventory.
+    2 - Get the to-be-updated IP ACGs from the work instruction.
+    The settings.yaml is not aware of the ids of
+    the IP ACGs specified.
+
+    Find the ids of the IP ACGs of 2 by looking them up in 1.
+    Update the input WorkInstruction with these ids.
+    """
+    logger.debug(
+        "Current inventory:\n"
+        f"{json.dumps(asdict(work_instruction), indent=4)}", 
+        extra={"depth": 1}
+    )
+    logger.debug(
+        "Current work instruction:\n"
+        f"{json.dumps(asdict(work_instruction), indent=4)}", 
+        extra={"depth": 1}
+    )
+
+    for work_instruction_ip_acg in work_instruction.ip_acgs:
+        for inventory_ip_acg in inventory.ip_acgs:
+            if work_instruction_ip_acg.name == inventory_ip_acg.name:
+                work_instruction_ip_acg.id = inventory_ip_acg.id
+
+    logger.debug(
+        "Updated work instruction:\n"
+        f"{json.dumps(asdict(work_instruction), indent=4)}", 
+        extra={"depth": 1}
+    )
+
+    return work_instruction
+
+
 def update_rules(ip_acg: IP_ACG):
     """
     xx
     """
-    rules_formatted = format_rules(ip_acg)  # CONT: need the NEW rules here; otherwise it will update itself with it's own old rules
+    rules_formatted = format_rules(ip_acg)
 
     response = workspaces.update_rules_of_ip_group(
         GroupId=ip_acg.id,
         UserRules=rules_formatted
     )
     logger.debug(
-        f"update_rules_of_ip_group - response: {response}", 
+        f"update_rules_of_ip_group - response: {json.dumps(response, indent=4)}", 
         extra={"depth": 1}
     )
-
+    logger.info(
+        f"Rules for IP ACG [{ip_acg.name}]updated.", extra={"depth": 1}
+    )
+    
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory):
     """
@@ -222,7 +262,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory):
         GroupIds=[ip_acg.id for ip_acg in ip_acgs]
     )
     logger.debug(
-        f"associate_ip_acg - response: {response}",
+        f"associate_ip_acg - response: {json.dumps(response, indent=4)}",
         extra={"depth": 1}
     )
 
@@ -236,7 +276,7 @@ def disassociate_ip_acg(delete_list: list, directory: Directory):
         GroupIds=delete_list
     )
     logger.debug(
-        f"disassociate_ip_acg - response: {response}",
+        f"disassociate_ip_acg - response: {json.dumps(response, indent=4)}",
         extra={"depth": 1}
     )
 
@@ -246,9 +286,20 @@ def delete_ip_acg(ip_acg_id: str):
     needs disassociate first.
     Unrelated to settings.yaml
     """
-    response = workspaces.delete_ip_group(GroupId=ip_acg_id)
+    try:
+        response = workspaces.delete_ip_group(GroupId=ip_acg_id)
 
-    logger.debug(
-        f"delete_ip_acg - response: {response}",
-        extra={"depth": 1}
-    )
+        logger.debug(
+            f"delete_ip_acg - response: {json.dumps(response, indent=4)}",
+            extra={"depth": 1}
+        )
+        logger.info(f"Deleted IP ACG [{ip_acg_id}].", extra={"depth": 1})
+
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ResourceNotFoundException":
+            logger.info(
+                f"IP ACG [{ip_acg_id}] not found. Skip deletion.", 
+                extra={"depth": 1}
+            )
+        else:
+            logger.info(f"Client error: {e}", extra={"depth": 1})

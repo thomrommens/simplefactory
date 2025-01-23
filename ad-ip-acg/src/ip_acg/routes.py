@@ -1,8 +1,10 @@
+# TODO: add each action to routes.py?
+
 import logging
 
 from directories import show_current_directories
 from interpretation import parse_settings
-from ip_acgs import show_current_ip_acgs
+from ip_acgs import match_ip_acgs, show_current_ip_acgs
 from exceptions import (
     IPACGNoneSpecifiedForDeleteException, 
     UnexpectedException
@@ -85,11 +87,13 @@ def run_selected_route(
             f"{'would' if cli['dryrun'] else 'will'} be updated:", 
             extra={"depth": 1}
         )
+        match_ip_acgs(inventory, work_instruction)
+
         report_ip_acgs(work_instruction.ip_acgs)
 
         if not cli["dryrun"]:
 
-            for ip_acg in inventory.ip_acgs:
+            for ip_acg in work_instruction.ip_acgs:
                 update_rules(ip_acg)
 
     elif cli["action"] == "delete":
@@ -103,17 +107,24 @@ def run_selected_route(
             )
         else:
             raise IPACGNoneSpecifiedForDeleteException(
-                    "You requested to delete IP ACGs, but you have not specified "
-                    "any IP ACG id (e.g., wsipg-abc12d34e) to delete. " 
-                    "Please do so, when calling the app from the command line. "
-                    "See README for further instructions."
+                "You requested to delete IP ACGs, but you have not specified "
+                "any IP ACG id (e.g., wsipg-abc12d34e) to delete. " 
+                "Please do so, when calling the app from the command line, "
+                "use option '--delete_list'. "
+                "See README for further instructions."
             )
 
         if not cli["dryrun"]:
-                for directory in work_instruction.directories:
-                    disassociate_ip_acg(cli["delete_list"])
-                for ip_acg_id in cli["delete_list"]:
-                    delete_ip_acg(ip_acg_id)
+            delete_list=cli["delete_list"]
+            for directory in work_instruction.directories:
+                disassociate_ip_acg(
+                    delete_list=delete_list,
+                    directory=directory
+                )
+            for ip_acg_id in delete_list:
+                delete_ip_acg(ip_acg_id)
+
+            # TODO: test deleting multiple items
 
     else:
         raise UnexpectedException("Unexpected error")

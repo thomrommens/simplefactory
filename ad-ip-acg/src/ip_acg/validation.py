@@ -6,7 +6,8 @@ from config import STD_INSTRUCTION
 from exceptions import (
     IPACGAmtRulesException, 
     IPACGDescriptionLengthException, 
-    IPACGDuplicateRulesException, 
+    IPACGDuplicateRulesException,
+    IPACGNameDuplicateException, 
     IPACGNameLengthException, 
     RulePrefixInvalidException, 
     RuleIPV4FormatInvalidException, 
@@ -15,6 +16,8 @@ from exceptions import (
 from models import Settings, WorkInstruction
 
 logger = logging.getLogger("ip_acg_logger")
+
+# TODO: consistent naming of validations: right direction
 
 # ****************************************************************************
 # Validate RULE level
@@ -39,12 +42,18 @@ def split_base_ip_and_prefix(rule: str):
 
 
 def remove_whitespaces(rule):
+    """
+    xx
+    """
 
     logger.debug(f"Remove whitespaces if any...", extra={"depth": 5})
     return rule.ip.replace(" ", "")
 
 
 def validate_linebreaks_absent(rule) -> bool:
+    """
+    xx
+    """
 
     logger.debug(f"Validate if no linebreaks...", extra={"depth": 5})
     if "\n" in rule.ip:
@@ -71,7 +80,9 @@ def validate_ipv4_format(base_ip: str) -> bool:
 
 
 def validate_not_invalid(base_ip: str):
-    """Test against set of IP addresses that do not make sense"""
+    """
+    Test against set of IP addresses that do not make sense
+    """
     # TODO: other function name
     # TODO: write validation
     # TODO: also validate these settings themselves, for IPv4 format?
@@ -79,6 +90,9 @@ def validate_not_invalid(base_ip: str):
 
 
 def validate_prefix(prefix) -> bool:
+    """
+    xx
+    """
     logger.debug(
         f"Validate prefix [{prefix}]...", 
         extra={"depth": 5}
@@ -102,7 +116,7 @@ def validate_no_dup_rules(rule_list: str):
     )
     logger.debug(f"Rule list: {rule_list}", extra={"depth": 5})
 
-    duplicates = [k for k,v in Counter(rule_list).items() if v > 1]
+    duplicates = [k for k, v in Counter(rule_list).items() if v > 1]
         
     if len(duplicates) > 0:        
         raise IPACGDuplicateRulesException(
@@ -133,12 +147,13 @@ def validate_amt_rules(rule_list):
 
 def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
     """
+    xx
     """
     logger.debug(
         f"Start: validate IP rules of settings.yaml...", 
         extra={"depth": 2}
     )
-    for ip_acg in work_instruction.ip_acgs:         
+    for ip_acg in work_instruction.ip_acgs:      
         logger.debug(
             f"Start: IP ACG [{ip_acg.name}]...", 
             extra={"depth": 3}
@@ -199,6 +214,25 @@ def validate_group_name(ip_acg):
         ) 
 
 
+def validate_no_dup_ip_acg_name(group_name_list):  # TODO: generalize dup check?
+    """
+    xx
+    """
+    logger.debug(
+        f"Validate that the IP ACG name is not a duplicate...", 
+        extra={"depth": 4}
+    )
+    logger.debug(f"Group name list: {group_name_list}", extra={"depth": 5})
+
+    duplicates = [k for k, v in Counter(group_name_list).items() if v > 1]
+        
+    if len(duplicates) > 0:        
+        raise IPACGNameDuplicateException(
+            f"Duplicate group name found: {duplicates}. "
+            f"{STD_INSTRUCTION}"
+        )
+    
+
 def validate_group_desc(ip_acg):
     """
     Validate if IP ACG description not longer than description length.
@@ -220,16 +254,22 @@ def validate_group_desc(ip_acg):
 # ----------------------------------------------------------------------------
 
 def validate_ip_acgs(work_instruction):
+    """
+    xx
+    """
     logger.debug(
         "Start: validate IP ACG properties of settings.yaml...",
         extra={"depth": 2}
         )
     
     for ip_acg in work_instruction.ip_acgs: 
+        group_name_list = []
         logger.debug(
             f"Start: IP ACG [{ip_acg.name}]...",
             extra={"depth": 3}
-        )        
+        )   
+        group_name_list.append(ip_acg.name)
+        validate_no_dup_ip_acg_name(group_name_list)     
         validate_group_name(ip_acg)
         validate_group_desc(ip_acg)
 
@@ -259,4 +299,3 @@ def validate_work_instruction(settings: Settings):
         extra={"depth": 1}
     )
     return work_instruction_ip_acgs_validated
-

@@ -9,6 +9,11 @@
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # ip_acgs
 
+# - 'name'
+#   - if you specify multiple IP ACGs, make sure you use unique names.
+#     - in case of updating an IP ACGs, the program looks up 
+#       the id of the existing, targeted IP ACGs, by using their name.
+
 # - 'rules'
 #    - specify a maximum of 10 rules.
 #    - a single rule can be a *single* IP address (prefix /32),
@@ -42,16 +47,16 @@ ip_acgs:
   desc: "Allowed inbound IP addresses from Domain A"
   origin: "This Department"
   rules: 
-  - "104.27.176.160": "This trusted single host"
-  - "203.0.113.55/31": "That trusted series of hosts"
+  - "104.27.176.222": "This trusted single host"
+  - "203.0.113.22/31": "That trusted series of hosts"
 
 - name: "Domain D"
   desc: "Allowed inbound IP addresses from Domain B"
   origin: "That Department"
   rules: 
-  - "198.51.100.77/30": "This trusted series of hosts"
-  - "45.33.32.156": "That trusted host"
-  - "67.207.82.32": "Yet another trusted host"
+  - "198.51.100.22/30": "This trusted series of hosts"
+  - "45.33.32.22": "That trusted host"
+  - "67.207.82.22": "Yet another trusted host"
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # tags

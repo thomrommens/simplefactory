@@ -14,10 +14,13 @@ SETTINGS_FILE_PATH = os.path.join(
     SETTINGS_FILE
 )
 
-STD_INSTRUCTION = "Please revise settings.yaml."
+STD_INSTRUCTION = "Please revise settings.yaml."  # TODO to feedback.py?
 
 
 class DepthFormatter(logging.Formatter):
+    """
+    xx
+    """
     def __init__(self, fmt=None, datefmt=None, style="%"):
         super().__init__(fmt, datefmt, style)
 
@@ -28,6 +31,9 @@ class DepthFormatter(logging.Formatter):
 
 
 def setup_logger(name, debug):
+    """
+    xx
+    """
     logger = logging.getLogger(name)
 
     level = logging.INFO

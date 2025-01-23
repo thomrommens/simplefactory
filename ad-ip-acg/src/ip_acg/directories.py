@@ -20,7 +20,7 @@ def get_directories():
     response = workspaces.describe_workspace_directories()
 
     logger.debug(
-        f"Describe_workspace_directories - response: {response}", 
+        f"describe_workspace_directories - response: {json.dumps(response, indent=4)}", 
         extra={"depth": 1}
     )
 
@@ -86,12 +86,6 @@ def show_current_directories() -> list[Directory]:
 
     directories_received = get_directories()
     directories = sel_directories(directories_received)
-    directories_as_dict = [asdict(directory) for directory in directories]
-    
-    logger.debug(
-        f"Directories found in AWS:\n{json.dumps(directories_as_dict, indent=4)}", 
-        extra={"depth": 1}
-    )
     
     report_directories(directories)
 

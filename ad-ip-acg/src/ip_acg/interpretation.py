@@ -4,13 +4,22 @@ import logging
 import yaml
 
 from config import SETTINGS_FILE_PATH
-from models import IP_ACG, Directory, Rule, Settings, Validation, WorkInstruction
+from models import (
+    IP_ACG, 
+    Directory, 
+    Rule, 
+    Settings, 
+    Validation, 
+    WorkInstruction
+)
 
 logger = logging.getLogger("ip_acg_logger")
 
 
 def get_settings():
-
+    """
+    xx
+    """
     with open(SETTINGS_FILE_PATH, "r") as settings_file:
         settings = yaml.safe_load(settings_file)
 
@@ -18,7 +27,9 @@ def get_settings():
 
 
 def get_validation_baseline(settings: dict) -> Validation:
-
+    """
+    xx
+    """
     return Validation(
         invalid_rules=[
             Rule(ip=ip_invalid, desc=desc_invalid)
@@ -31,6 +42,9 @@ def get_validation_baseline(settings: dict) -> Validation:
 
 
 def get_work_instruction(settings: dict):
+    """
+    xx
+    """
 
     return WorkInstruction(
         directories=[
@@ -56,6 +70,9 @@ def get_work_instruction(settings: dict):
 
 
 def parse_settings() -> Settings:
+    """
+    xx
+    """
 
     settings = get_settings()
     logger.debug(
