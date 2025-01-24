@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+# TODO: right order of classes
 
 @dataclass
 class Rule:
@@ -51,4 +52,10 @@ class WorkInstruction:
 class Settings:
     validation: Validation
     work_instruction: Optional[WorkInstruction] = None
-    
+
+
+@dataclass
+class AppInput:
+    cli: dict
+    settings: Settings
+    inventory: Inventory

@@ -9,6 +9,7 @@ import pandas as pd
 
 from tabulate import tabulate
 from config import workspaces
+from exceptions import IPACGIdMatchException
 from models import IP_ACG, Directory, Inventory, Rule, WorkInstruction
 
 # TODO: format file to logical order of functions
@@ -199,6 +200,15 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             logger.info(f"Client error: {e}", extra={"depth": 1})
 
 
+def validate_match_inventory(matches: int, inventory: Inventory) -> bool:
+    """
+    Validate if all IP ACGs from the inventory could be matched by name,
+    with all IP ACGs from the actual situation in AWS.
+    """
+    if not matches == len(inventory.ip_acgs):
+        raise IPACGIdMatchException("xx")
+
+
 def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> WorkInstruction:
     """
     1 - Get the current IP ACGs from the inventory.
@@ -220,11 +230,16 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
         extra={"depth": 1}
     )
 
+    matches = 0
     for work_instruction_ip_acg in work_instruction.ip_acgs:
         for inventory_ip_acg in inventory.ip_acgs:
             if work_instruction_ip_acg.name == inventory_ip_acg.name:
+                matches =+ 1
                 work_instruction_ip_acg.id = inventory_ip_acg.id
 
+    validate_match_inventory(matches, inventory)
+    # TODO: specify which IP ACGs could not be matched by name?
+    
     logger.debug(
         "Updated work instruction:\n"
         f"{json.dumps(asdict(work_instruction), indent=4)}", 

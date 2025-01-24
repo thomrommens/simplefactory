@@ -21,6 +21,7 @@ class IPACGDuplicateRulesException(Exception):
 class IPACGAmtRulesException(Exception):
     pass
 
+
 class IPACGNameDuplicateException(Exception):
     pass
 
@@ -34,6 +35,10 @@ class IPACGDescriptionLengthException(Exception):
 
 
 class IPACGNoneFoundException(Exception):
+    pass
+
+
+class IPACGIdMatchException(Exception):
     pass
 
 
