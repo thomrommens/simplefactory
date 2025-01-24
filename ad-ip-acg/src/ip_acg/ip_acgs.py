@@ -20,7 +20,9 @@ logger = logging.getLogger("ip_acg_logger")
 
 def get_ip_acgs() -> list[IP_ACG]:
     """
-    xx
+    Retrieve IP Access Control Groups from AWS Workspaces.
+
+    :return: List of IP_ACG objects containing the IP ACGs found in AWS
     """
     response = workspaces.describe_ip_groups()
     logger.debug(
@@ -35,16 +37,16 @@ def get_ip_acgs() -> list[IP_ACG]:
             f"No IP ACGs found in AWS. Skip describing.",
             extra={"depth": 1}
     )  # TODO: not displayed - inspect specific response at none
-
+        
 
 def sel_ip_acgs(ip_acgs_received: Optional[dict]) -> list[IP_ACG]:
     """
-    xx
+    Make sure ip_acgs are sorted by name.
     """
     ip_acgs = []
 
-    for ip_acg_received in ip_acgs_received:
-        ip_acg = IP_ACG(            
+    unsorted_ip_acgs = [
+        IP_ACG(            
             id=ip_acg_received.get("groupId"),
             name=ip_acg_received.get("groupName"),
             desc=ip_acg_received.get("groupDesc"),
@@ -57,7 +59,9 @@ def sel_ip_acgs(ip_acgs_received: Optional[dict]) -> list[IP_ACG]:
                 in ip_acg_received.get("userRules")
             ]
         )
-        ip_acgs.append(ip_acg)
+        for ip_acg_received in ip_acgs_received
+    ]
+    ip_acgs.extend(sorted(unsorted_ip_acgs, key=lambda x: x.name))
 
     return ip_acgs
 
@@ -106,6 +110,7 @@ def show_current_ip_acgs() -> Optional[list[IP_ACG]]:
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
     ip_acgs_received = get_ip_acgs()
+    
     if ip_acgs_received:
         ip_acgs = sel_ip_acgs(ip_acgs_received)
         ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
@@ -122,7 +127,7 @@ def show_current_ip_acgs() -> Optional[list[IP_ACG]]:
 # ----------------------------------------------------------------------------
 
 
-def format_rules(ip_acg: IP_ACG):
+def format_rules(ip_acg: IP_ACG) -> list[dict]:
     """
     Fit rules in request syntax format.
     Sort rules for user friendliness.
@@ -138,7 +143,7 @@ def format_rules(ip_acg: IP_ACG):
     return rules_sorted
 
 
-def update_tags(tags: dict, ip_acg: IP_ACG):
+def update_tags(tags: dict, ip_acg: IP_ACG) -> dict:
     """
     Replace placeholders
     """
@@ -151,7 +156,7 @@ def update_tags(tags: dict, ip_acg: IP_ACG):
     return tags
 
 
-def format_tags(tags: dict):
+def format_tags(tags: dict) -> list[dict]:
     """
     xx
     """
@@ -249,7 +254,7 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
     return work_instruction
 
 
-def update_rules(ip_acg: IP_ACG):
+def update_rules(ip_acg: IP_ACG) -> None:
     """
     xx
     """
@@ -268,7 +273,7 @@ def update_rules(ip_acg: IP_ACG):
     )
     
 
-def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory):
+def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     """
     xx
     """
@@ -282,7 +287,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory):
     )
 
 
-def disassociate_ip_acg(delete_list: list, directory: Directory):
+def disassociate_ip_acg(delete_list: list, directory: Directory) -> None:
     """
     xx
     """
@@ -296,7 +301,7 @@ def disassociate_ip_acg(delete_list: list, directory: Directory):
     )
 
 
-def delete_ip_acg(ip_acg_id: str):
+def delete_ip_acg(ip_acg_id: str) -> None:
     """
     needs disassociate first.
     Unrelated to settings.yaml

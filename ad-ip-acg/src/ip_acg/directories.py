@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Optional
 import pandas as pd
 from tabulate import tabulate
 
@@ -11,7 +12,7 @@ from models import Directory
 logger = logging.getLogger("ip_acg_logger")
 
 
-def get_directories():
+def get_directories() -> Optional[list[dict]]:
     """
     # if value in work_instruction for Directory, follow
     # else, get from AWS
@@ -54,7 +55,7 @@ def sel_directories(directories_received: dict) -> list[Directory]:
     return directories
 
 
-def report_directories(directories: list[Directory]):
+def report_directories(directories: list[Directory]) -> None:
     """
     xx
     """

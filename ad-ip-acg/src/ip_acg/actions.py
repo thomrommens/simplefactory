@@ -10,20 +10,30 @@ from ip_acgs import (
     update_rules,
     match_ip_acgs
 )
+from models import AppInput
 
 logger = logging.getLogger("ip_acg_logger")
 
 
-def create(app_input):
+def create(app_input: AppInput) -> None:
     """
-    xx
+    Creates new IP Access Control Groups in AWS based on the work instruction.
+    
+    If not in dryrun mode:
+    - Creates each IP ACG specified in the work instruction
+    - Applies the tags from the work instruction
+    - Associates the created IP ACGs with specified directories
+    
+    :param app_input: Contains CLI arguments, settings and inventory data
+    :return: None
+    :raises: Various AWS exceptions during creation and association
     """
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
 
     logger.info(
         "These IP ACGs "
-        f"{'would' if cli['dryrun']  else 'will'} be created:",  # TODO: abstract away
+        f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d:",
         extra={"depth": 1}
     )
     report_ip_acgs(work_instruction.ip_acgs)
@@ -42,17 +52,26 @@ def create(app_input):
                     associate_ip_acg(ip_acgs_created, directory)
 
 
-def update(app_input):
+def update(app_input: AppInput) -> None:
     """
-    xx
+    Updates existing IP Access Control Groups in AWS with new rules.
+    
+    If not in dryrun mode:
+    - Matches IP ACGs from work instruction to existing ones in AWS
+    - Updates the rules for each matched IP ACG
+    
+    :param app_input: Contains CLI arguments, settings and inventory data
+    :return: None
+    :raises: IPACGIdMatchException if IP ACGs cannot be matched
+    :raises: Various AWS exceptions during update
     """
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
     inventory = app_input.inventory
 
     logger.info(
-        "Rules of these IP ACGs "
-        f"{'would' if cli['dryrun'] else 'will'} be updated:", 
+        "These IP ACGs "
+        f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d:", 
         extra={"depth": 1}
             )
     match_ip_acgs(inventory, work_instruction)
@@ -65,21 +84,27 @@ def update(app_input):
             update_rules(ip_acg)
 
 
-def delete(app_input):
+def delete(app_input: AppInput) -> None:
     """
-    xx
+    Deletes specified IP Access Control Groups from AWS.
+    
+    If not in dryrun mode:
+    - Disassociates IP ACGs from their directories
+    - Deletes each IP ACG specified in the delete list
+    
+    :param app_input: Contains CLI arguments, settings and inventory data
+    :return: None
+    :raises: IPACGNoneSpecifiedForDeleteException if no IP ACGs specified for deletion
+    :raises: Various AWS exceptions during disassociation and deletion
     """
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
 
-    print("DELETE LIST:", cli["delete_list"])
-
     if cli["delete_list"]:
         logger.info(
             "These IP ACGs "
-            f"{'would' if cli['dryrun'] else 'will'} "
-            f"be deleted: {cli['delete_list']}", 
-            extra={"depth": 1}
+            f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d: {cli['delete_list']}",
+                extra={"depth": 1}
         )
         if not cli["dryrun"]:
             delete_list=cli["delete_list"]
@@ -95,11 +120,6 @@ def delete(app_input):
 
     else:
         raise IPACGNoneSpecifiedForDeleteException(
-            "You requested to delete IP ACGs, but you have not specified "
-            "any IP ACG id (e.g., wsipg-abc12d34e) to delete. " 
-            "Please do so, when calling the app from the command line, "
-            "use option '--delete_list'. "
-            "See README for further instructions."
+            "IP ACGs not specified for deletion"
         )
-
     

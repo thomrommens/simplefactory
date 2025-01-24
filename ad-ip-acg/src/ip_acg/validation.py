@@ -13,7 +13,7 @@ from exceptions import (
     RuleIPV4FormatInvalidException, 
     RuleLinebreakException
 )
-from models import Settings, WorkInstruction
+from models import IP_ACG, Rule, Settings, WorkInstruction
 
 logger = logging.getLogger("ip_acg_logger")
 
@@ -23,7 +23,7 @@ logger = logging.getLogger("ip_acg_logger")
 # Validate RULE level
 # ****************************************************************************
 
-def split_base_ip_and_prefix(rule: str):
+def split_ip_and_prefix(rule: Rule) -> tuple[str, int]:
     """
     Split
     """
@@ -31,17 +31,17 @@ def split_base_ip_and_prefix(rule: str):
     fwd_slash = rule.ip.find("/")
 
     if fwd_slash != -1:
-        base_ip = rule.ip[:fwd_slash]
+        ip = rule.ip[:fwd_slash]
         prefix = int(rule.ip[fwd_slash+1:])
 
     else:
-        base_ip = rule.ip
+        ip = rule.ip
         prefix = 32  # TODO replace with dynamic value
 
-    return base_ip, prefix
+    return ip, prefix
 
 
-def remove_whitespaces(rule):
+def remove_whitespaces(rule: Rule) -> Rule:
     """
     xx
     """
@@ -50,36 +50,35 @@ def remove_whitespaces(rule):
     return rule.ip.replace(" ", "")
 
 
-def validate_linebreaks_absent(rule) -> bool:
+def val_linebreaks_absent(rule) -> bool:
     """
     xx
     """
-
     logger.debug(f"Validate if no linebreaks...", extra={"depth": 5})
     if "\n" in rule.ip:
         raise RuleLinebreakException("Line break found in IP rule [{rule}].")
     
 
-def validate_ipv4_format(base_ip: str) -> bool:
+def val_ipv4_format(ip: str) -> bool:
     """
     Ref regex pattern: https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp?page=1&tab=scoredesc#tab-top
     Checks for population?
     """       
     logger.debug(
-        f"Validate IPv4 format for base_ip [{base_ip}]...", 
+        f"Validate IPv4 format for ip [{ip}]...", 
         extra={"depth": 5}
     )
     
     pattern = r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$"
 
-    if not re.match(pattern, base_ip):
+    if not re.match(pattern, ip):
         raise RuleIPV4FormatInvalidException(
-            f"Base IP address is invalid. {STD_INSTRUCTION}"
+            f"IP address is invalid. {STD_INSTRUCTION}"
         )
         # TODO: check if populated included?
 
 
-def validate_not_invalid(base_ip: str):
+def val_not_invalid(ip: str) -> bool:
     """
     Test against set of IP addresses that do not make sense
     """
@@ -89,7 +88,7 @@ def validate_not_invalid(base_ip: str):
     pass
 
 
-def validate_prefix(prefix) -> bool:
+def val_prefix(prefix) -> bool:
     """
     xx
     """
@@ -102,9 +101,9 @@ def validate_prefix(prefix) -> bool:
             f"Prefix [{prefix}] is invalid. {STD_INSTRUCTION}"
         )
     
-# TODO: limit of rule description length?
+# TODO: validate limit of rule description length?
 
-def validate_no_dup_rules(rule_list: str):
+def val_no_dup_rules(rule_list: list) -> None:
     """
     Validate no duplicate rules in rule list per IP ACG.
 
@@ -121,13 +120,13 @@ def validate_no_dup_rules(rule_list: str):
     if len(duplicates) > 0:        
         raise IPACGDuplicateRulesException(
             f"Duplicate rule(s) found: {duplicates}. "
-            "Note, this might also been due to the program's addition "
+            "Note, this might also been due to the app's addition "
             "of /32 for a single IP address. "
             f"{STD_INSTRUCTION}"
         )
     
 
-def validate_amt_rules(rule_list):
+def val_amt_rules(rule_list: list) -> None:
     """
     Validate if not larger than max number of IP rules.
     """
@@ -145,7 +144,7 @@ def validate_amt_rules(rule_list):
 
 # ----------------------------------------------------------------------------
 
-def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
+def val_rules(work_instruction: WorkInstruction) -> WorkInstruction:
     """
     xx
     """
@@ -167,19 +166,19 @@ def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
             
             rule.ip = remove_whitespaces(rule)
 
-            validate_linebreaks_absent(rule)
+            val_linebreaks_absent(rule)
 
-            base_ip, _ = split_base_ip_and_prefix(rule)
-            _, prefix = split_base_ip_and_prefix(rule)
+            ip, _ = split_ip_and_prefix(rule)
+            _, prefix = split_ip_and_prefix(rule)
             
-            rule_list.append(f"{base_ip}/{prefix}")
+            rule_list.append(f"{ip}/{prefix}")
 
-            validate_ipv4_format(base_ip)
-            validate_not_invalid(base_ip)
-            validate_prefix(prefix)
+            val_ipv4_format(ip)
+            val_not_invalid(ip)
+            val_prefix(prefix)
             
-        validate_no_dup_rules(rule_list)
-        validate_amt_rules(rule_list)
+        val_no_dup_rules(rule_list)
+        val_amt_rules(rule_list)
         logger.debug(
             f"Finish: IP ACG [{ip_acg.name}]...", 
             extra={"depth": 3}
@@ -195,7 +194,7 @@ def validate_rules(work_instruction: WorkInstruction) -> WorkInstruction:
 # Validate IP ACG level
 # ****************************************************************************
 
-def validate_group_name(ip_acg):
+def val_group_name(ip_acg: IP_ACG) -> None:
     """
     Validate if IP ACG name not longer than name length.
     """
@@ -214,7 +213,7 @@ def validate_group_name(ip_acg):
         ) 
 
 
-def validate_no_dup_ip_acg_name(group_name_list):  # TODO: generalize dup check?
+def val_no_dup_ip_acg_name(group_name_list: list) -> None:  # TODO: generalize dup check - ip acg name vs. rule?
     """
     xx
     """
@@ -233,7 +232,7 @@ def validate_no_dup_ip_acg_name(group_name_list):  # TODO: generalize dup check?
         )
     
 
-def validate_group_desc(ip_acg):
+def val_group_description(ip_acg: IP_ACG) -> None:
     """
     Validate if IP ACG description not longer than description length.
     """
@@ -253,7 +252,7 @@ def validate_group_desc(ip_acg):
 
 # ----------------------------------------------------------------------------
 
-def validate_ip_acgs(work_instruction):
+def val_ip_acgs(work_instruction: WorkInstruction) -> WorkInstruction:
     """
     xx
     """
@@ -269,9 +268,9 @@ def validate_ip_acgs(work_instruction):
             extra={"depth": 3}
         )   
         group_name_list.append(ip_acg.name)
-        validate_no_dup_ip_acg_name(group_name_list)     
-        validate_group_name(ip_acg)
-        validate_group_desc(ip_acg)
+        val_no_dup_ip_acg_name(group_name_list)     
+        val_group_name(ip_acg)
+        val_group_description(ip_acg)
 
     logger.debug(
         f"Finish: validate IP rules of settings.yaml...", 
@@ -283,7 +282,7 @@ def validate_ip_acgs(work_instruction):
 
 # ****************************************************************************
 
-def validate_work_instruction(settings: Settings):
+def val_work_instruction(settings: Settings) -> WorkInstruction:
     """
     xx
     """
@@ -291,8 +290,8 @@ def validate_work_instruction(settings: Settings):
         "Start: validate settings.yaml...",
         extra={"depth": 1}
     )    
-    work_instruction_rules_validated = validate_rules(settings.work_instruction)
-    work_instruction_ip_acgs_validated = validate_ip_acgs(work_instruction_rules_validated)
+    work_instruction_rules_validated = val_rules(settings.work_instruction)
+    work_instruction_ip_acgs_validated = val_ip_acgs(work_instruction_rules_validated)
     
     logger.debug(
         "Finish: validate settings.yaml.",

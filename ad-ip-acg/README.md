@@ -38,7 +38,7 @@ Thom Rommens, [Simplefactory](https://simplefactory.substack.com)
 
 
 ## Misc add
-directory = always WorkSpace directory here
+directory = always WorkSpace directory here; explain technically
 
 
 #   - if you *create* IP ACGs, you don't know the 'id' yet.

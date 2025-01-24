@@ -21,16 +21,16 @@ class DepthFormatter(logging.Formatter):
     """
     xx
     """
-    def __init__(self, fmt=None, datefmt=None, style="%"):
+    def __init__(self, fmt=None, datefmt=None, style="%") -> None:
         super().__init__(fmt, datefmt, style)
 
-    def format(self, record):
+    def format(self, record) -> str:
         pipes = " |" * getattr(record, "depth", 0)
         record.msg = f"{pipes}{' ' if pipes else ''}{record.msg}"
         return super().format(record)
 
 
-def setup_logger(name, debug):
+def setup_logger(name: str, debug: bool) -> logging.Logger:
     """
     xx
     """

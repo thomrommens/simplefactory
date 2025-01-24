@@ -16,7 +16,7 @@ from models import (
 logger = logging.getLogger("ip_acg_logger")
 
 
-def get_settings():
+def get_settings() -> dict:
     """
     xx
     """
@@ -41,33 +41,33 @@ def get_validation_baseline(settings: dict) -> Validation:
     )
 
 
-def get_work_instruction(settings: dict):
+def get_work_instruction(settings: dict) -> WorkInstruction:
     """
-    xx
+    Make sure ip_acgs are sorted by name.
     """
-
     return WorkInstruction(
         directories=[
             Directory(id=directory["id"], name=directory["name"])
             for directory in settings["directories"]
         ],
-        ip_acgs=[
-            IP_ACG(
-                name=ip_acg["name"],
-                desc=ip_acg["desc"],
-                rules=[
-                    Rule(ip=ip, desc=desc)
-                    for rule in ip_acg["rules"]
-                    for ip, desc in rule.items()
-                ],
-                origin=ip_acg["origin"],
-            )
-            for ip_acg in settings["ip_acgs"]
-
-        ],
+        ip_acgs=sorted(
+            [
+                IP_ACG(
+                    name=ip_acg["name"],
+                    desc=ip_acg["desc"],
+                    rules=[
+                        Rule(ip=ip, desc=desc)
+                        for rule in ip_acg["rules"]
+                        for ip, desc in rule.items()
+                    ],
+                    origin=ip_acg["origin"],
+                )
+                for ip_acg in settings["ip_acgs"]
+            ],
+            key=lambda x: x.name
+        ),
         tags=settings["tags"]
     )
-
 
 def parse_settings() -> Settings:
     """
@@ -97,5 +97,5 @@ def parse_settings() -> Settings:
 
     return Settings(
         validation=validation_baseline,
-        work_instruction = work_instruction
+        work_instruction=work_instruction
     )  

@@ -1,21 +1,19 @@
-# TODO: directories vs workspace_directories: consistent
-# TODO: Ruff checker
-# TODO: consistent: rule vs ip rule
-# TODO: consistent with arguments
-# TODO: logs consistent language, debug also
-# TODO: order of functions
-# TODO: add default AWS exceptions?
-# TODO: integrate main parts with extra layer?
-# TODO: abstract routes in main away, to modules
-# TODO: abstract messages away to feedback.py
-# TODO: order of functions/split to utils?
-# TODO: more try/catch approach to be able to skip and continue
-# TODO: try/except for responses
-# TODO: sort retrieved responses/dataclasses to consistently keep order in showing current vs. to be created
-# TODO: in work_instruction, also nest IP ACGs underneath directories? Currently None.
-# TODO: check pipes in log
-# TODO: consistent 'program' vs. 'app'
-# TODO: remove prints
+# TODO: Now
+# TODO: - in work_instruction, also nest IP ACGs underneath directories? Currently None.
+# TODO: - try/except for responses
+# TODO:     - add default AWS exceptions?
+# TODO: - order of functions/split to utils?
+
+# TODO: Intermediate
+# TODO: - logs consistent language, debug also
+# TODO: - check pipes in log
+
+# TODO: Final
+# TODO: - remove prints
+# TODO: - consistent with arguments
+# TODO: - check docstrings
+# TODO: - check typing
+# TODO: - Ruff checker
 
 import click
 
@@ -49,13 +47,13 @@ from models import AppInput
 )
 @click.option(
     "--delete_list", 
-    multiple=True, # TODO: check type
+    multiple=True,
     default=[],
     help=msg["click_options"]["delete_list"]
 )
 def main(action: str, dryrun: bool, debug: bool, delete_list: list) -> None:
     """
-    Integrate program.
+    Integrate app.
     :param action: action requested by user on command line.
     """
     logger = setup_logger("ip_acg_logger", debug)
