@@ -8,6 +8,7 @@ from interpretation import parse_settings
 from validation import validate_work_instruction
 from models import Settings, Inventory, AppInput
 
+
 logger = logging.getLogger("ip_acg_logger")
        
 
