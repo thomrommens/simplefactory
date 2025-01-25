@@ -1,6 +1,6 @@
 import logging
 
-from exceptions import IPACGNoneSpecifiedForDeleteException
+from exceptions import IPACGNoneFoundException, IPACGNoneSpecifiedForDeleteException
 from ip_acgs import (
     associate_ip_acg, 
     create_ip_acg, 
@@ -69,20 +69,28 @@ def update(app_input: AppInput) -> None:
     work_instruction = app_input.settings.work_instruction
     inventory = app_input.inventory
 
-    logger.info(
-        "These IP ACGs "
-        f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d:", 
-        extra={"depth": 1}
-    )
-    match_ip_acgs(inventory, work_instruction)
+    if inventory.ip_acgs:
 
-    report_ip_acgs(work_instruction.ip_acgs)
+        logger.info(
+            "These IP ACGs "
+            f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d:", 
+            extra={"depth": 1}
+        )
+        match_ip_acgs(inventory, work_instruction)
 
-    if not cli["dryrun"]:
+        report_ip_acgs(work_instruction.ip_acgs)
 
-        for ip_acg in work_instruction.ip_acgs:
-            update_rules(ip_acg)
+        if not cli["dryrun"]:
 
+            for ip_acg in work_instruction.ip_acgs:
+                update_rules(ip_acg)
+
+    else:
+        raise IPACGNoneFoundException(
+            "No IP ACGs found in inventory. Skip update of IP ACG rules. Please make sure you have "
+            "at least one IP ACG in AWS to update. Run the 'create' action to create an IP ACG. "
+            "See README.md for more information."
+        )
 
 def delete(app_input: AppInput) -> None:
     """
@@ -100,26 +108,24 @@ def delete(app_input: AppInput) -> None:
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
 
-    if cli["delete_list"]:
+    if cli["ip_acg_ids_to_delete"]:
         logger.info(
             "These IP ACGs "
-            f"{'would' if cli['dryrun'] else 'will'} be {cli['action']}d: "
-            f"{cli['delete_list']}", extra={"depth": 1}
+            f"{'would' if cli['dryrun'] else 'will'} be attempted to {cli['action']}: "
+            f"{cli['ip_acg_ids_to_delete']}", extra={"depth": 1}
         )
         if not cli["dryrun"]:
-            delete_list=cli["delete_list"]
+            ip_acg_ids_to_delete=cli["ip_acg_ids_to_delete"]
             for directory in work_instruction.directories:
                 disassociate_ip_acg(
-                    delete_list=delete_list,
+                    ip_acg_ids_to_delete=ip_acg_ids_to_delete,
                     directory=directory
                 )
-                for ip_acg_id in delete_list:
+                for ip_acg_id in ip_acg_ids_to_delete:
                     delete_ip_acg(ip_acg_id)
-
-        # TODO: test deleting multiple items
 
     else:
         raise IPACGNoneSpecifiedForDeleteException(
-            "IP ACGs not specified for deletion"
+            "Selected action is delete, but no IP ACGs specified for deletion."
         )
     

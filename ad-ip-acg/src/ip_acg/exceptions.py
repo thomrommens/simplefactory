@@ -1,3 +1,5 @@
+# TODO: consistently name exceptions
+
 class DirectoryNoneFoundException(Exception):
     pass
 
@@ -15,6 +17,10 @@ class RulePrefixInvalidException(Exception):
 
 
 class RuleDescriptionLengthException(Exception):
+    pass
+
+
+class IPACGNoneFoundException(Exception):
     pass
 
 
@@ -38,11 +44,15 @@ class IPACGDescriptionLengthException(Exception):
     pass
 
 
-class IPACGNoneFoundException(Exception):
+class IPACGCreateException(Exception):
     pass
 
 
 class IPACGIdMatchException(Exception):
+    pass
+
+
+class IpAcgDisassociationException(Exception):
     pass
 
 

@@ -1,8 +1,9 @@
+from botocore.exceptions import ClientError
 import json
 import logging
-from typing import Optional
 import pandas as pd
 from tabulate import tabulate
+from typing import Optional
 
 from config import workspaces
 from exceptions import DirectoryNoneFoundException
@@ -16,8 +17,34 @@ def get_directories() -> Optional[list[dict]]:
     """
     # if value in work_instruction for Directory, follow
     # else, get from AWS
+    -> # TODO: build this
     """
-    response = workspaces.describe_workspace_directories()
+    try:
+        response = workspaces.describe_workspace_directories()
+
+    except ClientError as e:
+        error_code = e.response["Error"]["Code"]
+        error_message = e.response["Error"]["Message"]
+        
+        if error_code == "AccessDeniedException":
+            error_msg = "Access denied when attempting to describe directories"
+            logger.error(error_msg, extra={"depth": 1})
+            raise DirectoryNoneFoundException(error_msg)
+            
+        elif error_code == "InvalidParameterValueException":
+            error_msg = "Invalid parameter provided when describing directories"
+            logger.error(error_msg, extra={"depth": 1})
+            raise DirectoryNoneFoundException(error_msg)
+            
+        elif error_code == "ResourceNotFoundException":
+            error_msg = "Resource not found when describing directories"
+            logger.error(error_msg, extra={"depth": 1})
+            raise DirectoryNoneFoundException(error_msg)
+            
+        else:
+            error_msg = f"AWS error when describing directories: {error_code} - {error_message}"
+            logger.error(error_msg, extra={"depth": 1})
+            raise DirectoryNoneFoundException(error_msg)
 
     logger.debug(
         f"describe_workspace_directories - response: {json.dumps(response, indent=4)}", 
@@ -26,12 +53,7 @@ def get_directories() -> Optional[list[dict]]:
 
     if response["Directories"]:
         return response["Directories"]
-    else:
-        raise DirectoryNoneFoundException(
-            "No Workspace directories found. "
-            "Make sure to have at least 1 directory available with which "
-            "an IP ACG can be associated."
-        )
+
 
 
 def sel_directories(directories_received: dict) -> list[Directory]:

@@ -44,8 +44,9 @@ def run_selected_route(app_input: AppInput) -> None:
     }
     try:
         action = app_input.cli["action"]
-        action_map[action](app_input)
         
     except Exception as e:
         raise UnexpectedException(f"Unexpected error: {e}") 
+    
+    action_map[action](app_input)
     

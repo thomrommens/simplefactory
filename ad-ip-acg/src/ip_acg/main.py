@@ -7,9 +7,13 @@
 # TODO: Intermediate
 # TODO: - logs consistent language, debug also
 # TODO: - check pipes in log
+# TODO: - nest IP ACGs underneath directories? Currently None.
 
 # TODO: Final
 # TODO: - remove prints
+# TODO: - check if both logger.error and raise are used
+# TODO: - check if logger.debug properly covered
+# TODO: - check if logger.debug properly displayed
 # TODO: - consistent with arguments
 # TODO: - check docstrings
 # TODO: - check typing
@@ -22,41 +26,13 @@ from routes import run_common_route, run_selected_route
 from feedback import msg
 from models import AppInput
 
-# TODO: cont - enable 
-# - python -m main create
-# - python -m main update 
-# - python -m main delete --list 1234567890, 1234567891
-# - python -m main action -debug 
-# - python -m main action -dryrun
 
 @click.command()
-@click.argument(
-    "action",
-    type=click.Choice(
-        ["create", "update", "delete"],
-        case_sensitive=False
-    ),
-    default="create"
-)
-@click.option(
-    "--dryrun", 
-    type=bool,
-    default=True,
-    help=msg["click_options"]["dryrun"]
-)
-@click.option(
-    "--debug", 
-    type=bool,
-    default=False,
-    help=msg["click_options"]["debug"]
-)
-@click.option(
-    "--delete_list", 
-    multiple=True,
-    default=[],
-    help=msg["click_options"]["delete_list"]
-)
-def main(action: str, dryrun: bool, debug: bool, delete_list: list) -> None:
+@click.argument("action", type=click.Choice(["create", "update", "delete"], case_sensitive=False))
+@click.argument("ip_acg_ids_to_delete", nargs=-1, required=False)
+@click.option("--dryrun",is_flag=True, default=False,help=msg["click_options"]["dryrun"])
+@click.option("--debug", is_flag=True, default=False, help=msg["click_options"]["debug"])
+def main(action: str, debug: bool, ip_acg_ids_to_delete: tuple, dryrun: bool) -> None:
     """
     Integrate app.
     :param action: action requested by user on command line.
@@ -67,10 +43,10 @@ def main(action: str, dryrun: bool, debug: bool, delete_list: list) -> None:
     logger.info(f"START MODULE: AMAZON WORKSPACES IP ACG")
     logger.info(HR)
 
-    logger.info(f"Selected action:      [{action}]", extra={"depth": 1})
-    logger.info(f"Dry run mode enabled: [{dryrun}]", extra={"depth": 1})
-    logger.info(f"Delete list supplied: [{delete_list}]", extra={"depth": 1})
-    logger.info(f"Debug mode enabled:   [{debug}]", extra={"depth": 1})
+    logger.info(f"Selected action:                 [{action}]", extra={"depth": 1})
+    logger.info(f"Delete list of IP ACGs supplied: [{ip_acg_ids_to_delete}]", extra={"depth": 1})
+    logger.info(f"Dry run mode enabled:            [{dryrun}]", extra={"depth": 1})
+    logger.info(f"Debug mode enabled:              [{debug}]", extra={"depth": 1})
 
     settings, inventory = run_common_route()
 
@@ -78,7 +54,7 @@ def main(action: str, dryrun: bool, debug: bool, delete_list: list) -> None:
         cli={
             "action": action,
                 "dryrun": dryrun, 
-                "delete_list": delete_list
+                "ip_acg_ids_to_delete": ip_acg_ids_to_delete
         },
         settings=settings,
         inventory=inventory

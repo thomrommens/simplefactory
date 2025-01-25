@@ -93,3 +93,8 @@ use cases
         - specify some in delete action
         - remove applicable ones from settings.yaml
 
+<!-- # - python -m main create
+# - python -m main update 
+# - python -m main delete 1234567890, 1234567891
+# - python -m main action --debug 
+# - python -m main action --dryrun -->
