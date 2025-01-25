@@ -60,7 +60,10 @@ class Validation:
     invalid_rules: list[Rule]
     prefix_default: str 
     prefix_min: str
-
+    rules_amt_max: int
+    rules_desc_length_max: int
+    ip_acg_name_length_max: int
+    # TODO: consistent order throughout code base
 
 @dataclass
 class WorkInstruction:

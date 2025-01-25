@@ -18,7 +18,7 @@ logger = logging.getLogger("ip_acg_logger")
 
 def get_settings() -> dict:
     """
-    xx
+    Get settings from settings.yaml.
     """
     with open(SETTINGS_FILE_PATH, "r") as settings_file:
         settings = yaml.safe_load(settings_file)
@@ -28,7 +28,7 @@ def get_settings() -> dict:
 
 def get_validation_baseline(settings: dict) -> Validation:
     """
-    xx
+    Get validation baseline (settings to validate user input against)from settings.yaml.
     """
     return Validation(
         invalid_rules=[
@@ -37,13 +37,17 @@ def get_validation_baseline(settings: dict) -> Validation:
             for ip_invalid, desc_invalid in rule.items()
         ],
         prefix_default=settings["user_input_validation"]["ip_address"]["prefix"]["default"],
-        prefix_min=settings["user_input_validation"]["ip_address"]["prefix"]["min"]
+        prefix_min=settings["user_input_validation"]["ip_address"]["prefix"]["min"],
+        rules_amt_max=settings["user_input_validation"]["ip_acg"]["rules_amt"]["max"],
+        rules_desc_length_max=settings["user_input_validation"]["ip_acg"]["rules_desc_length"]["max"],
+        ip_acg_name_length_max=settings["user_input_validation"]["ip_acg"]["name_length"]["max"]
     )
 
 
 def get_work_instruction(settings: dict) -> WorkInstruction:
     """
-    Make sure ip_acgs are sorted by name.
+    Parse retrieved settings to a WorkInstruction object.
+    Make sure IP ACGs are sorted by name.
     """
     return WorkInstruction(
         directories=[

@@ -73,7 +73,7 @@ def update(app_input: AppInput) -> None:
         "These IP ACGs "
         f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d:", 
         extra={"depth": 1}
-            )
+    )
     match_ip_acgs(inventory, work_instruction)
 
     report_ip_acgs(work_instruction.ip_acgs)
@@ -103,8 +103,8 @@ def delete(app_input: AppInput) -> None:
     if cli["delete_list"]:
         logger.info(
             "These IP ACGs "
-            f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d: {cli['delete_list']}",
-                extra={"depth": 1}
+            f"{'would' if cli['dryrun'] else 'will'} be {cli['action']}d: "
+            f"{cli['delete_list']}", extra={"depth": 1}
         )
         if not cli["dryrun"]:
             delete_list=cli["delete_list"]

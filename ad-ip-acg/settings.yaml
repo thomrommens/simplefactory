@@ -158,7 +158,12 @@ user_input_validation:
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   ip_acg: 
 
-    name_char_length:
+    name_length:
       max: 50    
     rules_amt:
       max: 10
+    rules_desc_length:
+      max: 255
+
+    # TODO: see if shortcut interpretation instead of keeping tree as-is, is fine
+    # TODO: consistent order throughout code base

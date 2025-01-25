@@ -210,6 +210,10 @@ def validate_match_inventory(matches: int, inventory: Inventory) -> bool:
     Validate if all IP ACGs from the inventory could be matched by name,
     with all IP ACGs from the actual situation in AWS.
     """
+    logger.debug(f"Matches: {matches}", extra={"depth": 1})
+    logger.debug(
+        f"Inventory ip_acgs length: {len(inventory.ip_acgs)}", extra={"depth": 1}
+    )
     if not matches == len(inventory.ip_acgs):
         raise IPACGIdMatchException("xx")
 
@@ -239,7 +243,11 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
     for work_instruction_ip_acg in work_instruction.ip_acgs:
         for inventory_ip_acg in inventory.ip_acgs:
             if work_instruction_ip_acg.name == inventory_ip_acg.name:
-                matches =+ 1
+                logger.debug(
+                    f"Matching IP ACG names: {work_instruction_ip_acg.name} with {inventory_ip_acg.name}",
+                    extra={"depth": 2}
+                )
+                matches += 1
                 work_instruction_ip_acg.id = inventory_ip_acg.id
 
     validate_match_inventory(matches, inventory)

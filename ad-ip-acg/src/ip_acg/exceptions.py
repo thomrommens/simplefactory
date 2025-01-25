@@ -14,6 +14,10 @@ class RulePrefixInvalidException(Exception):
     pass
 
 
+class RuleDescriptionLengthException(Exception):
+    pass
+
+
 class IPACGDuplicateRulesException(Exception):
     pass
 
