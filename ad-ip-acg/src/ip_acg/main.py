@@ -22,16 +22,21 @@ from routes import run_common_route, run_selected_route
 from feedback import msg
 from models import AppInput
 
+# TODO: cont - enable 
+# - python -m main create
+# - python -m main update 
+# - python -m main delete --list 1234567890, 1234567891
+# - python -m main action -debug 
+# - python -m main action -dryrun
 
 @click.command()
-@click.option(
-    "--action", 
+@click.argument(
+    "action",
     type=click.Choice(
-        ["create", "update", "delete"], 
+        ["create", "update", "delete"],
         case_sensitive=False
-    ), 
-    default="create", 
-    help=msg["click_options"]["action"]
+    ),
+    default="create"
 )
 @click.option(
     "--dryrun", 
