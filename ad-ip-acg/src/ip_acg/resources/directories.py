@@ -6,7 +6,7 @@ from tabulate import tabulate
 from typing import Optional
 
 from config import DirectoryNoneFoundException, workspaces
-from models import Directory
+from resources.models import Directory
 
 
 logger = logging.getLogger("ip_acg_logger")
@@ -41,7 +41,8 @@ def get_directories() -> Optional[list[dict]]:
             raise DirectoryNoneFoundException(error_msg)
             
         else:
-            error_msg = f"AWS error when describing directories: {error_code} - {error_message}"
+            error_msg = "AWS error when describing directories: "
+            f"{error_code} - {error_message}"
             logger.error(error_msg, extra={"depth": 1})
             raise DirectoryNoneFoundException(error_msg)
 
@@ -75,12 +76,13 @@ def sel_directories(directories_received: dict) -> list[Directory]:
 
     return directories
 
-
 def report_directories(directories: list[Directory]) -> None:
     """
-    xx
-    """
+    Display a formatted table of directory information.
 
+    :param directories: List of Directory objects containing directory details
+    :raises None
+    """
     data = []
     if directories: 
         for directory in directories:
@@ -101,9 +103,16 @@ def report_directories(directories: list[Directory]) -> None:
 
 def show_current_directories() -> list[Directory]:
     """
-    xx
+    Get and display the current directories in AWS WorkSpaces.
+
+    Retrieve directories from AWS, process the response into Directory objects,
+    and display them in a formatted table.
+
+    :returns: List of Directory objects containing directory information
+    :raises: ClientError: If there is an error calling AWS WorkSpaces API
     """
-    logger.info("Current directories (before execution of action):", extra={"depth": 1})  # TODO make logs more dynamic with actions in them
+    logger.info("Current directories (before execution of action):", extra={"depth": 1})  
+    # TODO make logs more dynamic with actions in them
 
     directories_received = get_directories()
     directories = sel_directories(directories_received)

@@ -3,11 +3,12 @@ from typing import Counter
 
 from config import (
     IPACGDescriptionLengthException,
+    IPACGIdMatchException,
     IPACGNameDuplicateException,
     IPACGNameLengthException,
     STD_INSTRUCTION
 )
-from resources.models import IP_ACG, Settings, WorkInstruction
+from resources.models import IP_ACG, Inventory, Settings, WorkInstruction
 
 
 logger = logging.getLogger("ip_acg_logger")
@@ -100,3 +101,19 @@ def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkIn
         )
 
     return work_instruction
+
+
+def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
+    """
+    Validate if all IP ACGs from the inventory could be matched by name,
+    with all IP ACGs from the actual situation in AWS.
+    """
+    logger.debug(f"Matches: {matches}", extra={"depth": 1})
+    logger.debug(
+        f"Inventory ip_acgs length: {len(inventory.ip_acgs)}", extra={"depth": 1}
+    )
+    if not matches == len(inventory.ip_acgs):
+        raise IPACGIdMatchException(
+            "Could not match all current IP ACGs from AWS with IP ACGs specified "
+            "in settings.yaml."
+        )

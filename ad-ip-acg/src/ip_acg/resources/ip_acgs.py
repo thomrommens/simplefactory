@@ -1,22 +1,21 @@
+from botocore.exceptions import ClientError
 from dataclasses import asdict
-from datetime import datetime
 import json
 import logging
+import pandas as pd
+from tabulate import tabulate
 from textwrap import indent
 from typing import Optional
-from botocore.exceptions import ClientError
-import pandas as pd
 
-from tabulate import tabulate
 from config import (
-    IPACGIdMatchException, 
     IPACGCreateException, 
-    IpAcgDisassociationException, 
+    IpAcgDisassociationException,
     workspaces
 )
-from models import IP_ACG, Directory, Inventory, Rule, WorkInstruction
-
-# TODO: format file to logical order of functions
+from resources.models import IP_ACG, Directory, Inventory, Rule, WorkInstruction
+from resources.rules import format_rules, update_rules
+from resources.tags import update_tags, format_tags
+from validation.ip_acgs import val_ip_acgs_match_inventory
 
 
 logger = logging.getLogger("ip_acg_logger")
@@ -38,7 +37,7 @@ def get_ip_acgs() -> list[IP_ACG]:
         if response["Result"]:
             return response["Result"]
         
-        logger.error("No IP groups found in response", extra={"depth": 1})
+        logger.warning("No IP ACGs found in AWS.", extra={"depth": 1})
 
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
@@ -131,12 +130,18 @@ def report_ip_acgs(ip_acgs: list[IP_ACG]):
 
 def show_current_ip_acgs() -> Optional[list[IP_ACG]]:
     """
-    xx
+    Show the current IP Access Control Groups in AWS.
+
+    Retrieve IP ACGs from AWS, process them into internal format, and display a report.
+    Log the raw and processed IP ACGs at debug level.
+
+    :returns: List of IP_ACG objects if any exist in AWS, None otherwise
+    :raises: Any exceptions from get_ip_acgs() or sel_ip_acgs() are propagated
     """
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
     ip_acgs_received = get_ip_acgs()
-    print(f"ip_acgs_received: {ip_acgs_received}")
+    logger.debug(f"ip_acgs_received: {ip_acgs_received}", extra={"depth": 1})
 
     if ip_acgs_received:
         ip_acgs = sel_ip_acgs(ip_acgs_received)
@@ -150,44 +155,6 @@ def show_current_ip_acgs() -> Optional[list[IP_ACG]]:
         )
 
         return ip_acgs
-
-# ----------------------------------------------------------------------------
-
-
-def format_rules(ip_acg: IP_ACG) -> list[dict]:
-    """
-    Fit rules in request syntax format.
-    Sort rules for user friendliness.
-    """
-    rules = [
-        {"ipRule": rule.ip, "ruleDesc": rule.desc}
-        for rule in ip_acg.rules
-    ]
-    rules_sorted = sorted(
-        rules,
-        key=lambda rules: rules["ipRule"]
-    )
-    return rules_sorted
-
-
-def update_tags(tags: dict, ip_acg: IP_ACG) -> dict:
-    """
-    Replace placeholders
-    """
-    timestamp = datetime.now().isoformat()
-
-    tags["IPACGName"] = ip_acg.name
-    tags["Created"] = timestamp
-    tags["RulesLastApplied"] = timestamp  #TODO: make sure to update as only tag at update route
-
-    return tags
-
-
-def format_tags(tags: dict) -> list[dict]:
-    """
-    xx
-    """
-    return [{"Key": k, "Value": v} for k, v in tags.items()]
 
 
 def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
@@ -217,7 +184,7 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         ip_acg.id = response.get("GroupId")
 
         logger.info(
-            f"Created IP ACG [{ip_acg.name}] with id: [{ip_acg.id}]", 
+            f"Created IP ACG [{ip_acg.name}] with id [{ip_acg.id}].",  # TODO: add tabulated here too, with other markup?
             extra={"depth": 1}
         )
         
@@ -249,19 +216,6 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             error_msg = f"AWS error when creating IP group: {error_code} - {error_message}."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-
-
-def validate_match_inventory(matches: int, inventory: Inventory) -> bool:
-    """
-    Validate if all IP ACGs from the inventory could be matched by name,
-    with all IP ACGs from the actual situation in AWS.
-    """
-    logger.debug(f"Matches: {matches}", extra={"depth": 1})
-    logger.debug(
-        f"Inventory ip_acgs length: {len(inventory.ip_acgs)}", extra={"depth": 1}
-    )
-    if not matches == len(inventory.ip_acgs):
-        raise IPACGIdMatchException("xx")
 
 
 def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> WorkInstruction:
@@ -296,7 +250,7 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
                 matches += 1
                 work_instruction_ip_acg.id = inventory_ip_acg.id
 
-    validate_match_inventory(matches, inventory)
+    val_ip_acgs_match_inventory(matches, inventory)
     # TODO: specify which IP ACGs could not be matched by name?
     
     logger.debug(
@@ -307,50 +261,7 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
 
     return work_instruction
 
-
-def update_rules(ip_acg: IP_ACG) -> None:
-    """
-    xx
-    """
-    rules_formatted = format_rules(ip_acg)
-
-    try:
-        response = workspaces.update_rules_of_ip_group(
-            GroupId=ip_acg.id,
-            UserRules=rules_formatted
-        )
-    except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
-        
-        if error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to update IP group rules"
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-            
-        elif error_code == "InvalidParameterValueException":
-            error_msg = "Invalid parameter provided when updating IP group rules"
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-            
-        elif error_code == "ResourceNotFoundException":
-            error_msg = "Resource not found when updating IP group rules"
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-            
-        else:
-            error_msg = f"AWS error when updating IP group rules: {error_code} - {error_message}"
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-        
-    logger.debug(
-        f"update_rules_of_ip_group - response: {json.dumps(response, indent=4)}", 
-        extra={"depth": 1}
-    )
-    logger.info(
-        f"Rules for IP ACG [{ip_acg.name}]updated.", extra={"depth": 1}
-    )
-    
+  
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     """

@@ -1,8 +1,6 @@
 # TODO: Now
 # TODO: - in work_instruction, also nest IP ACGs underneath directories? Currently None.
-# TODO: - try/except for responses
-# TODO:     - add default AWS exceptions?
-# TODO: - order of functions/split to utils?
+# TODO: - order of functions
 
 # TODO: Intermediate
 # TODO: - logs consistent language, debug also
@@ -21,11 +19,17 @@
 # TODO: - run black	
 # TODO: - wrap at 88 (black)
 # TODO: - check import types
+# TODO: - replace xx
+# TODO: - test generally in AWS
+# TODO: - add deletion marker in tabulate
+# TODO: - add specs of to-be-deleted IP ACGs
+# TODO: - add status route to only show current state in AWS
+# TODO: - consistent groups vs IP ACGs
 
 import click
 
 from config import HR, setup_logger, click_help
-from routing.actions import run_common_route, run_selected_route
+from routing.routes import run_common_route, run_selected_route
 
 from resources.models import AppInput
 
@@ -35,10 +39,14 @@ from resources.models import AppInput
     "action", 
     type=click.Choice(
         ["create", "update", "delete"], 
-        case_sensitive=False), 
-    help=click_help["action"]
+        case_sensitive=False
     )
-@click.argument("ip_acg_ids_to_delete", nargs=-1, required=False, help=click_help["delete_list"])
+)
+@click.argument(
+    "ip_acg_ids_to_delete", 
+    nargs=-1, 
+    required=False,
+)
 @click.option("--dryrun",is_flag=True, default=False, help=click_help["dryrun"])
 @click.option("--debug", is_flag=True, default=False, help=click_help["debug"])
 def main(action: str, debug: bool, ip_acg_ids_to_delete: tuple, dryrun: bool) -> None:
@@ -52,10 +60,10 @@ def main(action: str, debug: bool, ip_acg_ids_to_delete: tuple, dryrun: bool) ->
     logger.info(f"START MODULE: AMAZON WORKSPACES IP ACG")
     logger.info(HR)
 
-    logger.info(f"Selected action:                 [{action}]", extra={"depth": 1})
-    logger.info(f"Delete list of IP ACGs supplied: [{ip_acg_ids_to_delete}]", extra={"depth": 1})
-    logger.info(f"Dry run mode enabled:            [{dryrun}]", extra={"depth": 1})
-    logger.info(f"Debug mode enabled:              [{debug}]", extra={"depth": 1})
+    logger.info(f"Selected action:        [{action}]", extra={"depth": 1})
+    logger.info(f"Delete list of IP ACGs: [{ip_acg_ids_to_delete}]", extra={"depth": 1})
+    logger.info(f"Dry run mode enabled:   [{dryrun}]", extra={"depth": 1})
+    logger.info(f"Debug mode enabled:     [{debug}]", extra={"depth": 1})
 
     settings, inventory = run_common_route()
 

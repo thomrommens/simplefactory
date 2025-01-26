@@ -1,12 +1,12 @@
 import logging
 
-from actions import create, update, delete
-from resources.directories import show_current_directories
 from config import UnexpectedException
+from resources.directories import show_current_directories
 from resources.ip_acgs import show_current_ip_acgs
+from resources.models import AppInput, Inventory, Settings
+from routing.actions import create, delete, update
 from validation import val_work_instruction
 from validation.utils import parse_settings
-from resources.models import Settings, Inventory, AppInput
 
 
 logger = logging.getLogger("ip_acg_logger")
