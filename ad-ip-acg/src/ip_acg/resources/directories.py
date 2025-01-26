@@ -5,8 +5,7 @@ import pandas as pd
 from tabulate import tabulate
 from typing import Optional
 
-from config import workspaces
-from exceptions import DirectoryNoneFoundException
+from config import DirectoryNoneFoundException, workspaces
 from models import Directory
 
 

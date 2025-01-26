@@ -1,5 +1,6 @@
 import logging
-from models import Settings, WorkInstruction
+
+from resources.models import Settings, WorkInstruction
 from .ip_acgs import val_ip_acgs
 from .rules import val_rules
 

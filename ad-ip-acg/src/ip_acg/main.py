@@ -18,20 +18,29 @@
 # TODO: - check docstrings
 # TODO: - check typing
 # TODO: - Ruff checker
+# TODO: - run black	
+# TODO: - wrap at 88 (black)
+# TODO: - check import types
 
 import click
 
-from config import HR, setup_logger
-from routes import run_common_route, run_selected_route
-from feedback import msg
-from models import AppInput
+from config import HR, setup_logger, click_help
+from routing.actions import run_common_route, run_selected_route
+
+from resources.models import AppInput
 
 
 @click.command()
-@click.argument("action", type=click.Choice(["create", "update", "delete"], case_sensitive=False))
-@click.argument("ip_acg_ids_to_delete", nargs=-1, required=False)
-@click.option("--dryrun",is_flag=True, default=False,help=msg["click_options"]["dryrun"])
-@click.option("--debug", is_flag=True, default=False, help=msg["click_options"]["debug"])
+@click.argument(
+    "action", 
+    type=click.Choice(
+        ["create", "update", "delete"], 
+        case_sensitive=False), 
+    help=click_help["action"]
+    )
+@click.argument("ip_acg_ids_to_delete", nargs=-1, required=False, help=click_help["delete_list"])
+@click.option("--dryrun",is_flag=True, default=False, help=click_help["dryrun"])
+@click.option("--debug", is_flag=True, default=False, help=click_help["debug"])
 def main(action: str, debug: bool, ip_acg_ids_to_delete: tuple, dryrun: bool) -> None:
     """
     Integrate app.

@@ -8,8 +8,12 @@ from botocore.exceptions import ClientError
 import pandas as pd
 
 from tabulate import tabulate
-from config import workspaces
-from exceptions import IPACGIdMatchException, IPACGCreateException, IpAcgDisassociationException
+from config import (
+    IPACGIdMatchException, 
+    IPACGCreateException, 
+    IpAcgDisassociationException, 
+    workspaces
+)
 from models import IP_ACG, Directory, Inventory, Rule, WorkInstruction
 
 # TODO: format file to logical order of functions

@@ -1,7 +1,7 @@
 import logging
 
-from exceptions import IPACGNoneFoundException, IPACGNoneSpecifiedForDeleteException
-from ip_acgs import (
+from config import IPACGNoneFoundException, IPACGNoneSpecifiedForDeleteException
+from resources.ip_acgs import (
     associate_ip_acg, 
     create_ip_acg, 
     delete_ip_acg, 
@@ -10,7 +10,8 @@ from ip_acgs import (
     update_rules,
     match_ip_acgs
 )
-from models import AppInput
+from resources.models import AppInput
+
 
 logger = logging.getLogger("ip_acg_logger")
 
@@ -87,8 +88,9 @@ def update(app_input: AppInput) -> None:
 
     else:
         raise IPACGNoneFoundException(
-            "No IP ACGs found in inventory. Skip update of IP ACG rules. Please make sure you have "
-            "at least one IP ACG in AWS to update. Run the 'create' action to create an IP ACG. "
+            "No IP ACGs found in inventory. Skip update of IP ACG rules. " 
+            "Please make sure you have at least one IP ACG in AWS to update. "
+            "Run the 'create' action to create an IP ACG. "
             "See README.md for more information."
         )
 
