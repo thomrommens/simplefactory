@@ -31,6 +31,7 @@ def create(app_input: AppInput) -> None:
     """
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
+    inventory = app_input.inventory
 
     logger.info(
         "These IP ACGs "
@@ -41,15 +42,23 @@ def create(app_input: AppInput) -> None:
 
     if not cli["dryrun"] :
         tags = work_instruction.tags
+        
+        # If no directories are specified in the settings.yaml, 
+        #  associate the IP ACGs with all directories in the inventory
+        #  TODO: test
+        if not work_instruction.directories[0].id and not work_instruction.directories[0].name:
+            directories = inventory.directories
+        else:
+            directories = work_instruction.directories
 
         ip_acgs_created = []
         for ip_acg in work_instruction.ip_acgs:
             ip_acg_created = create_ip_acg(ip_acg, tags)
             
             if ip_acg_created:
-                ip_acgs_created.append(ip_acg_created)      
-
-                for directory in work_instruction.directories:
+                ip_acgs_created.append(ip_acg_created)  
+                               
+                for directory in directories:
                     associate_ip_acg(ip_acgs_created, directory)
 
 
@@ -108,7 +117,7 @@ def delete(app_input: AppInput) -> None:
     :raises: Various AWS exceptions during disassociation and deletion
     """
     cli = app_input.cli
-    work_instruction = app_input.settings.work_instruction
+    inventory = app_input.inventory
 
     if cli["ip_acg_ids_to_delete"]:
         logger.info(
@@ -117,14 +126,22 @@ def delete(app_input: AppInput) -> None:
             f"{cli['ip_acg_ids_to_delete']}", extra={"depth": 1}
         )
         if not cli["dryrun"]:
-            ip_acg_ids_to_delete=cli["ip_acg_ids_to_delete"]
-            for directory in work_instruction.directories:
-                disassociate_ip_acg(
-                    ip_acg_ids_to_delete=ip_acg_ids_to_delete,
-                    directory=directory
-                )
-                for ip_acg_id in ip_acg_ids_to_delete:
-                    delete_ip_acg(ip_acg_id)
+            ip_acg_ids_to_delete = cli["ip_acg_ids_to_delete"]
+            
+            for ip_acg_id in ip_acg_ids_to_delete:
+                for directory in inventory.directories:
+                    try:
+                        disassociate_ip_acg(
+                            ip_acg_ids_to_delete=[ip_acg_id],
+                            directory=directory
+                        )
+                    except Exception as e:
+                        logger.warning(
+                            f"Failed to disassociate IP ACG {ip_acg_id} "
+                            f"from directory {directory}: {str(e)}",
+                            extra={"depth": 2}
+                        )
+                delete_ip_acg(ip_acg_id)
 
     else:
         raise IPACGNoneSpecifiedForDeleteException(

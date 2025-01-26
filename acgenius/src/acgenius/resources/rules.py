@@ -9,7 +9,6 @@ from resources.models import IP_ACG
 logger = logging.getLogger("ip_acg_logger")
 
 
-
 def format_rules(ip_acg: IP_ACG) -> list[dict]:
     """
     Fit rules in request syntax format.
@@ -28,7 +27,7 @@ def format_rules(ip_acg: IP_ACG) -> list[dict]:
 
 def update_rules(ip_acg: IP_ACG) -> None:
     """
-    xx
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.htmlx
     """
     rules_formatted = format_rules(ip_acg)
 
@@ -40,22 +39,32 @@ def update_rules(ip_acg: IP_ACG) -> None:
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
-        
-        if error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to update IP group rules"
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-            
-        elif error_code == "InvalidParameterValueException":
+
+        if error_code == "InvalidParameterValuesException":
             error_msg = "Invalid parameter provided when updating IP group rules"
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-            
+        
         elif error_code == "ResourceNotFoundException":
             error_msg = "Resource not found when updating IP group rules"
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-            
+        
+        elif error_code == "ResourceLimitExceededException":
+            error_msg = "Limit exceeded when updating IP group."
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "InvalidResourceStateException":
+            error_msg = "Invalid resource state when updating IP group rules"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "AccessDeniedException":
+            error_msg = "Access denied when attempting to update IP group rules"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
         else:
             error_msg = f"AWS error when updating IP group rules: {error_code} - {error_message}"
             logger.error(error_msg, extra={"depth": 1})

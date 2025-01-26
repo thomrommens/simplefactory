@@ -1,4 +1,4 @@
-# Project Title
+# `acgenius`
 
 Simple overview of use/purpose.
 

@@ -16,7 +16,7 @@ def get_directories() -> Optional[list[dict]]:
     """
     # if value in work_instruction for Directory, follow
     # else, get from AWS
-    -> # TODO: build this
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_workspace_directories.html
     """
     try:
         response = workspaces.describe_workspace_directories()
@@ -25,18 +25,8 @@ def get_directories() -> Optional[list[dict]]:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
         
-        if error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to describe directories"
-            logger.error(error_msg, extra={"depth": 1})
-            raise DirectoryNoneFoundException(error_msg)
-            
-        elif error_code == "InvalidParameterValueException":
+        if error_code == "InvalidParameterValuesException":
             error_msg = "Invalid parameter provided when describing directories"
-            logger.error(error_msg, extra={"depth": 1})
-            raise DirectoryNoneFoundException(error_msg)
-            
-        elif error_code == "ResourceNotFoundException":
-            error_msg = "Resource not found when describing directories"
             logger.error(error_msg, extra={"depth": 1})
             raise DirectoryNoneFoundException(error_msg)
             
@@ -53,7 +43,6 @@ def get_directories() -> Optional[list[dict]]:
 
     if response["Directories"]:
         return response["Directories"]
-
 
 
 def sel_directories(directories_received: dict) -> list[Directory]:

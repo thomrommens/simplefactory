@@ -1,5 +1,4 @@
 # TODO: Now
-# TODO: - in work_instruction, also nest IP ACGs underneath directories? Currently None.
 # TODO: - order of functions
 
 # TODO: Intermediate
@@ -26,6 +25,7 @@
 # TODO: - add status route to only show current state in AWS
 # TODO: - consistent groups vs IP ACGs
 # TODO: - change name of module to acgenius
+# TODO: - update docstrings?
 
 import click
 

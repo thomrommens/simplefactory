@@ -13,7 +13,7 @@ from config import (
     workspaces
 )
 from resources.models import IP_ACG, Directory, Inventory, Rule, WorkInstruction
-from resources.rules import format_rules, update_rules
+from resources.rules import format_rules
 from resources.tags import update_tags, format_tags
 from validation.ip_acgs import val_ip_acgs_match_inventory
 
@@ -24,6 +24,7 @@ logger = logging.getLogger("ip_acg_logger")
 def get_ip_acgs() -> list[IP_ACG]:
     """
     Retrieve IP Access Control Groups from AWS Workspaces.
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_ip_groups.html
 
     :return: List of IP_ACG objects containing the IP ACGs found in AWS
     """
@@ -42,19 +43,14 @@ def get_ip_acgs() -> list[IP_ACG]:
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
-        
-        if error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to describe IP groups"
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-            
-        elif error_code == "InvalidParameterValueException":
+
+        if error_code == "InvalidParameterValuesException":
             error_msg = "Invalid parameter provided when describing IP groups"
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-            
-        elif error_code == "ResourceNotFoundException":
-            error_msg = "Resource not found when describing IP groups"
+        
+        elif error_code == "AccessDeniedException":
+            error_msg = "Access denied when attempting to describe IP groups"
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
             
@@ -186,32 +182,37 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         logger.info(
             f"Created IP ACG [{ip_acg.name}] with id [{ip_acg.id}].",  # TODO: add tabulated here too, with other markup?
             extra={"depth": 1}
-        )
-        
+        )        
         return ip_acg
+    
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
-        
-        if error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to create IP group. Please check your IAM role. See README.md for more information."
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-            
-        elif error_code == "InvalidParameterValueException":
+
+        if error_code == "InvalidParameterValuesException":
             error_msg = "Invalid parameter provided when creating IP group."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-            
-        elif error_code == "ResourceAlreadyExistsException":
-            error_msg = f"IP group [{ip_acg.name}] already exists. Skip create."
-            logger.error(error_msg, extra={"depth": 1})
-            
-        elif error_code == "LimitExceededException":
+
+        elif error_code == "ResourceLimitExceededException":
             error_msg = "Limit exceeded when creating IP group."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-            
+        
+        elif error_code == "ResourceAlreadyExistsException":
+            error_msg = f"IP group [{ip_acg.name}] already exists. Skip create."
+            logger.error(error_msg, extra={"depth": 1})
+
+        elif error_code == "ResourceCreationFailedException":
+            error_msg = "Failed to create IP group."
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "AccessDeniedException":
+            error_msg = "Access denied when attempting to create IP group. Please check your IAM role. See README.md for more information."
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+                       
         else:
             error_msg = f"AWS error when creating IP group: {error_code} - {error_message}."
             logger.error(error_msg, extra={"depth": 1})
@@ -260,12 +261,11 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
     )
 
     return work_instruction
-
   
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     """
-    xx
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/associate_ip_groups.html
     """
     try:
         response = workspaces.associate_ip_groups(
@@ -275,24 +275,34 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
-        
-        if error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to associate IP groups"
-            logger.error(error_msg, extra={"depth": 1})
-            raise IPACGCreateException(error_msg)
-            
-        elif error_code == "InvalidParameterValueException":
+
+        if error_code == "InvalidParameterValuesException":
             error_msg = "Invalid parameter provided when associating IP groups"
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-            
+                               
         elif error_code == "ResourceNotFoundException":
             error_msg = "Resource not found when associating IP groups"
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-            
-        elif error_code == "LimitExceededException":
+        
+        elif error_code == "ResourceLimitExceededException":
             error_msg = "Limit exceeded when associating IP groups"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "InvalidResourceStateException":
+            error_msg = "Invalid resource state when associating IP groups"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "AccessDeniedException":
+            error_msg = "Access denied when attempting to associate IP groups"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+       
+        elif error_code == "OperationNotSupportedException":
+            error_msg = "Operation not supported when associating IP groups"
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
             
@@ -309,7 +319,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
 
 def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> None:
     """
-    xx
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/disassociate_ip_groups.html
     """
     try:
         response = workspaces.disassociate_ip_groups(
@@ -317,27 +327,38 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
             GroupIds=ip_acg_ids_to_delete
         )
     except ClientError as e:
-        if e.response["Error"]["Code"] == "ResourceNotFoundException":
-            logger.info(
-                f"IP ACG or Directory not found.", 
-                extra={"depth": 1}
-            )
-            raise IpAcgDisassociationException("IP ACG or Directory not found.")
-        elif e.response["Error"]["Code"] == "InvalidParameterValueException":
-            logger.error(
-                "Invalid parameter provided for disassociation.", 
-                extra={"depth": 1}
-            )
-            raise IpAcgDisassociationException("Invalid parameter provided for disassociation.")
-        elif e.response["Error"]["Code"] == "AccessDeniedException":
-            logger.error(
-                "Access denied when attempting disassociation.", 
-                extra={"depth": 1}
-            )
-            raise IpAcgDisassociationException("Access denied when attempting disassociation.")
+        error_code = e.response["Error"]["Code"]
+        error_message = e.response["Error"]["Message"]
+
+        if error_code == "InvalidParameterValuesException":
+            error_msg = "Invalid parameter provided for disassociation."
+            logger.error(error_msg, extra={"depth": 1})
+            raise IpAcgDisassociationException(error_msg)
+
+        elif error_code == "ResourceNotFoundException":
+            error_msg = "IP ACG or Directory not found."
+            logger.error(error_msg, extra={"depth": 1})
+            raise IpAcgDisassociationException(error_msg)
+        
+        elif error_code == "InvalidResourceStateException":
+            error_msg = "Invalid resource state when associating IP groups"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "AccessDeniedException":
+            error_msg = "Access denied when attempting disassociation."
+            logger.error(error_msg, extra={"depth": 1})
+            raise IpAcgDisassociationException(error_msg)
+        
+        elif error_code == "OperationNotSupportedException":
+            error_msg = "Operation not supported when disassociating IP groups"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
         else:
-            logger.error(f"AWS error during disassociation: {e}", extra={"depth": 1})
-            raise IpAcgDisassociationException(f"AWS error during disassociation: {e}")
+            error_msg = f"AWS error during disassociation: {error_code} - {error_message}"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IpAcgDisassociationException(error_msg)
         
     logger.debug(
         f"disassociate_ip_acg - response: {json.dumps(response, indent=4)}",
@@ -349,45 +370,41 @@ def delete_ip_acg(ip_acg_id: str) -> None:
     """
     needs disassociate first.
     Unrelated to settings.yaml
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/delete_ip_group.html
     """
     try:
-        try:
-            response = workspaces.delete_ip_group(GroupId=ip_acg_id)
-        except ClientError as e:
-            error_code = e.response["Error"]["Code"]
-            error_message = e.response["Error"]["Message"]
-            
-            if error_code == "AccessDeniedException":
-                error_msg = "Access denied when attempting to delete IP group"
-                logger.error(error_msg, extra={"depth": 1})
-                raise IPACGCreateException(error_msg)
-                
-            elif error_code == "InvalidParameterValueException":
-                error_msg = "Invalid parameter provided when deleting IP group"
-                logger.error(error_msg, extra={"depth": 1})
-                raise IPACGCreateException(error_msg)
-                
-            elif error_code == "ResourceNotFoundException":
-                error_msg = "IP group not found when attempting deletion"
-                logger.error(error_msg, extra={"depth": 1})
-                raise IPACGCreateException(error_msg)
-                
-            else:
-                error_msg = f"AWS error when deleting IP group: {error_code} - {error_message}"
-                logger.error(error_msg, extra={"depth": 1})
-                raise IPACGCreateException(error_msg)
-
-        logger.debug(
-            f"delete_ip_acg - response: {json.dumps(response, indent=4)}",
-            extra={"depth": 1}
-        )
-        logger.info(f"Deleted IP ACG [{ip_acg_id}].", extra={"depth": 1})
-
+        response = workspaces.delete_ip_group(GroupId=ip_acg_id)
     except ClientError as e:
-        if e.response["Error"]["Code"] == "ResourceNotFoundException":
-            logger.info(
-                f"IP ACG [{ip_acg_id}] not found. Skip deletion.", 
-                extra={"depth": 1}
-            )
+        error_code = e.response["Error"]["Code"]
+        error_message = e.response["Error"]["Message"]
+
+        if error_code == "InvalidParameterValuesException":
+            error_msg = "Invalid parameter provided when deleting IP group"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "ResourceNotFoundException":
+            error_msg = "IP group not found when attempting deletion"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "ResourceAssociatedException":
+            error_msg = "IP group is associated with a directory"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+        
+        elif error_code == "AccessDeniedException":
+            error_msg = "Access denied when attempting to delete IP group"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+            
         else:
-            logger.info(f"Client error: {e}", extra={"depth": 1})
+            error_msg = f"AWS error when deleting IP group: {error_code} - {error_message}"
+            logger.error(error_msg, extra={"depth": 1})
+            raise IPACGCreateException(error_msg)
+
+    logger.debug(
+        f"delete_ip_acg - response: {json.dumps(response, indent=4)}",
+        extra={"depth": 1}
+    )
+    logger.info(f"Deleted IP ACG [{ip_acg_id}].", extra={"depth": 1})
