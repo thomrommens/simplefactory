@@ -1,12 +1,10 @@
-# TODO: Now
+
 # TODO: - order of functions
 
-# TODO: Intermediate
 # TODO: - logs consistent language, debug also
 # TODO: - check pipes in log
 # TODO: - nest IP ACGs underneath directories? Currently None.
 
-# TODO: Final
 # TODO: - remove prints
 # TODO: - check if both logger.error and raise are used
 # TODO: - check if logger.debug properly covered

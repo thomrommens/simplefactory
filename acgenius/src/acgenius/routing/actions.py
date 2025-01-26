@@ -103,6 +103,7 @@ def update(app_input: AppInput) -> None:
             "See README.md for more information."
         )
 
+
 def delete(app_input: AppInput) -> None:
     """
     Deletes specified IP Access Control Groups from AWS.
@@ -147,4 +148,3 @@ def delete(app_input: AppInput) -> None:
         raise IPACGNoneSpecifiedForDeleteException(
             "Selected action is delete, but no IP ACGs specified for deletion."
         )
-    

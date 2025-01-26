@@ -12,7 +12,7 @@ from resources.models import Directory
 logger = logging.getLogger("ip_acg_logger")
 
 
-def get_directories() -> Optional[list[dict]]:
+def get_inventory_directories() -> Optional[list[dict]]:
     """
     # if value in work_instruction for Directory, follow
     # else, get from AWS
@@ -45,7 +45,7 @@ def get_directories() -> Optional[list[dict]]:
         return response["Directories"]
 
 
-def sel_directories(directories_received: dict) -> list[Directory]:
+def sel_inventory_directories(directories_inventory: dict) -> list[Directory]:
     """
     There might currently be no IP ACG in a directory.
     Then, for that directory, the key `ipGroupIds`
@@ -53,17 +53,18 @@ def sel_directories(directories_received: dict) -> list[Directory]:
     """
     directories = []
 
-    for directory_received in directories_received:
+    for directory in directories_inventory:
         directory = Directory(
-            id=directory_received.get("DirectoryId"),
-            name=directory_received.get("DirectoryName"),
-            type=directory_received.get("DirectoryType"),
-            state=directory_received.get("State"),
-            ip_acgs=directory_received.get("ipGroupIds"),
+            id=directory.get("DirectoryId"),
+            name=directory.get("DirectoryName"),
+            type=directory.get("DirectoryType"),
+            state=directory.get("State"),
+            ip_acgs=directory.get("ipGroupIds"),
         )
     directories.append(directory)
 
     return directories
+
 
 def report_directories(directories: list[Directory]) -> None:
     """
@@ -90,7 +91,7 @@ def report_directories(directories: list[Directory]) -> None:
         print("(No directories found)")
 
 
-def show_current_directories() -> list[Directory]:
+def show_inventory_directories() -> list[Directory]:
     """
     Get and display the current directories in AWS WorkSpaces.
 
@@ -101,11 +102,12 @@ def show_current_directories() -> list[Directory]:
     :raises: ClientError: If there is an error calling AWS WorkSpaces API
     """
     logger.info("Current directories (before execution of action):", extra={"depth": 1})  
-    # TODO make logs more dynamic with actions in them
 
-    directories_received = get_directories()
-    directories = sel_directories(directories_received)
+    directories_inventory = get_inventory_directories()
+    directories_inventory_sel = sel_inventory_directories(directories_inventory)
     
-    report_directories(directories)
+    report_directories(directories_inventory_sel)
 
-    return directories
+    # TODO make more generic show_directories?
+
+    return directories_inventory_sel

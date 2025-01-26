@@ -21,7 +21,7 @@ from validation.ip_acgs import val_ip_acgs_match_inventory
 logger = logging.getLogger("ip_acg_logger")
 
 
-def get_ip_acgs() -> list[IP_ACG]:
+def get_inventory_ip_acgs() -> list[IP_ACG]:
     """
     Retrieve IP Access Control Groups from AWS Workspaces.
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_ip_groups.html
@@ -60,31 +60,31 @@ def get_ip_acgs() -> list[IP_ACG]:
             raise IPACGCreateException(error_msg)
 
 
-def sel_ip_acgs(ip_acgs_received: Optional[dict]) -> list[IP_ACG]:
+def sel_inventory_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     """
     Make sure ip_acgs are sorted by name.
     """
-    ip_acgs = []
+    ip_acgs_sel = []
 
     unsorted_ip_acgs = [
         IP_ACG(            
-            id=ip_acg_received.get("groupId"),
-            name=ip_acg_received.get("groupName"),
-            desc=ip_acg_received.get("groupDesc"),
+            id=ip_acg.get("groupId"),
+            name=ip_acg.get("groupName"),
+            desc=ip_acg.get("groupDesc"),
             rules=[
                 Rule(
                     ip=rule.get("ipRule"),
                     desc=rule.get("ruleDesc")
                 )
                 for rule 
-                in ip_acg_received.get("userRules")
+                in ip_acg.get("userRules")
             ]
         )
-        for ip_acg_received in ip_acgs_received
+        for ip_acg in ip_acgs_inventory
     ]
-    ip_acgs.extend(sorted(unsorted_ip_acgs, key=lambda x: x.name))
+    ip_acgs_sel.extend(sorted(unsorted_ip_acgs, key=lambda x: x.name))
 
-    return ip_acgs
+    return ip_acgs_sel
 
 
 def report_ip_acgs(ip_acgs: list[IP_ACG]):
@@ -124,7 +124,7 @@ def report_ip_acgs(ip_acgs: list[IP_ACG]):
         print("(No IP ACGs found)")
 
 
-def show_current_ip_acgs() -> Optional[list[IP_ACG]]:
+def show_inventory_ip_acgs() -> Optional[list[IP_ACG]]:
     """
     Show the current IP Access Control Groups in AWS.
 
@@ -134,13 +134,14 @@ def show_current_ip_acgs() -> Optional[list[IP_ACG]]:
     :returns: List of IP_ACG objects if any exist in AWS, None otherwise
     :raises: Any exceptions from get_ip_acgs() or sel_ip_acgs() are propagated
     """
+    # TODO make more generic show_ip_acgs?
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
-    ip_acgs_received = get_ip_acgs()
+    ip_acgs_received = get_inventory_ip_acgs()
     logger.debug(f"ip_acgs_received: {ip_acgs_received}", extra={"depth": 1})
 
     if ip_acgs_received:
-        ip_acgs = sel_ip_acgs(ip_acgs_received)
+        ip_acgs = sel_inventory_ip_acgs(ip_acgs_received)
         ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
 
         report_ip_acgs(ip_acgs)

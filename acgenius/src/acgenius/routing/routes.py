@@ -1,8 +1,8 @@
 import logging
 
 from config import UnexpectedException
-from resources.directories import show_current_directories
-from resources.ip_acgs import show_current_ip_acgs
+from resources.directories import show_inventory_directories
+from resources.ip_acgs import show_inventory_ip_acgs
 from resources.models import AppInput, Inventory, Settings
 from routing.actions import create, delete, update
 from validation import val_work_instruction
@@ -15,8 +15,8 @@ logger = logging.getLogger("ip_acg_logger")
 def run_common_route() -> tuple[Settings, Inventory]:
     """
     """
-    directories = show_current_directories()
-    ip_acgs = show_current_ip_acgs()
+    directories = show_inventory_directories()
+    ip_acgs = show_inventory_ip_acgs()
     inventory = Inventory(
         directories=directories,
         ip_acgs=ip_acgs

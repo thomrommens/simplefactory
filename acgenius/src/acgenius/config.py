@@ -1,22 +1,20 @@
-import os
 import boto3
 import logging
+import os
 from pathlib import Path
 
 
-workspaces = boto3.client("workspaces", region_name="eu-west-1")
-
-HR = "=" * 88
-
 SETTINGS_FILE = "settings.yaml"
-
 SETTINGS_FILE_PATH = os.path.join(
     Path().resolve().parent.parent, 
     SETTINGS_FILE
 )
 
-STD_INSTRUCTION = "Please revise settings.yaml."  # TODO to feedback.py?
+STD_INSTRUCTION = "Please revise settings.yaml."
 
+HR = "=" * 88
+
+workspaces = boto3.client("workspaces", region_name="eu-west-1")
 
 click_help = {
     "dryrun": (
