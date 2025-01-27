@@ -30,8 +30,8 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         f"Create IP ACG [{ip_acg.name}]...", 
         extra={"depth": 1}
     )
-    tags_updated = extend_tags(tags, ip_acg)
-    tags_formatted = format_tags(tags_updated)
+    tags_extended = extend_tags(tags, ip_acg)
+    tags_formatted = format_tags(tags_extended)
 
     rules_formatted = format_rules(ip_acg)
     
@@ -92,10 +92,13 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     )
 
 
-def update_rules(ip_acg: IP_ACG) -> None:
+def update_rules(ip_acg: IP_ACG, tags: dict) -> None:
     """
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.htmlx
     """
+    tags_extended = extend_tags(tags, ip_acg)
+    tags_formatted = format_tags(tags_extended)
+
     rules_formatted = format_rules(ip_acg)
 
     logger.debug(
@@ -108,27 +111,23 @@ def update_rules(ip_acg: IP_ACG) -> None:
             GroupId=ip_acg.id,
             UserRules=rules_formatted
         )
-
-    except ParamValidationError as e:
-        error_msg = (
-            f"AWS error at [update_rules_of_ip_group]: {e}. "
-            "Are you sure you all IP ACGs from settings.yaml already exist in in AWS?"
-        )
-        logger.error(error_msg, extra={"depth": 1})
-        raise ValueError(
-            f"Parameter validation failed for update_rules_of_ip_group: {error_msg}"
-        ) from e  # TODO
     
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
 
-        logger.error(
-            f"AWS error at [update_rules_of_ip_group]: "
-            f"{error_code} - {error_message}", 
-            extra={"depth": 1}
-        )
-        raise e
+        if error_code == "ValidationException": # TODO: test
+            logger.error (
+                f"AWS error at [update_rules_of_ip_group]: "
+                f"{error_code} - {error_message}. ",
+                extra={"depth": 1}
+            )
+            raise UnexpectedException(
+                f"Validation error: {e}. "
+                "Are you sure the IP ACGs from settings.yaml "
+                "already exist in in AWS?", 
+                extra={"depth": 1}
+            )
         
     logger.debug(
         f"Response of [update_rules_of_ip_group]: {json.dumps(response, indent=4)}.", 
@@ -204,7 +203,7 @@ def delete_ip_acg(ip_acg_id: str) -> None:
         if error_code == "ResourceNotFoundException":
             logger.error(
                 f"IP ACG [{ip_acg_id}] not found in AWS. "
-                "Are you sure you specified an existing IP ACG on the command line ?"
+                "Are you sure you specified an existing IP ACG on the command line?"
             )
         else:
             logger.error(

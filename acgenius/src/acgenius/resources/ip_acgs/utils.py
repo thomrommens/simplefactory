@@ -48,7 +48,6 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
                 work_instruction_ip_acg.id = inventory_ip_acg.id
 
     val_ip_acgs_match_inventory(matches, inventory)
-    # TODO: specify which IP ACGs could not be matched by name?
     
     logger.debug(
         "Updated work instruction:\n"
@@ -89,9 +88,8 @@ def extend_tags(tags: dict, ip_acg: IP_ACG) -> dict:
     )
     timestamp = datetime.now().isoformat()
 
-    tags["IPACGName"] = ip_acg.name
+    tags["IPACGName"] = ip_acg.name    
     tags["Created"] = timestamp
-    tags["RulesLastApplied"] = timestamp  #TODO: make sure to update as only tag at update route
 
     return tags
 

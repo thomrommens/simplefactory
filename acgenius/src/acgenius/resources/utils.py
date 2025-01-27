@@ -75,4 +75,4 @@ def create_report(
                 print(f"\n{subject_table}\n")
 
     else:
-        print(f"(No {type(item)} found)")  # TODO
+        logger.warning(f"No item found for report.", extra={"depth": 1})

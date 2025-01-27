@@ -34,17 +34,19 @@ def get_validation_baseline(settings: dict) -> Validation:
     """
     logger.debug(f"Get validation baseline from settings.yaml...", extra={"depth": 2})
 
+    ui = settings["user_input_validation"]
+
     return Validation(
         invalid_rules=[
             Rule(ip=ip_invalid, desc=desc_invalid)
-            for rule in settings["user_input_validation"]["ip_address"]["invalid"]
+            for rule in ui["ip_address"]["invalid"]
             for ip_invalid, desc_invalid in rule.items()
         ],
-        prefix_default=settings["user_input_validation"]["ip_address"]["prefix"]["default"],
-        prefix_min=settings["user_input_validation"]["ip_address"]["prefix"]["min"],
-        rules_amt_max=settings["user_input_validation"]["ip_acg"]["rules_amt"]["max"],
-        rules_desc_length_max=settings["user_input_validation"]["ip_acg"]["rules_desc_length"]["max"],
-        ip_acg_name_length_max=settings["user_input_validation"]["ip_acg"]["name_length"]["max"]
+        rules_amt_max=ui["ip_acg"]["rules_amt"]["max"],
+        rules_desc_length_max=ui["ip_acg"]["rules_desc_length"]["max"],
+        prefix_default=ui["ip_address"]["prefix"]["default"],
+        prefix_min=ui["ip_address"]["prefix"]["min"],
+        ip_acg_name_length_max=ui["ip_acg"]["name_length"]["max"]
     )
 
 

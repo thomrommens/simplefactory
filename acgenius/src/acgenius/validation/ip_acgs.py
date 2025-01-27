@@ -13,8 +13,6 @@ from resources.models import IP_ACG, Inventory, Settings, WorkInstruction
 
 logger = logging.getLogger("acgenius")
 
-# TODO: validate if selected directory exists? -> dir in wi vs dir in inv
-
 
 def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """

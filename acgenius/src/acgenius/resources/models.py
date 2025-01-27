@@ -58,12 +58,11 @@ class Validation:
         prefix_min: Minimum allowed CIDR prefix length
     """
     invalid_rules: list[Rule]
-    prefix_default: str 
-    prefix_min: str
     rules_amt_max: int
     rules_desc_length_max: int
+    prefix_default: str 
+    prefix_min: str
     ip_acg_name_length_max: int
-    # TODO: consistent order throughout code base
 
 
 @dataclass

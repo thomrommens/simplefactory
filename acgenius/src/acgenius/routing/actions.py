@@ -1,5 +1,6 @@
 import logging
 
+from validation.directories import val_directories_specified
 from config import IPACGNoneFoundException, IPACGNoneSpecifiedForDeleteException
 from resources.utils import create_report
 from resources.ip_acgs.work_instruction import (
@@ -47,16 +48,14 @@ def create(app_input: AppInput) -> None:
 
     create_report(subject=work_instruction.ip_acgs, origin="work_instruction")
 
-    if not cli["dryrun"] :
-        tags = work_instruction.tags
+    if not cli["dryrun"]:
         
-        # If no directories are specified in the settings.yaml, 
-        #  associate the IP ACGs with all directories in the inventory
-        #  TODO: test
-        if not work_instruction.directories[0].id and not work_instruction.directories[0].name:  # TODO: separate function
-            directories = inventory.directories
-        else:
+        tags = work_instruction.tags
+               
+        if val_directories_specified(work_instruction):  # TODO: test
             directories = work_instruction.directories
+        else:
+            directories = inventory.directories
 
         ip_acgs_created = []
         for ip_acg in work_instruction.ip_acgs:

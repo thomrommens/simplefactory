@@ -1,14 +1,17 @@
 # TODO: test 
-# TODO: - generally in AWS: create scenarios
 # TODO: - UTs
+
+# TODO: - generally in AWS: create scenarios
+# TODO: - test with actual workspace
 # TODO: - catch specific instances of exceptions
 # TODO: - let break neatly, not with full AWS stack error
+# TODO: - revisit
 
 # TODO: finalize
 # TODO: - update docstrings
 # TODO: - update typing
 # TODO: - Ruff
-# TODO: - Black (part of Ruff?)
+# TODO: - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/
 # TODO: - import order
 
 # ======================================================================================
