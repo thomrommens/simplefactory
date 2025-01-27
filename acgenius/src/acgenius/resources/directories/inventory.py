@@ -3,9 +3,9 @@ import json
 import logging
 from typing import Optional
 
-from config import workspaces
+from config import EXC_INVALID_PARAM, workspaces
 from resources.models import Directory
-from resources.utils import create_report
+from resources.utils import create_report, process_error
 
 
 logger = logging.getLogger("acgenius")
@@ -21,26 +21,24 @@ def get_directories() -> Optional[list[dict]]:
     
     try:
         response = workspaces.describe_workspace_directories()
+        logger.debug(
+            "Response of [describe_workspace_directories]: "
+            f"{json.dumps(response, indent=4)}", 
+            extra={"depth": 2}
+        )
+        if response["Directories"]:
+            return response["Directories"]
 
     except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
+        msg_generic = "Could not get directories from AWS."
         
-        logger.error(
-            "AWS error at [describe_workspace_directories]: "
-            f"{error_code} - {error_message}.", 
-            extra={"depth": 1}
-        )
-        raise e
-
-    logger.debug(
-        "Response of [describe_workspace_directories]: "
-        f"{json.dumps(response, indent=4)}", 
-        extra={"depth": 2}
-    )
-
-    if response["Directories"]:
-        return response["Directories"]
+        error_map = {
+            "InvalidParameterValuesException": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            }
+        }
+        process_error(error_map, e)
 
 
 def sel_directories(directories_inventory: dict) -> list[Directory]:

@@ -3,9 +3,9 @@ import json
 import logging
 from typing import Optional
 
-from config import workspaces
+from config import EXC_ACCESS_DENIED, EXC_INVALID_PARAM, STD_INSTRUCTION_README, workspaces
 from resources.models import IP_ACG, Rule
-from resources.utils import create_report
+from resources.utils import create_report, process_error, set_app_response
 
 
 logger = logging.getLogger("acgenius")
@@ -27,21 +27,25 @@ def get_ip_acgs() -> list[IP_ACG]:
             f"Response of [describe_ip_groups]: {json.dumps(response, indent=4)}", 
             extra={"depth": 2}
         )
-
         if response.get("Result"):
             return response["Result"]
 
         logger.info("No IP ACGs found in AWS.", extra={"depth": 2})
 
     except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
+        msg_generic = "Could not get IP ACGs from AWS."
 
-        logger.error(
-            f"AWS error at [describe_ip_groups]: {error_code} - {error_message}", 
-            extra={"depth": 2}
-        )
-        raise e
+        error_map = {
+            "InvalidParameterValuesException": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
+            "AccessDeniedException": {
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "crash": True
+            }
+        }
+        process_error(error_map, e)
 
 
 def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:

@@ -6,7 +6,7 @@ from config import (
     IPACGIdMatchException,
     IPACGNameDuplicateException,
     IPACGNameLengthException,
-    STD_INSTRUCTION
+    STD_INSTRUCTION_SETTINGS
 )
 from resources.models import IP_ACG, Inventory, Settings, WorkInstruction
 
@@ -32,7 +32,7 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
             "The IP ACG group name contains "
             f"[{len_ip_acg_name}] characters; "
             f"more than the [{group_name_length_max}] characters AWS allows. "
-            f"{STD_INSTRUCTION}",
+            f"{STD_INSTRUCTION_SETTINGS}",
         ) 
 
 
@@ -51,7 +51,7 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
     if len(duplicates) > 0:        
         raise IPACGNameDuplicateException(
             f"Duplicate IP ACG name found: {duplicates}. "
-            f"{STD_INSTRUCTION}"
+            f"{STD_INSTRUCTION_SETTINGS}"
         )
     
 
@@ -72,7 +72,7 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
             "The IP ACG group description contains "
             f"[{len_ip_acg_desc}] characters; "
             f"more than the [{desc_length_max}] characters AWS allows. "
-            f"{STD_INSTRUCTION}"
+            f"{STD_INSTRUCTION_SETTINGS}"
         ) 
 
 

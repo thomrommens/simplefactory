@@ -10,7 +10,27 @@ SETTINGS_FILE_PATH = os.path.join(
     SETTINGS_FILE
 )
 
-STD_INSTRUCTION = "Please revise settings.yaml."
+STD_INSTRUCTION_SETTINGS = "Please revise settings.yaml."
+STD_INSTRUCTION_README = "See README.md for more info."
+
+EXC_INVALID_PARAM = "Did you specify any parameters in describe_workspace_directories?"
+EXC_ACCESS_DENIED = "It seems you do not have all permissions. Please check your IAM role."
+EXC_RESOURCE_LIMIT = (
+    "It seems you have attempted to many calls in a short amount of time. "
+    "Please try again later."
+)
+EXC_RESOURCE_NOT_FOUND = (
+    "Could not find IP ACG and/or the directory in AWS. "
+    "Double check if they have been created, "
+    "and if not, do a 'create' run of this app."
+)
+EXC_RESOURCE_STATE = (
+    "The IP ACG and/or the directory in AWS"
+    "are in an unexpected state. "
+    "Please inspect these resources in the AWS console. "
+)
+EXC_OPERATION_NOT_SUPPORTED = "The operation is not supported."
+
 
 HR = "=" * 88
 

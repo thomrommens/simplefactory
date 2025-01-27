@@ -1,12 +1,20 @@
-import sys
-from botocore.exceptions import ClientError, ParamValidationError
+from botocore.exceptions import ClientError
 
 import json
 import logging
 from typing import Optional
 
-from resources.utils import exit_app
-from config import UnexpectedException, workspaces
+from resources.utils import process_error
+from config import (
+    EXC_ACCESS_DENIED, 
+    EXC_INVALID_PARAM, 
+    EXC_OPERATION_NOT_SUPPORTED, 
+    EXC_RESOURCE_LIMIT, 
+    EXC_RESOURCE_NOT_FOUND, 
+    EXC_RESOURCE_STATE, 
+    STD_INSTRUCTION_README, 
+    workspaces
+)
 
 from resources.models import (
     Directory,
@@ -54,15 +62,34 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             extra={"depth": 2}
         )        
         return ip_acg
-
+    
     except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
+        msg_generic = f"Could not create IP ACG [{ip_acg.name}] in AWS."
 
-        logger.error(
-            f"AWS error at [create_ip_group]: {error_code} - {error_message}", 
-            extra={"depth": 2}
-        )
+        error_map = {
+            "InvalidParameterValuesException": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
+            "ResourceLimitExceededException": {
+                "msg": f"{msg_generic} {EXC_RESOURCE_LIMIT}",
+                "crash": True
+            },
+            "ResourceAlreadyExistsException": {
+                "msg": f"{msg_generic} It seems the IP ACG already exists. Skip creation",
+                "crash": False
+            },
+            "ResourceCreationFailedException": {
+                "msg": f"{msg_generic} Something went wrong internally at AWS. "
+                "Please try again later.",
+                "crash": True
+            },
+            "AccessDeniedException": {
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "crash": True
+            }
+        }
+        process_error(error_map, e)
  
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
@@ -79,28 +106,48 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
             DirectoryId=directory.id,
             GroupIds=[ip_acg.id for ip_acg in ip_acgs]
         )
+        logger.debug(
+            f"Response of [associate_ip_acg]: {json.dumps(response, indent=4)}",
+            extra={"depth": 2}
+        )
+
     except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
+        msg_generic = (
+            f"Could not associate IP ACGs with directory [{directory.id}] in AWS."
+        )
+        error_map = {
+            "InvalidParameterValuesException": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
+            "ResourceNotFoundException": {
+                "msg": f"{msg_generic} {EXC_RESOURCE_NOT_FOUND} {STD_INSTRUCTION_README}",
+                "crash": True
+            },
+            "ResourceLimitExceededException": {
+                "msg": f"{msg_generic} {EXC_RESOURCE_LIMIT}",
+                "crash": True
+            },
+            "InvalidResourceStateException": {
+                "msg": f"{msg_generic} {EXC_RESOURCE_STATE}",
+                "crash": True
+            },
+            "AccessDeniedException": {
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "crash": True
+            },
+            "OperationNotSupportedException": {
+                "msg": f"{msg_generic} {EXC_OPERATION_NOT_SUPPORTED}",
+                "crash": True
+            },
+        }
+        process_error(error_map, e)
 
-        logger.error(
-            f"AWS error at [associate_ip_groups]: {error_code} - {error_message}", 
-            extra={"depth": 1}
-        )  
-               
-    logger.debug(
-        f"Response of [associate_ip_acg]: {json.dumps(response, indent=4)}",
-        extra={"depth": 2}
-    )
 
-
-def update_rules(ip_acg: IP_ACG, tags: dict) -> None:
+def update_rules(ip_acg: IP_ACG) -> None:
     """
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.html
     """
-    tags_extended = extend_tags(tags, ip_acg)
-    tags_formatted = format_tags(tags_extended)
-
     rules_formatted = format_rules(ip_acg)
 
     logger.debug(
@@ -113,32 +160,46 @@ def update_rules(ip_acg: IP_ACG, tags: dict) -> None:
             GroupId=ip_acg.id,
             UserRules=rules_formatted
         )
-    
-    except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
-
-        if error_code == "ValidationException": # TODO: test
-            logger.error (
-                f"AWS error at [update_rules_of_ip_group]: "
-                f"{error_code} - {error_message}. ",
-                extra={"depth": 1}
-            )
-            raise UnexpectedException(
-                f"Validation error: {e}. "
-                "Are you sure the IP ACGs from settings.yaml "
-                "already exist in in AWS?", 
-                extra={"depth": 1}
-            )
-        
-    logger.debug(
+        logger.debug(
         f"Response of [update_rules_of_ip_group]: {json.dumps(response, indent=4)}.", 
         extra={"depth": 2}
-    )
-    logger.info(
-        f"Rules for IP ACG with name[{ip_acg.name}] and id [{ip_acg.id}] updated.",
-        extra={"depth": 1}
-    )
+        )
+        logger.info(
+            f"Rules for IP ACG with name[{ip_acg.name}] and id [{ip_acg.id}] updated.",
+            extra={"depth": 1}
+        )
+
+    except ClientError as e:
+        msg_generic = (
+            f"Could not update rules of IP ACG [{ip_acg.name}] 
+            and id [{ip_acg.id}] in AWS."
+        )
+        error_map = {
+            "InvalidParameterValuesException": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
+            "ResourceNotFoundException": {
+                "msg": f"{msg_generic} Could not find the IP ACG. Are you sure it exists?",
+                "crash": True
+            },
+            "ResourceLimitExceededException": {
+                "msg": f"{msg_generic} {EXC_RESOURCE_LIMIT}",
+                "crash": True
+            },
+            "InvalidResourceStateException": {
+                "msg": (
+                    f"{msg_generic} The IP ACG is in an unexpected state. "
+                    "Please inspect it in the AWS console. "
+                ),
+                "crash": True
+            },
+            "AccessDeniedException": {
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "crash": True
+            }
+        }
+        process_error(error_map, e)
 
 
 def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> None:
@@ -155,34 +216,47 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
             DirectoryId=directory.id,
             GroupIds=ip_acg_ids_to_delete
         )
+        logger.debug(
+            f"Response of [disassociate_ip_acg]: {json.dumps(response, indent=4)}...",
+            extra={"depth": 2}
+        )
 
     except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-
-        if error_code == "ValidationException":
-            logger.info(
-                f"Could not disassociate IP ACG(s) from directory. "
-                f"One of your IP ACG ids was not recognized. "
-                "Are you sure that you specified a valid IP ACG id "
-                "(e.g., 'wsipg-ab1234567'), and that the IP ACG exists in AWS?",
-                extra={"depth": 1}
-            )
-            logger.error(
-                f"❌ Full error: {e}",                
-                extra={"depth": 1}
-            )
-            exit_app()           
-
-        else:
-            logger.error(
-                f"AWS error at [disassociate_ip_groups]: {e}", 
-                extra={"depth": 1}
-            )
-
-    logger.debug(
-        f"Response of [disassociate_ip_acg]: {json.dumps(response, indent=4)}...",
-        extra={"depth": 2}
-    )
+        msg_generic = (
+            f"Could not disassociate IP ACG from directory with name [{directory.name}] 
+            and id [{directory.name}] in AWS."
+        )
+        error_map = {
+            "ValidationException": {  # TODO: check if this error is caught
+                "msg": (
+                    f"{msg_generic} Are you sure you specified a valid IP ACG?
+                    And does the IP ACG still exist? Please check the status in 
+                    a status run of the app. {STD_INSTRUCTION_README}"
+                ),
+                "crash": True
+            },
+            "InvalidParameterValuesException": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
+            "ResourceNotFoundException": {
+                "msg": f"{msg_generic} {EXC_RESOURCE_NOT_FOUND}",
+                "crash": True
+            },
+            "InvalidResourceStateException": {
+                "msg": f"{msg_generic} {EXC_RESOURCE_STATE}",
+                "crash": True
+            },
+            "AccessDeniedException": {
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "crash": True
+            },
+            "OperationNotSupportedException": {
+                "msg": f"{msg_generic} {EXC_OPERATION_NOT_SUPPORTED}",
+                "crash": True
+            }
+        }
+        process_error(error_map, e)
 
 
 def delete_ip_acg(ip_acg_id: str) -> None:
@@ -204,19 +278,28 @@ def delete_ip_acg(ip_acg_id: str) -> None:
         logger.info(f"Deleted IP ACG [{ip_acg_id}].", extra={"depth": 1})
 
     except ClientError as e:
-        error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
-
-        if error_code == "ResourceNotFoundException":
-            logger.error(
-                f"IP ACG [{ip_acg_id}] not found in AWS. "
-                f"Are you sure [{ip_acg_id}] actually exists in AWS?",
-                extra={"depth": 1}
-            )
-            sys.exit(1)
-        else:
-            logger.error(
-                "AWS error at [delete_ip_acg]: "
-                f"{error_code} - {error_message}", 
-                extra={"depth": 1}
-            )
+        msg_generic = f"Could not delete IP ACG [{ip_acg_id}] in AWS."
+        error_map = {
+            "InvalidParameterValuesException": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
+            "ResourceNotFoundException": {
+                "msg": f"{msg_generic} Could not find IP ACG in AWS. Double check if it 
+                 has have been created, and if not, do a 'create' run of this app.  {STD_INSTRUCTION_README}",
+                "crash": True
+            },
+            "ResourceAssociatedException": {
+                "msg": (
+                    f"{msg_generic} The IP ACG is still associated 
+                    with a directory in AWS. Please retry a 'delete' run first.
+                    Otherwise, please inspect in the AWS console."
+                ),
+                "crash": True
+            },
+            "AccessDeniedException": {
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "crash": True
+            }
+        }
+        process_error(error_map, e)

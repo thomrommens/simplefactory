@@ -10,7 +10,7 @@ from config import (
     RuleIPV4FormatInvalidException,
     RuleLinebreakException,
     RulePrefixInvalidException,
-    STD_INSTRUCTION
+    STD_INSTRUCTION_SETTINGS
 )
 
 from resources.models import Rule, Settings, WorkInstruction
@@ -52,7 +52,7 @@ def val_ip_format_correct(ip: str) -> Optional[bool]:
 
     if not re.match(pattern, ip):
         raise RuleIPV4FormatInvalidException(
-            f"IP address is invalid. {STD_INSTRUCTION}"
+            f"IP address is invalid. {STD_INSTRUCTION_SETTINGS}"
         )
 
 
@@ -94,7 +94,7 @@ def val_prefix_allowed(prefix: int, settings: Settings) -> bool:
     )
     if not prefix_min <= prefix <= prefix_default:
         raise RulePrefixInvalidException(
-            f"Prefix [{prefix}] is invalid. {STD_INSTRUCTION}"
+            f"Prefix [{prefix}] is invalid. {STD_INSTRUCTION_SETTINGS}"
         )
     
 
@@ -115,7 +115,7 @@ def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
     if len(rule.desc) > rules_desc_length_max:
         raise RuleDescriptionLengthException(
             f"Rule description exceeds AWS limit of [{rules_desc_length_max}] characters. "
-            f"{STD_INSTRUCTION}"
+            f"{STD_INSTRUCTION_SETTINGS}"
         )
 
 
@@ -139,7 +139,7 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
             f"Duplicate rule(s) found: {duplicates}. "
             "Note, this might also been due to the app's addition "
             "of /32 for a single IP address. "
-            f"{STD_INSTRUCTION}"
+            f"{STD_INSTRUCTION_SETTINGS}"
         )
     
 
@@ -162,7 +162,7 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
         raise IPACGAmtRulesException(
             f"The IP ACG contains [{amt_rules}] rules; "
             f"more than the [{amt_rules_max}] IP rules AWS allows per IP ACG."
-            f"{STD_INSTRUCTION}"
+            f"{STD_INSTRUCTION_SETTINGS}"
         ) 
     
 

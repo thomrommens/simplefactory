@@ -79,12 +79,40 @@ def create_report(
         logger.warning(f"No item found for report.", extra={"depth": 1})
 
 
-def exit_app() -> None:
+def process_error(error_map, e):
     """
-    Gently exit app (preventing full stack trace)
+    xx
     """
+    code = e.response["Error"]["Code"]
+
+    msg = error_map.get(
+        code, {}
+        ).get("msg", "Unexpected AWS error.")
+    crash = error_map.get(
+        code, {}
+        ).get("crash", True)
+
+    logger.info(f"{code} | {msg}", extra={"depth": 1})
+    set_app_response(e, crash)
+
+
+def set_app_response(e: Exception, crash: bool = True) -> None:
+    """
+    Standard response (preventing full stack trace)
+    """
+    if not crash:
+        logger.warning(
+            f"⚠️ Full error: {e}",                
+            extra={"depth": 1}
+        )   
+        return     
+
+    logger.error(
+        f"❌ Full error: {e}",                
+        extra={"depth": 1}
+    )        
     logger.info(
-        f"Exiting app.",                
+        f"Cannot continue. Exit app.",                
         extra={"depth": 1}
     )
     sys.exit(1)
