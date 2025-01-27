@@ -93,9 +93,8 @@ def setup_logger(name: str, debug: bool) -> logging.Logger:
     return logger
 
 
-# TODO: consistently name exceptions
 
-class DirectoryNoneFoundException(Exception):
+class UnexpectedException(Exception):
     pass
 
 
@@ -119,6 +118,10 @@ class IPACGNoneFoundException(Exception):
     pass
 
 
+class IPACGNoneSpecifiedForDeleteException(Exception):
+    pass
+
+
 class IPACGDuplicateRulesException(Exception):
     pass
 
@@ -139,21 +142,5 @@ class IPACGDescriptionLengthException(Exception):
     pass
 
 
-class IPACGCreateException(Exception):
-    pass
-
-
 class IPACGIdMatchException(Exception):
-    pass
-
-
-class IpAcgDisassociationException(Exception):
-    pass
-
-
-class IPACGNoneSpecifiedForDeleteException(Exception):
-    pass
-
-
-class UnexpectedException(Exception):
     pass

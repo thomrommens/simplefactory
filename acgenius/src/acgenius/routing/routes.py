@@ -15,7 +15,7 @@ logger = logging.getLogger("acgenius")
 def run_common_route() -> tuple[Settings, Inventory]:
     """
     """
-    logger.debug(f"Run common route...", extra={"depth": 5})
+    logger.debug(f"Run common route...", extra={"depth": 1})
 
     directories = show_directories()
     ip_acgs = show_ip_acgs()
@@ -39,7 +39,7 @@ def run_selected_route(app_input: AppInput) -> None:
     """
     xx
     """
-    logger.debug(f"Run selected route...", extra={"depth": 5})
+    logger.debug(f"Run selected route...", extra={"depth": 1})
 
     action_map = {
         "status": actions.status,
@@ -54,9 +54,11 @@ def run_selected_route(app_input: AppInput) -> None:
         raise UnexpectedException(f"Unexpected error: {e}") 
     
     cli = app_input.cli    
-    logger.info(
-        "These IP ACGs "
-        f"{'would' if cli['dryrun'] else 'will'} be attempted to {cli['action']}:",
-        extra={"depth": 1}
-    )
+    
+    if not cli["action"] == "status":
+        logger.info(
+            "These IP ACGs "
+            f"{'would' if cli['dryrun'] else 'will'} be attempted to {cli['action']}: ",
+            extra={"depth": 1}
+        )
     action_map[action](app_input)

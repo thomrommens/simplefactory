@@ -15,7 +15,7 @@ def specify_report(item: Union[Directory, IP_ACG]) -> dict:
     """
     xx
     """
-    logger.debug(f"Specify_report for item: [{item}]...", extra={"depth": 5})
+    logger.debug(f"Specify report...", extra={"depth": 2})
     
     if isinstance(item, IP_ACG):
         return {
@@ -37,7 +37,7 @@ def create_report(
     Report a ...
     Rules is nested within IP_ACG, so no separate argument.
     """
-    logger.debug(f"Create_report for item: [{subject}]...", extra={"depth": 5})
+    logger.debug(f"Create report...", extra={"depth": 1})
 
     data = []
     fmt = "psql" if origin == "work_instruction" else "fancy_grid"
@@ -52,7 +52,8 @@ def create_report(
             data.append(row)
 
             df = pd.DataFrame(data)
-            df.index = [f"■ {i}"]
+            icon = "□" if isinstance(item, Directory) else "■"
+            df.index = [f"{icon} {i}"]
             subject_table = f"{tabulate(df, headers='keys', tablefmt=fmt)}"
 
             if isinstance(item, IP_ACG):

@@ -3,7 +3,7 @@ import json
 import logging
 from typing import Optional
 
-from config import DirectoryNoneFoundException, workspaces
+from config import workspaces
 from resources.models import Directory
 from resources.utils import create_report
 
@@ -17,7 +17,7 @@ def get_directories() -> Optional[list[dict]]:
     # else, get from AWS
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_workspace_directories.html
     """
-    logger.debug(f"Call: [describe_workspace_directories]...", extra={"depth": 5})
+    logger.debug(f"Call: [describe_workspace_directories]...", extra={"depth": 2})
     
     try:
         response = workspaces.describe_workspace_directories()
@@ -26,22 +26,17 @@ def get_directories() -> Optional[list[dict]]:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
         
-        if error_code == "InvalidParameterValuesException":
-            error_msg = "You provided an invalid parameter."
-            logger.error(error_msg, extra={"depth": 1})
-            raise DirectoryNoneFoundException(error_msg)
-            
-        else:
-            error_msg = (
-                "AWS error at [describe_workspace_directories]: "
-                f"{error_code} - {error_message}."
-            )
-            logger.error(error_msg, extra={"depth": 1})
-            raise DirectoryNoneFoundException(error_msg)
+        logger.error(
+            "AWS error at [describe_workspace_directories]: "
+            f"{error_code} - {error_message}.", 
+            extra={"depth": 1}
+        )
+        raise e
 
     logger.debug(
-        f"Response of [describe_workspace_directories]: {json.dumps(response, indent=4)}", 
-        extra={"depth": 1}
+        "Response of [describe_workspace_directories]: "
+        f"{json.dumps(response, indent=4)}", 
+        extra={"depth": 2}
     )
 
     if response["Directories"]:
@@ -56,7 +51,7 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
     """
     logger.debug(
         f"Select relevant directory info from retrieved directories...", 
-        extra={"depth": 5}
+        extra={"depth": 2}
     )
     
     directories = []

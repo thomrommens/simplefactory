@@ -1,12 +1,3 @@
-# TODO: logs 
-# TODO: - pipes debug/non-debug
-# TODO: - check if both logger.error and raise are used
-# TODO: - check if logger.debug properly covered
-# TODO: - check if logger.debug properly displayed
-# TODO: - feedback as 'you'
-# TODO: - logger.info everywhere?
-# TODO: specify logs with id and name
-
 # TODO: functions
 # TODO: - consistent with arguments, specifying param
 # TODO: - update docstrings
@@ -15,8 +6,9 @@
 # TODO: - exceptions reduction?
 
 # TODO: test 
-# TODO: - generally in AWS
+# TODO: - generally in AWS: create scenarios
 # TODO: - UTs
+# TODO: - catch specific instances of exceptions
 
 # TODO: finalize
 # TODO: - Ruff
