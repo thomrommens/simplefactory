@@ -7,13 +7,23 @@ from resources.ip_acgs import (
     delete_ip_acg, 
     disassociate_ip_acg, 
     report_ip_acgs, 
-    update_rules,
     match_ip_acgs
 )
+from resources.rules import update_rules
 from resources.models import AppInput
 
 
 logger = logging.getLogger("ip_acg_logger")
+
+
+def status(app_input: AppInput) -> None:
+    """
+    Placeholder
+    """
+    logger.info(
+        "Completed display of status.",
+        extra={"depth": 1}
+    )
 
 
 def create(app_input: AppInput) -> None:

@@ -4,7 +4,7 @@ from config import UnexpectedException
 from resources.directories import show_inventory_directories
 from resources.ip_acgs import show_inventory_ip_acgs
 from resources.models import AppInput, Inventory, Settings
-from routing.actions import create, delete, update
+from routing.actions import status, create, delete, update
 from validation import val_work_instruction
 from validation.utils import parse_settings
 
@@ -38,6 +38,7 @@ def run_selected_route(app_input: AppInput) -> None:
     xx
     """
     action_map = {
+        "status": status,
         "create": create,
         "update": update,
         "delete": delete

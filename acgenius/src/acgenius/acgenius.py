@@ -14,7 +14,6 @@
 # TODO: - check typing
 # TODO: - Ruff checker
 # TODO: - run black	
-# TODO: - wrap at 88 (black)
 # TODO: - check import types
 # TODO: - replace xx
 # TODO: - test generally in AWS
@@ -37,7 +36,7 @@ from resources.models import AppInput
 @click.argument(
     "action", 
     type=click.Choice(
-        ["create", "update", "delete"], 
+        ["status", "create", "update", "delete"], 
         case_sensitive=False
     )
 )
