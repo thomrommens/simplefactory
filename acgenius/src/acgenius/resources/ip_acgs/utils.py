@@ -20,6 +20,11 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
     Update the input WorkInstruction with these ids.
     """
     logger.debug(
+        f"Try to match IP ACGs from work instruction [{work_instruction.name}] "
+        f"with IP ACGs from inventory [{inventory.name}]", 
+        extra={"depth": 5}
+    )
+    logger.debug(
         "Current inventory:\n"
         f"{json.dumps(asdict(work_instruction), indent=4)}", 
         extra={"depth": 1}
@@ -35,7 +40,8 @@ def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> Wo
         for inventory_ip_acg in inventory.ip_acgs:
             if work_instruction_ip_acg.name == inventory_ip_acg.name:
                 logger.debug(
-                    f"Matching IP ACG names: {work_instruction_ip_acg.name} with {inventory_ip_acg.name}",
+                    f"Matching IP ACG names: [{work_instruction_ip_acg.name}] with "
+                    f"[{inventory_ip_acg.name}]",
                     extra={"depth": 2}
                 )
                 matches += 1
@@ -58,6 +64,10 @@ def format_rules(ip_acg: IP_ACG) -> list[dict]:
     Fit rules in request syntax format.
     Sort rules for user friendliness.
     """
+    logger.debug(
+        f"Format rules for IP ACG [{ip_acg.name}]", 
+        extra={"depth": 5}
+    )
     rules = [
         {"ipRule": rule.ip, "ruleDesc": rule.desc}
         for rule in ip_acg.rules
@@ -73,6 +83,10 @@ def extend_tags(tags: dict, ip_acg: IP_ACG) -> dict:
     """
     xx
     """
+    logger.debug(
+        f"Extend tags for IP ACG [{ip_acg.name}]", 
+        extra={"depth": 5}
+    )
     timestamp = datetime.now().isoformat()
 
     tags["IPACGName"] = ip_acg.name
@@ -86,4 +100,8 @@ def format_tags(tags: dict) -> list[dict]:
     """
     xx
     """
+    logger.debug(
+        f"Format tags [{tags}]", 
+        extra={"depth": 5}
+    )
     return [{"Key": k, "Value": v} for k, v in tags.items()]

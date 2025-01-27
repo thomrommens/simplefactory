@@ -19,11 +19,13 @@ def get_ip_acgs() -> list[IP_ACG]:
 
     :return: List of IP_ACG objects containing the IP ACGs found in AWS
     """
+    logger.debug(f"Call: [describe_ip_groups]", extra={"depth": 5})
+
     try:
         response = workspaces.describe_ip_groups()
         
         logger.debug(
-            f"describe_ip_groups - response: {json.dumps(response, indent=4)}", 
+            f"Response of [describe_ip_groups]: {json.dumps(response, indent=4)}", 
             extra={"depth": 1}
         )
         if response["Result"]:
@@ -36,17 +38,21 @@ def get_ip_acgs() -> list[IP_ACG]:
         error_message = e.response["Error"]["Message"]
 
         if error_code == "InvalidParameterValuesException":
-            error_msg = "Invalid parameter provided when describing IP groups."
+            error_msg = "You provided an invalid parameter."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
         
         elif error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to describe IP groups."
+            error_msg = (
+                "You do not have access to describe IP groups. "
+                "Please verify if your IAM role meets the criteria specified "
+                "in README.md."
+            )
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
             
         else:
-            error_msg = f"AWS error when describing IP groups: {error_code} - {error_message}."
+            error_msg = f"AWS error at [describe_ip_groups]: {error_code} - {error_message}."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
 
@@ -55,6 +61,11 @@ def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     """
     Make sure ip_acgs are sorted by name.
     """
+    logger.debug(
+        f"Select relevant IP ACG info from retrieved IP ACGs, and sort by name...", 
+        extra={"depth": 5}
+    )
+    
     ip_acgs_sel = []
 
     unsorted_ip_acgs = [
@@ -91,17 +102,11 @@ def show_ip_acgs() -> Optional[list[IP_ACG]]:
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
     ip_acgs_received = get_ip_acgs()
-    logger.debug(f"ip_acgs_received: {ip_acgs_received}", extra={"depth": 1})
 
     if ip_acgs_received:
         ip_acgs = sel_ip_acgs(ip_acgs_received)
         ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
 
         create_report(subject=ip_acgs, origin="inventory")
-
-        logger.debug(
-            f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 
-            extra={"depth": 1}
-        )
 
         return ip_acgs

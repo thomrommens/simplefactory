@@ -20,6 +20,8 @@ def get_settings() -> dict:
     """
     Get settings from settings.yaml.
     """
+    logger.debug(f"Get settings from settings.yaml", extra={"depth": 5})
+
     with open(SETTINGS_FILE_PATH, "r") as settings_file:
         settings = yaml.safe_load(settings_file)
 
@@ -30,6 +32,8 @@ def get_validation_baseline(settings: dict) -> Validation:
     """
     Get validation baseline (settings to validate user input against)from settings.yaml.
     """
+    logger.debug(f"Get validation baseline from settings.yaml", extra={"depth": 5})
+
     return Validation(
         invalid_rules=[
             Rule(ip=ip_invalid, desc=desc_invalid)
@@ -49,6 +53,8 @@ def get_work_instruction(settings: dict) -> WorkInstruction:
     Parse retrieved settings to a WorkInstruction object.
     Make sure IP ACGs are sorted by name.
     """
+    logger.debug(f"Get work instruction from settings", extra={"depth": 5})
+
     return WorkInstruction(
         directories=[
             Directory(id=directory["id"], name=directory["name"])
@@ -77,6 +83,7 @@ def parse_settings() -> Settings:
     """
     xx
     """
+    logger.debug(f"Parse settings", extra={"depth": 5})
 
     settings = get_settings()
     logger.debug(
@@ -109,6 +116,7 @@ def split_ip_and_prefix(rule: Rule) -> tuple[str, int]:
     """
     Split IP address and prefix.
     """
+    logger.debug(f"Split IP address and prefix", extra={"depth": 5})
 
     fwd_slash = rule.ip.find("/")
 
@@ -128,4 +136,5 @@ def remove_whitespaces(rule: Rule) -> Rule:
     Remove whitespaces from IP address.
     """
     logger.debug(f"Remove whitespaces if any...", extra={"depth": 5})
+    
     return rule.ip.replace(" ", "")

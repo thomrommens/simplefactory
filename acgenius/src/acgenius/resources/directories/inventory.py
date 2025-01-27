@@ -17,6 +17,8 @@ def get_directories() -> Optional[list[dict]]:
     # else, get from AWS
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_workspace_directories.html
     """
+    logger.debug(f"Call: [describe_workspace_directories]", extra={"depth": 5})
+    
     try:
         response = workspaces.describe_workspace_directories()
 
@@ -25,18 +27,20 @@ def get_directories() -> Optional[list[dict]]:
         error_message = e.response["Error"]["Message"]
         
         if error_code == "InvalidParameterValuesException":
-            error_msg = "Invalid parameter provided when describing directories."
+            error_msg = "You provided an invalid parameter."
             logger.error(error_msg, extra={"depth": 1})
             raise DirectoryNoneFoundException(error_msg)
             
         else:
-            error_msg = "AWS error when describing directories: "
-            f"{error_code} - {error_message}."
+            error_msg = (
+                "AWS error at [describe_workspace_directories]: "
+                f"{error_code} - {error_message}."
+            )
             logger.error(error_msg, extra={"depth": 1})
             raise DirectoryNoneFoundException(error_msg)
 
     logger.debug(
-        f"describe_workspace_directories - response: {json.dumps(response, indent=4)}", 
+        f"Response of [describe_workspace_directories]: {json.dumps(response, indent=4)}", 
         extra={"depth": 1}
     )
 
@@ -50,6 +54,11 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
     Then, for that directory, the key `ipGroupIds`
     is not present in the response.
     """
+    logger.debug(
+        f"Select relevant directory info from retrieved directories", 
+        extra={"depth": 5}
+    )
+    
     directories = []
 
     for directory in directories_inventory:

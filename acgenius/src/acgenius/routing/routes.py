@@ -15,6 +15,8 @@ logger = logging.getLogger("acgenius")
 def run_common_route() -> tuple[Settings, Inventory]:
     """
     """
+    logger.debug(f"Run common route", extra={"depth": 5})
+
     directories = show_directories()
     ip_acgs = show_ip_acgs()
     inventory = Inventory(
@@ -37,6 +39,8 @@ def run_selected_route(app_input: AppInput) -> None:
     """
     xx
     """
+    logger.debug(f"Run selected route", extra={"depth": 5})
+    
     action_map = {
         "status": actions.status,
         "create": actions.create,

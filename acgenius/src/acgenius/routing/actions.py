@@ -39,6 +39,8 @@ def create(app_input: AppInput) -> None:
     :return: None
     :raises: Various AWS exceptions during creation and association
     """
+    logger.debug(f"Action: create IP ACGs", extra={"depth": 5})
+    
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
     inventory = app_input.inventory
@@ -80,6 +82,8 @@ def update(app_input: AppInput) -> None:
     :raises: IPACGIdMatchException if IP ACGs cannot be matched
     :raises: Various AWS exceptions during update
     """
+    logger.debug(f"Action: update IP ACGs", extra={"depth": 5})
+
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
     inventory = app_input.inventory
@@ -115,6 +119,8 @@ def delete(app_input: AppInput) -> None:
     :raises: IPACGNoneSpecifiedForDeleteException if no IP ACGs specified for deletion
     :raises: Various AWS exceptions during disassociation and deletion
     """
+    logger.debug(f"Action: delete IP ACGs", extra={"depth": 5})
+
     cli = app_input.cli
     inventory = app_input.inventory
 
@@ -132,8 +138,9 @@ def delete(app_input: AppInput) -> None:
                         )
                     except Exception as e:
                         logger.warning(
-                            f"Failed to disassociate IP ACG {ip_acg_id} "
-                            f"from directory {directory}: {str(e)}",
+                            f"Failed to disassociate IP ACG [{ip_acg_id}] "
+                            f"from directory [{directory.name} - {directory.id}]: "
+                            f"{str(e)}",
                             extra={"depth": 2}
                         )
                 delete_ip_acg(ip_acg_id)

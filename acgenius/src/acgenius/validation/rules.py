@@ -26,7 +26,11 @@ def val_ip_linebreaks_absent(rule) -> Optional[bool]:
     :param rule: Rule object containing IP address to validate
     :raises RuleLinebreakException: If linebreak is found in IP address
     """
-    logger.debug(f"Validate if no linebreaks...", extra={"depth": 5})
+    logger.debug(
+        f"Validate that there are no linebreaks in IP rule [{rule.ip}]...", 
+        extra={"depth": 5}
+    )
+    
     if "\n" in rule.ip:
         raise RuleLinebreakException(f"Line break found in IP rule [{rule.ip}].")
     
@@ -60,6 +64,11 @@ def val_ip_allowed(ip: str, settings: Settings) -> Optional[bool]:
     :param settings: Settings object containing validation rules
     :return: True if IP is allowed, False if IP is in disallowed list
     """
+    logger.debug(
+        f"Validate IP address [{ip}] against disallowed IPs from settings.yaml", 
+        extra={"depth": 5}
+    )
+
     invalid_ips = [
         rule.ip
         for rule 
@@ -145,7 +154,7 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
     amt_rules_max = settings.validation.rules_amt_max
 
     logger.debug(
-        f"Validate that the maximum number of IP rules is {amt_rules_max} or less...", 
+        f"Validate that the maximum number of IP rules is [{amt_rules_max}] or less...", 
         extra={"depth": 5}
     ) 
     amt_rules = len(rule_list)
@@ -183,7 +192,7 @@ def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInst
             )       
             
             rule.ip = remove_whitespaces(rule)
-
+            
             val_ip_linebreaks_absent(rule)
 
             ip, _ = split_ip_and_prefix(rule)

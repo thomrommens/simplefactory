@@ -20,13 +20,13 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """
     Validate that IP ACG name is not longer than the AWS imposed limit.
     """
-    group_name_length_max = settings.validation.ip_acg_name_length_max
-
     logger.debug(
-        "Validate that the IP ACG name length "
-        f"is not longer than [{group_name_length_max}] characters...",
+        f"Validate that IP ACG name [{ip_acg.name}] "
+        f"is not longer than [{settings.validation.ip_acg_name_length_max}] characters...",
         extra={"depth": 4}
     )
+    group_name_length_max = settings.validation.ip_acg_name_length_max
+
     len_ip_acg_name = len(ip_acg.name)
     if not len_ip_acg_name <= group_name_length_max:
         raise IPACGNameLengthException(
@@ -45,13 +45,13 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
         f"Validate that the IP ACG name is not a duplicate...", 
         extra={"depth": 4}
     )
-    logger.debug(f"Group name list: {ip_acg_name_list}", extra={"depth": 5})
+    logger.debug(f"IP ACG name list: {ip_acg_name_list}", extra={"depth": 5})
 
     duplicates = [k for k, v in Counter(ip_acg_name_list).items() if v > 1]
         
     if len(duplicates) > 0:        
         raise IPACGNameDuplicateException(
-            f"Duplicate group name found: {duplicates}. "
+            f"Duplicate IP ACG name found: {duplicates}. "
             f"{STD_INSTRUCTION}"
         )
     
@@ -110,6 +110,10 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
     Validate if all IP ACGs from the inventory could be matched by name,
     with all IP ACGs from the actual situation in AWS.
     """
+    logger.debug(
+        "Validate if all IP ACGs from the inventory could be matched by name", 
+        extra={"depth": 1}
+    )
     logger.debug(f"Matches: {matches}", extra={"depth": 1})
     logger.debug(
         f"Inventory ip_acgs length: {len(inventory.ip_acgs)}", extra={"depth": 1}

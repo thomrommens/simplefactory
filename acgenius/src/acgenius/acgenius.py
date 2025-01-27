@@ -1,16 +1,18 @@
 # TODO: logs 
-# TODO: - consistent language, debug also
 # TODO: - pipes debug/non-debug
 # TODO: - check if both logger.error and raise are used
 # TODO: - check if logger.debug properly covered
 # TODO: - check if logger.debug properly displayed
 # TODO: - feedback as 'you'
+# TODO: - logger.info everywhere?
+# TODO: specify logs with id and name
 
 # TODO: functions
 # TODO: - consistent with arguments, specifying param
 # TODO: - update docstrings
 # TODO: - update typing
 # TODO: - update inits consistently
+# TODO: - exceptions reduction?
 
 # TODO: test 
 # TODO: - generally in AWS
@@ -44,7 +46,7 @@ from resources.models import AppInput
 )
 @click.option("--dryrun",is_flag=True, default=False, help=click_help["dryrun"])
 @click.option("--debug", is_flag=True, default=False, help=click_help["debug"])
-def main(action: str, debug: bool, ip_acg_ids_to_delete: tuple, dryrun: bool) -> None:
+def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool, ) -> None:
     """
     Integrate app.
     :param action: action requested by user on command line.
