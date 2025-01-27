@@ -1,16 +1,12 @@
-# TODO: functions
-# TODO: - consistent with arguments, specifying param
-# TODO: - update docstrings
-# TODO: - update typing
-# TODO: - update inits consistently
-# TODO: - exceptions reduction?
-
 # TODO: test 
 # TODO: - generally in AWS: create scenarios
 # TODO: - UTs
 # TODO: - catch specific instances of exceptions
+# TODO: - let break neatly, not with full AWS stack error
 
 # TODO: finalize
+# TODO: - update docstrings
+# TODO: - update typing
 # TODO: - Ruff
 # TODO: - Black (part of Ruff?)
 # TODO: - import order

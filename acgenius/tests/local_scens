@@ -1,2 +1,6 @@
 - specify invalid ids for deletion in cli
 - try to update rules of non-existent ip acg
+- settings.yaml
+    - only key
+    - only value
+    - none
