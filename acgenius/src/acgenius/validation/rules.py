@@ -19,7 +19,7 @@ from .utils import remove_whitespaces, split_ip_and_prefix
 logger = logging.getLogger("acgenius")
 
 
-def val_linebreaks_absent(rule) -> Optional[bool]:
+def val_ip_linebreaks_absent(rule) -> Optional[bool]:
     """
     Validate that no linebreaks exist in the IP rule.
 
@@ -31,7 +31,7 @@ def val_linebreaks_absent(rule) -> Optional[bool]:
         raise RuleLinebreakException(f"Line break found in IP rule [{rule.ip}].")
     
 
-def val_ipv4_format_correct(ip: str) -> Optional[bool]:
+def val_ip_format_correct(ip: str) -> Optional[bool]:
     """
     Validate that IP address follows correct IPv4 format using regex pattern.
 
@@ -184,14 +184,14 @@ def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInst
             
             rule.ip = remove_whitespaces(rule)
 
-            val_linebreaks_absent(rule)
+            val_ip_linebreaks_absent(rule)
 
             ip, _ = split_ip_and_prefix(rule)
             _, prefix = split_ip_and_prefix(rule)
             
             rule_list.append(f"{ip}/{prefix}")
 
-            val_ipv4_format_correct(ip)
+            val_ip_format_correct(ip)
             val_ip_allowed(ip, settings)
             val_prefix_allowed(prefix, settings)
             

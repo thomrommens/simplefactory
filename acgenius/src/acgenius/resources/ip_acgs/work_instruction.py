@@ -21,6 +21,7 @@ from resources.ip_acgs.utils import (
 
 logger = logging.getLogger("acgenius")
 
+
 def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
     """
     Skip (not error out) at trying to create existing
@@ -288,4 +289,3 @@ def delete_ip_acg(ip_acg_id: str) -> None:
             error_msg = f"AWS error when deleting IP group: {error_code} - {error_message}."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
-

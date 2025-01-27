@@ -27,17 +27,17 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
         f"is not longer than [{group_name_length_max}] characters...",
         extra={"depth": 4}
     )
-    len_group_name = len(ip_acg.name)
-    if not len_group_name <= group_name_length_max:
+    len_ip_acg_name = len(ip_acg.name)
+    if not len_ip_acg_name <= group_name_length_max:
         raise IPACGNameLengthException(
             "The IP ACG group name contains "
-            f"[{len_group_name}] characters; "
+            f"[{len_ip_acg_name}] characters; "
             f"more than the [{group_name_length_max}] characters AWS allows. "
             f"{STD_INSTRUCTION}",
         ) 
 
 
-def val_ip_acg_name_unique(group_name_list: list) -> None:
+def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
     """
     Validate that the IP ACG name is unique in the list of all IP ACGs.
     """
@@ -45,9 +45,9 @@ def val_ip_acg_name_unique(group_name_list: list) -> None:
         f"Validate that the IP ACG name is not a duplicate...", 
         extra={"depth": 4}
     )
-    logger.debug(f"Group name list: {group_name_list}", extra={"depth": 5})
+    logger.debug(f"Group name list: {ip_acg_name_list}", extra={"depth": 5})
 
-    duplicates = [k for k, v in Counter(group_name_list).items() if v > 1]
+    duplicates = [k for k, v in Counter(ip_acg_name_list).items() if v > 1]
         
     if len(duplicates) > 0:        
         raise IPACGNameDuplicateException(
@@ -67,11 +67,11 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
         f"is not longer than [{desc_length_max}] characters...",
         extra={"depth": 4}
     )
-    len_group_desc = len(ip_acg.desc)
-    if not len_group_desc <= desc_length_max:
+    len_ip_acg_desc = len(ip_acg.desc)
+    if not len_ip_acg_desc <= desc_length_max:
         raise IPACGDescriptionLengthException(
             "The IP ACG group description contains "
-            f"[{len_group_desc}] characters; "
+            f"[{len_ip_acg_desc}] characters; "
             f"more than the [{desc_length_max}] characters AWS allows. "
             f"{STD_INSTRUCTION}"
         ) 
@@ -87,13 +87,13 @@ def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkIn
         )
     
     for ip_acg in work_instruction.ip_acgs: 
-        group_name_list = []
+        ip_acg_name_list = []
         logger.debug(
             f"Start: IP ACG [{ip_acg.name}]...",
             extra={"depth": 3}
         )   
-        group_name_list.append(ip_acg.name)
-        val_ip_acg_name_unique(group_name_list)     
+        ip_acg_name_list.append(ip_acg.name)
+        val_ip_acg_name_unique(ip_acg_name_list)     
         val_ip_acg_name_length_allowed(ip_acg, settings)
         val_ip_acg_description_length_allowed(ip_acg, settings)
 

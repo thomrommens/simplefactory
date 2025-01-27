@@ -1,38 +1,31 @@
-
-# TODO: - order of functions
-
-# TODO: - logs consistent language, debug also
-# TODO: - check pipes in log
-# TODO: - nest IP ACGs underneath directories? Currently None.
-
-# TODO: - remove prints
+# TODO: logs 
+# TODO: - consistent language, debug also
+# TODO: - pipes debug/non-debug
 # TODO: - check if both logger.error and raise are used
 # TODO: - check if logger.debug properly covered
 # TODO: - check if logger.debug properly displayed
-# TODO: - consistent with arguments
-# TODO: - check docstrings
-# TODO: - check typing
-# TODO: - Ruff checker
-# TODO: - run black	
-# TODO: - check import types
-# TODO: - replace xx
-# TODO: - test generally in AWS
-# TODO: - add deletion marker in tabulate
-# TODO: - add specs of to-be-deleted IP ACGs
-# TODO: - add status route to only show current state in AWS
-# TODO: - consistent groups vs IP ACGs
-# TODO: - change name of module to acgenius
-# TODO: - update docstrings?
-# TODO: - group vs. ip acg vs ip_acg vs ipacg
-# TODO: inits consistently
-# TODO: validation also for delete route?
-# TODO: feedback as 'you'
+# TODO: - feedback as 'you'
 
+# TODO: functions
+# TODO: - consistent with arguments, specifying param
+# TODO: - update docstrings
+# TODO: - update typing
+# TODO: - update inits consistently
+
+# TODO: test 
+# TODO: - generally in AWS
+# TODO: - UTs
+
+# TODO: finalize
+# TODO: - Ruff
+# TODO: - Black (part of Ruff?)
+# TODO: - import order
+
+# ======================================================================================
 import click
 
 from config import HR, setup_logger, click_help
 from routing.routes import run_common_route, run_selected_route
-
 from resources.models import AppInput
 
 
