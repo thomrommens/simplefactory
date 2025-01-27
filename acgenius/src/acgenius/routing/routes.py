@@ -1,8 +1,8 @@
 import logging
 
 from config import UnexpectedException
-from resources.directories import show_inventory_directories
-from resources.ip_acgs import show_inventory_ip_acgs
+from acgenius.src.acgenius.resources.directories.inventory import show_inventory_directories
+from acgenius.src.acgenius.resources.ip_acgs.inventory import show_inventory_ip_acgs
 from resources.models import AppInput, Inventory, Settings
 from routing.actions import status, create, delete, update
 from validation import val_work_instruction

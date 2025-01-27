@@ -1,7 +1,7 @@
 import logging
 
 from config import IPACGNoneFoundException, IPACGNoneSpecifiedForDeleteException
-from resources.ip_acgs import (
+from acgenius.src.acgenius.resources.ip_acgs.inventory import (
     associate_ip_acg, 
     create_ip_acg, 
     delete_ip_acg, 

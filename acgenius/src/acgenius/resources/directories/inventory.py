@@ -66,31 +66,6 @@ def sel_inventory_directories(directories_inventory: dict) -> list[Directory]:
     return directories
 
 
-def report_directories(directories: list[Directory]) -> None:
-    """
-    Display a formatted table of directory information.
-
-    :param directories: List of Directory objects containing directory details
-    :raises None
-    """
-    data = []
-    if directories: 
-        for directory in directories:
-            row = {
-                "id": directory.id,
-                "name": directory.name,
-                "ip_acgs_associated": directory.ip_acgs,
-                "type": directory.type,
-                "state": directory.state
-            }
-            data.append(row)
-        df = pd.DataFrame(data)
-        df.index += 1
-        print(f"{tabulate(df, headers='keys', tablefmt='psql')}\n")
-    else:
-        print("(No directories found)")
-
-
 def show_inventory_directories() -> list[Directory]:
     """
     Get and display the current directories in AWS WorkSpaces.
