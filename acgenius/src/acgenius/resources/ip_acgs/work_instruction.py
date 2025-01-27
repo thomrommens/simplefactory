@@ -203,7 +203,8 @@ def delete_ip_acg(ip_acg_id: str) -> None:
         if error_code == "ResourceNotFoundException":
             logger.error(
                 f"IP ACG [{ip_acg_id}] not found in AWS. "
-                "Are you sure you specified an existing IP ACG on the command line?"
+                f"Are you sure [{ip_acg_id}] actually exists in AWS?",
+                extra={"depth": 1}
             )
         else:
             logger.error(
@@ -211,4 +212,3 @@ def delete_ip_acg(ip_acg_id: str) -> None:
                 f"{error_code} - {error_message}", 
                 extra={"depth": 1}
             )
-        raise e

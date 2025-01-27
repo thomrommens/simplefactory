@@ -44,14 +44,14 @@
 ip_acgs:
 
 - name: "Domain C"
-  desc: "Allowed inbound IP addresses from Domain A"
+  desc: "Allowed inbound IP addresses from Domain C"
   origin: "This Department"
   rules: 
   - "104.27.176.222": "This trusted single host"
   - "203.0.113.22/31": "That trusted series of hosts"
 
 - name: "Domain D"
-  desc: "Allowed inbound IP addresses from Domain B"
+  desc: "Allowed inbound IP addresses from Domain D"
   origin: "That Department"
   rules: 
   - "198.51.100.22/30": "This trusted series of hosts"
@@ -69,12 +69,12 @@ ip_acgs:
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 tags:
+
   Application: "WorkSpacesEnv"
   Environment: "test"
   Department: "ThatDepartment"
   CostCenter: "ThatCostCenter"
-  CreatedBy: "IP ACG module"
-  ModifiedBy: "IP ACG module"
+  CreatedBy: "ACGenius"
 
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -128,6 +128,7 @@ user_input_validation:
     #
     # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     invalid:
+
     - "0.0.0.0": "Open to all"
     - "10.91.0.0": "Private subnet"
     - "127.0.0.1": "Localhost"
@@ -146,6 +147,7 @@ user_input_validation:
     # 
     # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     prefix:
+    
       default: 32  # that is, 1 IP address in your CIDR Base IP
       min: 27  # that is, 32 IP addresses in your CIDR Base IP
     

@@ -2,17 +2,23 @@
 # TODO: - UTs
 
 # TODO: - generally in AWS: create scenarios
+# TODO: remove dirs, add 2 new dirs
 # TODO: - test with actual workspace
 # TODO: - catch specific instances of exceptions
 # TODO: - let break neatly, not with full AWS stack error
-# TODO: - revisit
+# TODO: - revisit - authorize IP group required?
 
 # TODO: finalize
 # TODO: - update docstrings
 # TODO: - update typing
 # TODO: - Ruff
-# TODO: - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/
-# TODO: - import order
+# TODO:     - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/
+# TODO:         - import order
+
+# TODO: update README.md
+# TODO: update CHANGELOG.md
+# TODO: update CONTRIBUTING.md
+
 
 # ======================================================================================
 import click
@@ -37,7 +43,7 @@ from resources.models import AppInput
 )
 @click.option("--dryrun",is_flag=True, default=False, help=click_help["dryrun"])
 @click.option("--debug", is_flag=True, default=False, help=click_help["debug"])
-def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool, ) -> None:
+def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool) -> None:
     """
     Integrate app.
     :param action: action requested by user on command line.
