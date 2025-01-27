@@ -93,8 +93,14 @@ use cases
         - specify some in delete action
         - remove applicable ones from settings.yaml
 
-<!-- # - python -m main create
-# - python -m main update 
-# - python -m main delete 1234567890, 1234567891
-# - python -m main action --debug 
-# - python -m main action --dryrun -->
+# - python -m acgenius status 
+# - python -m acgenius create 
+# - python -m acgenius update 
+# - python -m acgenius delete 1234567890, 1234567891
+# - python -m acgenius action --debug 
+# - python -m acgenius action --dryrun -->
+
+
+crud
+
+add red warning for delete

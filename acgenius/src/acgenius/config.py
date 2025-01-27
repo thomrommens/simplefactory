@@ -22,7 +22,10 @@ click_help = {
         "This only shows the plan or inventory, "
         "and does not actually apply anything in AWS."
     ),
-    "debug": "Enable debug mode?",
+    "debug": (
+        "Enable debug mode? "
+        "This will show more detailed information in the logs."
+    ),
 }
 
 
@@ -88,7 +91,6 @@ def setup_logger(name: str, debug: bool) -> logging.Logger:
         logger.addHandler(ch)
 
     return logger
-
 
 
 # TODO: consistently name exceptions

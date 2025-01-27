@@ -2,26 +2,17 @@ from botocore.exceptions import ClientError
 from dataclasses import asdict
 import json
 import logging
-import pandas as pd
-from tabulate import tabulate
-from textwrap import indent
 from typing import Optional
 
-from config import (
-    IPACGCreateException, 
-    IpAcgDisassociationException,
-    workspaces
-)
-from resources.models import IP_ACG, Directory, Inventory, Rule, WorkInstruction
-from resources.rules import format_rules
-from resources.tags import update_tags, format_tags
-from validation.ip_acgs import val_ip_acgs_match_inventory
+from config import IPACGCreateException, workspaces
+from resources.models import IP_ACG, Rule
+from resources.utils import create_report
 
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
 
 
-def get_inventory_ip_acgs() -> list[IP_ACG]:
+def get_ip_acgs() -> list[IP_ACG]:
     """
     Retrieve IP Access Control Groups from AWS Workspaces.
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_ip_groups.html
@@ -38,29 +29,29 @@ def get_inventory_ip_acgs() -> list[IP_ACG]:
         if response["Result"]:
             return response["Result"]
         
-        logger.warning("No IP ACGs found in AWS.", extra={"depth": 1})
+        logger.info("No IP ACGs found in AWS.", extra={"depth": 2})
 
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
         error_message = e.response["Error"]["Message"]
 
         if error_code == "InvalidParameterValuesException":
-            error_msg = "Invalid parameter provided when describing IP groups"
+            error_msg = "Invalid parameter provided when describing IP groups."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
         
         elif error_code == "AccessDeniedException":
-            error_msg = "Access denied when attempting to describe IP groups"
+            error_msg = "Access denied when attempting to describe IP groups."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
             
         else:
-            error_msg = f"AWS error when describing IP groups: {error_code} - {error_message}"
+            error_msg = f"AWS error when describing IP groups: {error_code} - {error_message}."
             logger.error(error_msg, extra={"depth": 1})
             raise IPACGCreateException(error_msg)
 
 
-def sel_inventory_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
+def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     """
     Make sure ip_acgs are sorted by name.
     """
@@ -87,7 +78,7 @@ def sel_inventory_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_
     return ip_acgs_sel
 
 
-def show_inventory_ip_acgs() -> Optional[list[IP_ACG]]:
+def show_ip_acgs() -> Optional[list[IP_ACG]]:
     """
     Show the current IP Access Control Groups in AWS.
 
@@ -97,17 +88,16 @@ def show_inventory_ip_acgs() -> Optional[list[IP_ACG]]:
     :returns: List of IP_ACG objects if any exist in AWS, None otherwise
     :raises: Any exceptions from get_ip_acgs() or sel_ip_acgs() are propagated
     """
-    # TODO make more generic show_ip_acgs?
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
-    ip_acgs_received = get_inventory_ip_acgs()
+    ip_acgs_received = get_ip_acgs()
     logger.debug(f"ip_acgs_received: {ip_acgs_received}", extra={"depth": 1})
 
     if ip_acgs_received:
-        ip_acgs = sel_inventory_ip_acgs(ip_acgs_received)
+        ip_acgs = sel_ip_acgs(ip_acgs_received)
         ip_acgs_as_dict = [asdict(ip_acg) for ip_acg in ip_acgs]
 
-        report_ip_acgs(ip_acgs)
+        create_report(subject=ip_acgs, origin="inventory")
 
         logger.debug(
             f"IP ACGs found in AWS:\n{json.dumps(ip_acgs_as_dict, indent=4)}", 

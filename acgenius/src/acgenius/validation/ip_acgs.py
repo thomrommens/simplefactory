@@ -11,10 +11,12 @@ from config import (
 from resources.models import IP_ACG, Inventory, Settings, WorkInstruction
 
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
+
+# TODO: validate if selected directory exists? -> dir in wi vs dir in inv
 
 
-def val_group_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
+def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """
     Validate that IP ACG name is not longer than the AWS imposed limit.
     """
@@ -54,23 +56,23 @@ def val_ip_acg_name_unique(group_name_list: list) -> None:
         )
     
 
-def val_group_description_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
+def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """
     Validate if IP ACG description not longer than description length.
     """
-    group_desc_length_max = settings.validation.rules_desc_length_max
+    desc_length_max = settings.validation.rules_desc_length_max
 
     logger.debug(
         "Validate that the IP ACG description "
-        f"is not longer than [{group_desc_length_max}] characters...",
+        f"is not longer than [{desc_length_max}] characters...",
         extra={"depth": 4}
     )
     len_group_desc = len(ip_acg.desc)
-    if not len_group_desc <= group_desc_length_max:
+    if not len_group_desc <= desc_length_max:
         raise IPACGDescriptionLengthException(
             "The IP ACG group description contains "
             f"[{len_group_desc}] characters; "
-            f"more than the [{group_desc_length_max}] characters AWS allows. "
+            f"more than the [{desc_length_max}] characters AWS allows. "
             f"{STD_INSTRUCTION}"
         ) 
 
@@ -92,8 +94,8 @@ def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkIn
         )   
         group_name_list.append(ip_acg.name)
         val_ip_acg_name_unique(group_name_list)     
-        val_group_name_length_allowed(ip_acg, settings)
-        val_group_description_length_allowed(ip_acg, settings)
+        val_ip_acg_name_length_allowed(ip_acg, settings)
+        val_ip_acg_description_length_allowed(ip_acg, settings)
 
     logger.debug(
         f"Finish: validate IP rules of settings.yaml...", 

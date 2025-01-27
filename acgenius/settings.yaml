@@ -79,13 +79,17 @@ tags:
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # directories
-#
+# - Directories settings are only used for the 'create' action. 
+#   The 'update' action only updates IP ACGs, not directories.
+#   The 'delete' action just deleted IP ACGs. 
+#     It will disassociate the IP ACGs from all directories to which they are attached.
+
 # - Do you want to apply IP ACGs to *all* of the Active & Registered 
 #   WorkSpace directories in your AWS account?
 #
 #   - if yes: set 'id' and 'name' to None.
 #
-#   - if no:
+#   - if no (you only want a subset of directories):
 #
 #     - update the suggested directory below.
 #     - if you have more than one directory, add additional directories

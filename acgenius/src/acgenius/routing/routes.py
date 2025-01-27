@@ -1,22 +1,22 @@
 import logging
 
 from config import UnexpectedException
-from acgenius.src.acgenius.resources.directories.inventory import show_inventory_directories
-from acgenius.src.acgenius.resources.ip_acgs.inventory import show_inventory_ip_acgs
+from resources.directories.inventory import show_directories
+from resources.ip_acgs.inventory import show_ip_acgs
 from resources.models import AppInput, Inventory, Settings
-from routing.actions import status, create, delete, update
+from routing import actions
 from validation import val_work_instruction
 from validation.utils import parse_settings
 
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
        
 
 def run_common_route() -> tuple[Settings, Inventory]:
     """
     """
-    directories = show_inventory_directories()
-    ip_acgs = show_inventory_ip_acgs()
+    directories = show_directories()
+    ip_acgs = show_ip_acgs()
     inventory = Inventory(
         directories=directories,
         ip_acgs=ip_acgs
@@ -38,10 +38,10 @@ def run_selected_route(app_input: AppInput) -> None:
     xx
     """
     action_map = {
-        "status": status,
-        "create": create,
-        "update": update,
-        "delete": delete
+        "status": actions.status,
+        "create": actions.create,
+        "update": actions.update,
+        "delete": actions.delete
     }
     try:
         action = app_input.cli["action"]
@@ -49,5 +49,10 @@ def run_selected_route(app_input: AppInput) -> None:
     except Exception as e:
         raise UnexpectedException(f"Unexpected error: {e}") 
     
+    cli = app_input.cli    
+    logger.info(
+        "These IP ACGs "
+        f"{'would' if cli['dryrun'] else 'will'} be attempted to {cli['action']}:",
+        extra={"depth": 1}
+    )
     action_map[action](app_input)
-    

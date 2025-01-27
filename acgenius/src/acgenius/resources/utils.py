@@ -1,100 +1,74 @@
-from datetime import datetime
+import logging
+from textwrap import indent
+from typing import Union
+import pandas as pd
+from tabulate import tabulate
+
+from resources.ip_acgs.utils import format_rules
 from resources.models import Directory, IP_ACG
 
 
-def report_directories(directories: list[Directory]) -> None:
-    """
-    Display a formatted table of directory information.
+logger = logging.getLogger("acgenius")
 
-    :param directories: List of Directory objects containing directory details
-    :raises None
+
+def specify_report(item: Union[Directory, IP_ACG]) -> dict:
     """
+    xx
+    """
+    if isinstance(item, IP_ACG):
+        return {
+            "description": item.desc,
+        }
+    elif isinstance(item, Directory):
+        return {
+            "ip_acgs_associated": item.ip_acgs,
+            "type": item.type,
+            "state": item.state
+        }
+
+
+def create_report(
+        subject: Union[list[Directory], list[IP_ACG]],
+        origin: str
+    ) -> None:
+    """
+    Report a ...
+    Rules is nested within IP_ACG, so no separate argument.
+    """
+
     data = []
-    if directories: 
-        for directory in directories:
-            row = {
-                "id": directory.id,
-                "name": directory.name,
-                "ip_acgs_associated": directory.ip_acgs,
-                "type": directory.type,
-                "state": directory.state
-            }
-            data.append(row)
-        df = pd.DataFrame(data)
-        df.index += 1
-        print(f"{tabulate(df, headers='keys', tablefmt='psql')}\n")
-    else:
-        print("(No directories found)")
+    fmt = "psql" if origin == "work_instruction" else "fancy_grid"
 
+    if subject:
 
-def report_ip_acgs(ip_acgs: list[IP_ACG]):
-    """
-    xx
-    """
-    
-    if ip_acgs:
         i = 0
-        for ip_acg in ip_acgs:
-            
-            # TODO: abstract
-            # IP ACG
+        for item in subject:
             i += 1
-            print(f"■ IP ACG {i}")
-            row = {
-                "id": ip_acg.id,
-                "name": ip_acg.name,
-                "description": ip_acg.desc,
-            }
-            data = [(row)]
+            row = {"id": item.id, "name": item.name}
+            row.update(specify_report(item))
+            data.append(row)
+
             df = pd.DataFrame(data)
-            df.index += i
-            print(f"{tabulate(df, headers='keys', tablefmt='psql')}")
+            df.index = [f"■ {i}"]
+            subject_table = f"{tabulate(df, headers='keys', tablefmt=fmt)}"
 
-            # RULES          
-            print("\\")    
-            rules_formatted = format_rules(ip_acg)
-            rules_table = [["rule", "description"]] + [[item["ipRule"], item["ruleDesc"]] for item in rules_formatted]
+            if isinstance(item, IP_ACG):
+                
+                rules_formatted = format_rules(item)
+                rules_table = [["rule", "description"]]
 
-            rules_table_str = tabulate(rules_table, headers="firstrow", tablefmt="psql")
-            rules_table_indented = indent(rules_table_str, " " * 2)
-            print(rules_table_indented)
-            print("\n")
-            
+                for item in rules_formatted:
+                    rules_table.append([item["ipRule"], item["ruleDesc"]])
+
+                rules_table = tabulate(rules_table, headers="firstrow", tablefmt=fmt)
+                print(subject_table)
+                print("\____")
+                print(indent(rules_table, " " * 6))
+                print("\n")
+                data = []
+
+            else:
+                print(f"\n{subject_table}\n")
+
     else:
-        print("(No IP ACGs found)")
-
-
-def format_rules(ip_acg: IP_ACG) -> list[dict]:
-    """
-    Fit rules in request syntax format.
-    Sort rules for user friendliness.
-    """
-    rules = [
-        {"ipRule": rule.ip, "ruleDesc": rule.desc}
-        for rule in ip_acg.rules
-    ]
-    rules_sorted = sorted(
-        rules,
-        key=lambda rules: rules["ipRule"]
-    )
-    return rules_sorted
-
-
-def extend_tags(tags: dict, ip_acg: IP_ACG) -> dict:
-    """
-    xx
-    """
-    timestamp = datetime.now().isoformat()
-
-    tags["IPACGName"] = ip_acg.name
-    tags["Created"] = timestamp
-    tags["RulesLastApplied"] = timestamp  #TODO: make sure to update as only tag at update route
-
-    return tags
-
-
-def format_tags(tags: dict) -> list[dict]:
-    """
-    xx
-    """
-    return [{"Key": k, "Value": v} for k, v in tags.items()]
+        print(f"(No {type(item)} found)")  # TODO

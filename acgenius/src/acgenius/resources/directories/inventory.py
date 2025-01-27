@@ -1,18 +1,17 @@
 from botocore.exceptions import ClientError
 import json
 import logging
-import pandas as pd
-from tabulate import tabulate
 from typing import Optional
 
 from config import DirectoryNoneFoundException, workspaces
 from resources.models import Directory
+from resources.utils import create_report
 
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
 
 
-def get_inventory_directories() -> Optional[list[dict]]:
+def get_directories() -> Optional[list[dict]]:
     """
     # if value in work_instruction for Directory, follow
     # else, get from AWS
@@ -26,13 +25,13 @@ def get_inventory_directories() -> Optional[list[dict]]:
         error_message = e.response["Error"]["Message"]
         
         if error_code == "InvalidParameterValuesException":
-            error_msg = "Invalid parameter provided when describing directories"
+            error_msg = "Invalid parameter provided when describing directories."
             logger.error(error_msg, extra={"depth": 1})
             raise DirectoryNoneFoundException(error_msg)
             
         else:
             error_msg = "AWS error when describing directories: "
-            f"{error_code} - {error_message}"
+            f"{error_code} - {error_message}."
             logger.error(error_msg, extra={"depth": 1})
             raise DirectoryNoneFoundException(error_msg)
 
@@ -45,7 +44,7 @@ def get_inventory_directories() -> Optional[list[dict]]:
         return response["Directories"]
 
 
-def sel_inventory_directories(directories_inventory: dict) -> list[Directory]:
+def sel_directories(directories_inventory: dict) -> list[Directory]:
     """
     There might currently be no IP ACG in a directory.
     Then, for that directory, the key `ipGroupIds`
@@ -66,7 +65,7 @@ def sel_inventory_directories(directories_inventory: dict) -> list[Directory]:
     return directories
 
 
-def show_inventory_directories() -> list[Directory]:
+def show_directories() -> list[Directory]:
     """
     Get and display the current directories in AWS WorkSpaces.
 
@@ -78,11 +77,9 @@ def show_inventory_directories() -> list[Directory]:
     """
     logger.info("Current directories (before execution of action):", extra={"depth": 1})  
 
-    directories_inventory = get_inventory_directories()
-    directories_inventory_sel = sel_inventory_directories(directories_inventory)
+    directories_inventory = get_directories()
+    directories_inventory_sel = sel_directories(directories_inventory)
     
-    report_directories(directories_inventory_sel)
-
-    # TODO make more generic show_directories?
+    create_report(subject=directories_inventory_sel, origin="inventory")
 
     return directories_inventory_sel

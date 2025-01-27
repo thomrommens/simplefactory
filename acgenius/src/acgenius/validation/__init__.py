@@ -5,7 +5,7 @@ from .ip_acgs import val_ip_acgs
 from .rules import val_rules
 
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
 
 
 def val_work_instruction(settings: Settings) -> WorkInstruction:

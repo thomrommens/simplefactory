@@ -1,19 +1,19 @@
 import logging
 
 from config import IPACGNoneFoundException, IPACGNoneSpecifiedForDeleteException
-from acgenius.src.acgenius.resources.ip_acgs.inventory import (
+from resources.utils import create_report
+from resources.ip_acgs.work_instruction import (
     associate_ip_acg, 
     create_ip_acg, 
     delete_ip_acg, 
-    disassociate_ip_acg, 
-    report_ip_acgs, 
-    match_ip_acgs
+    disassociate_ip_acg
 )
-from resources.rules import update_rules
+from resources.ip_acgs.work_instruction import update_rules
+from resources.ip_acgs.utils import match_ip_acgs
 from resources.models import AppInput
 
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
 
 
 def status(app_input: AppInput) -> None:
@@ -43,12 +43,7 @@ def create(app_input: AppInput) -> None:
     work_instruction = app_input.settings.work_instruction
     inventory = app_input.inventory
 
-    logger.info(
-        "These IP ACGs "
-        f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d:",
-        extra={"depth": 1}
-    )
-    report_ip_acgs(work_instruction.ip_acgs)
+    create_report(subject=work_instruction.ip_acgs, origin="work_instruction")
 
     if not cli["dryrun"] :
         tags = work_instruction.tags
@@ -56,7 +51,7 @@ def create(app_input: AppInput) -> None:
         # If no directories are specified in the settings.yaml, 
         #  associate the IP ACGs with all directories in the inventory
         #  TODO: test
-        if not work_instruction.directories[0].id and not work_instruction.directories[0].name:
+        if not work_instruction.directories[0].id and not work_instruction.directories[0].name:  # TODO: separate function
             directories = inventory.directories
         else:
             directories = work_instruction.directories
@@ -91,17 +86,10 @@ def update(app_input: AppInput) -> None:
 
     if inventory.ip_acgs:
 
-        logger.info(
-            "These IP ACGs "
-            f"{'would' if cli['dryrun']  else 'will'} be {cli['action']}d:", 
-            extra={"depth": 1}
-        )
         match_ip_acgs(inventory, work_instruction)
-
-        report_ip_acgs(work_instruction.ip_acgs)
+        create_report(subject=work_instruction.ip_acgs, origin="work_instruction")
 
         if not cli["dryrun"]:
-
             for ip_acg in work_instruction.ip_acgs:
                 update_rules(ip_acg)
 
@@ -131,11 +119,7 @@ def delete(app_input: AppInput) -> None:
     inventory = app_input.inventory
 
     if cli["ip_acg_ids_to_delete"]:
-        logger.info(
-            "These IP ACGs "
-            f"{'would' if cli['dryrun'] else 'will'} be attempted to {cli['action']}: "
-            f"{cli['ip_acg_ids_to_delete']}", extra={"depth": 1}
-        )
+
         if not cli["dryrun"]:
             ip_acg_ids_to_delete = cli["ip_acg_ids_to_delete"]
             
@@ -156,5 +140,8 @@ def delete(app_input: AppInput) -> None:
 
     else:
         raise IPACGNoneSpecifiedForDeleteException(
-            "Selected action is delete, but no IP ACGs specified for deletion."
+            f"You selected action [{cli['action']}], "
+            "but you did not specify any IP ACGs to delete. "
+            "Please specify at least one IP ACG to delete. "
+            "See README.md for more information."
         )

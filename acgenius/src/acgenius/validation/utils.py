@@ -13,7 +13,7 @@ from resources.models import (
     WorkInstruction
 )
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
 
 
 def get_settings() -> dict:

@@ -23,6 +23,10 @@
 # TODO: - consistent groups vs IP ACGs
 # TODO: - change name of module to acgenius
 # TODO: - update docstrings?
+# TODO: - group vs. ip acg vs ip_acg vs ipacg
+# TODO: inits consistently
+# TODO: validation also for delete route?
+# TODO: feedback as 'you'
 
 import click
 
@@ -52,7 +56,7 @@ def main(action: str, debug: bool, ip_acg_ids_to_delete: tuple, dryrun: bool) ->
     Integrate app.
     :param action: action requested by user on command line.
     """
-    logger = setup_logger("ip_acg_logger", debug)
+    logger = setup_logger("acgenius", debug)
 
     logger.info(HR)
     logger.info(f"START MODULE: AMAZON WORKSPACES IP ACG")
@@ -68,8 +72,8 @@ def main(action: str, debug: bool, ip_acg_ids_to_delete: tuple, dryrun: bool) ->
     app_input = AppInput(
         cli={
             "action": action,
-                "dryrun": dryrun, 
-                "ip_acg_ids_to_delete": ip_acg_ids_to_delete
+            "dryrun": dryrun, 
+            "ip_acg_ids_to_delete": ip_acg_ids_to_delete
         },
         settings=settings,
         inventory=inventory

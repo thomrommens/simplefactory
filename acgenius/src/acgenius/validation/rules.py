@@ -16,7 +16,7 @@ from config import (
 from resources.models import Rule, Settings, WorkInstruction
 from .utils import remove_whitespaces, split_ip_and_prefix
 
-logger = logging.getLogger("ip_acg_logger")
+logger = logging.getLogger("acgenius")
 
 
 def val_linebreaks_absent(rule) -> Optional[bool]:

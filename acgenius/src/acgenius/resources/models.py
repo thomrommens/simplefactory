@@ -65,6 +65,7 @@ class Validation:
     ip_acg_name_length_max: int
     # TODO: consistent order throughout code base
 
+
 @dataclass
 class WorkInstruction:
     """
