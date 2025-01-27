@@ -65,7 +65,7 @@ def val_ip_allowed(ip: str, settings: Settings) -> Optional[bool]:
     :return: True if IP is allowed, False if IP is in disallowed list
     """
     logger.debug(
-        f"Validate IP address [{ip}] against disallowed IPs from settings.yaml", 
+        f"Validate IP address [{ip}] against disallowed IPs from settings.yaml...", 
         extra={"depth": 5}
     )
 

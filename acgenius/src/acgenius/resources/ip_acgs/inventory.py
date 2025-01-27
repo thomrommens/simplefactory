@@ -19,7 +19,7 @@ def get_ip_acgs() -> list[IP_ACG]:
 
     :return: List of IP_ACG objects containing the IP ACGs found in AWS
     """
-    logger.debug(f"Call: [describe_ip_groups]", extra={"depth": 5})
+    logger.debug(f"Call: [describe_ip_groups]...", extra={"depth": 5})
 
     try:
         response = workspaces.describe_ip_groups()

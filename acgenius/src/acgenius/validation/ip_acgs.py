@@ -22,7 +22,8 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """
     logger.debug(
         f"Validate that IP ACG name [{ip_acg.name}] "
-        f"is not longer than [{settings.validation.ip_acg_name_length_max}] characters...",
+        f"is not longer than [{settings.validation.ip_acg_name_length_max}] "
+        f"characters...",
         extra={"depth": 4}
     )
     group_name_length_max = settings.validation.ip_acg_name_length_max
@@ -114,12 +115,13 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
         "Validate if all IP ACGs from the inventory could be matched by name", 
         extra={"depth": 1}
     )
-    logger.debug(f"Matches: {matches}", extra={"depth": 1})
+    logger.debug(f"Matches: [{matches}]...", extra={"depth": 1})
     logger.debug(
-        f"Inventory ip_acgs length: {len(inventory.ip_acgs)}", extra={"depth": 1}
+        f"Inventory [ip_acgs] length: [{len(inventory.ip_acgs)}]...", extra={"depth": 1}
     )
     if not matches == len(inventory.ip_acgs):
         raise IPACGIdMatchException(
             "Could not match all current IP ACGs from AWS with IP ACGs specified "
-            "in settings.yaml."
+            "in settings.yaml. Are you sure you have the correct IP ACGs specified "
+            "in settings.yaml?"
         )

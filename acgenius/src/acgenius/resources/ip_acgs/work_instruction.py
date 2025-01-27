@@ -29,7 +29,7 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/create_ip_group.html
     """
     logger.debug(
-        f"Create IP ACG [{ip_acg.name}]", 
+        f"Create IP ACG [{ip_acg.name}]...", 
         extra={"depth": 5}
     )
     tags_updated = extend_tags(tags, ip_acg)
@@ -164,7 +164,7 @@ def update_rules(ip_acg: IP_ACG) -> None:
     rules_formatted = format_rules(ip_acg)
 
     logger.debug(
-        f"Update rules for IP ACG [{ip_acg.name}]", 
+        f"Update rules for IP ACG [{ip_acg.name}]...", 
         extra={"depth": 5}
     )
 
@@ -228,7 +228,8 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/disassociate_ip_groups.html
     """
     logger.debug(
-        f"Disassociate IP ACG [{ip_acg_ids_to_delete}] from directory [{directory.name}]", 
+        f"Disassociate IP ACG [{ip_acg_ids_to_delete}] "
+        f"from directory [{directory.name}]...", 
         extra={"depth": 5}
     )
     try:
@@ -272,7 +273,7 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
             raise IpAcgDisassociationException(error_msg)
         
     logger.debug(
-        f"Response of [disassociate_ip_acg]: {json.dumps(response, indent=4)}",
+        f"Response of [disassociate_ip_acg]: {json.dumps(response, indent=4)}...",
         extra={"depth": 1}
     )
 
@@ -284,7 +285,7 @@ def delete_ip_acg(ip_acg_id: str) -> None:
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/delete_ip_group.html
     """
     logger.debug(
-        f"Delete IP ACG [{ip_acg_id}]", 
+        f"Delete IP ACG [{ip_acg_id}]...", 
         extra={"depth": 5}
     )
     try:

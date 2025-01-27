@@ -39,7 +39,7 @@ def create(app_input: AppInput) -> None:
     :return: None
     :raises: Various AWS exceptions during creation and association
     """
-    logger.debug(f"Action: create IP ACGs", extra={"depth": 5})
+    logger.debug(f"Action: create IP ACGs...", extra={"depth": 5})
     
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
@@ -82,7 +82,7 @@ def update(app_input: AppInput) -> None:
     :raises: IPACGIdMatchException if IP ACGs cannot be matched
     :raises: Various AWS exceptions during update
     """
-    logger.debug(f"Action: update IP ACGs", extra={"depth": 5})
+    logger.debug(f"Action: update IP ACGs...", extra={"depth": 5})
 
     cli = app_input.cli
     work_instruction = app_input.settings.work_instruction
@@ -119,7 +119,7 @@ def delete(app_input: AppInput) -> None:
     :raises: IPACGNoneSpecifiedForDeleteException if no IP ACGs specified for deletion
     :raises: Various AWS exceptions during disassociation and deletion
     """
-    logger.debug(f"Action: delete IP ACGs", extra={"depth": 5})
+    logger.debug(f"Action: delete IP ACGs...", extra={"depth": 5})
 
     cli = app_input.cli
     inventory = app_input.inventory

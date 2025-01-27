@@ -15,7 +15,7 @@ def specify_report(item: Union[Directory, IP_ACG]) -> dict:
     """
     xx
     """
-    logger.debug(f"Specify_report for item: [{item}]", extra={"depth": 5})
+    logger.debug(f"Specify_report for item: [{item}]...", extra={"depth": 5})
     
     if isinstance(item, IP_ACG):
         return {
@@ -37,7 +37,7 @@ def create_report(
     Report a ...
     Rules is nested within IP_ACG, so no separate argument.
     """
-    logger.debug(f"Create_report for item: [{subject}]", extra={"depth": 5})
+    logger.debug(f"Create_report for item: [{subject}]...", extra={"depth": 5})
 
     data = []
     fmt = "psql" if origin == "work_instruction" else "fancy_grid"
