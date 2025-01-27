@@ -9,3 +9,5 @@
 - validate these settings.validation.ip_address.invalid themselves, for IPv4 format?
 
 - AWS currently does not support updating tags of an existing IP ACG. If that would become available, we could add a tag "RulesLastModifiedInAWS" to the IP ACG.
+
+- validate the validation baseline too

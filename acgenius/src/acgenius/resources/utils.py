@@ -1,4 +1,5 @@
 import logging
+import sys
 from textwrap import indent
 from typing import Union
 import pandas as pd
@@ -76,3 +77,14 @@ def create_report(
 
     else:
         logger.warning(f"No item found for report.", extra={"depth": 1})
+
+
+def exit_app() -> None:
+    """
+    Gently exit app (preventing full stack trace)
+    """
+    logger.info(
+        f"Exiting app.",                
+        extra={"depth": 1}
+    )
+    sys.exit(1)

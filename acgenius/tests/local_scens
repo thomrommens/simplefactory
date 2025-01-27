@@ -10,6 +10,8 @@ UPDATE
 
 DELETE
 - specify invalid ids for deletion in cli
+- one IP ACG could be deleted, other not
+    - other not recognized
 
 SETTINGS
 - only key

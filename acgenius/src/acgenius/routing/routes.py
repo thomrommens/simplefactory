@@ -25,7 +25,7 @@ def run_common_route() -> tuple[Settings, Inventory]:
     ) 
 
     settings = parse_settings()
-    validation_baseline = settings.validation  # TODO validate the validation baseline too?
+    validation_baseline = settings.validation
     work_instruction = val_work_instruction(settings)
     settings = Settings(
         validation=validation_baseline, 

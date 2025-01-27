@@ -1,9 +1,11 @@
+import sys
 from botocore.exceptions import ClientError, ParamValidationError
 
 import json
 import logging
 from typing import Optional
 
+from resources.utils import exit_app
 from config import UnexpectedException, workspaces
 
 from resources.models import (
@@ -94,7 +96,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
 
 def update_rules(ip_acg: IP_ACG, tags: dict) -> None:
     """
-    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.htmlx
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.html
     """
     tags_extended = extend_tags(tags, ip_acg)
     tags_formatted = format_tags(tags_extended)
@@ -156,19 +158,24 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
 
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
-        error_message = e.response["Error"]["Message"]
 
         if error_code == "ValidationException":
-
-            logger.error(f"Validation error when calling DeleteIpGroup: {e}", extra={"depth": 1})
-            raise UnexpectedException(
-                f"Validation error: {e}. "
-                "Are you sure you specified an IP ACG id (e.g., 'wsipg-ab1234567')?"
+            logger.info(
+                f"Could not disassociate IP ACG(s) from directory. "
+                f"One of your IP ACG ids was not recognized. "
+                "Are you sure that you specified a valid IP ACG id "
+                "(e.g., 'wsipg-ab1234567'), and that the IP ACG exists in AWS?",
+                extra={"depth": 1}
             )
-        
+            logger.error(
+                f"❌ Full error: {e}",                
+                extra={"depth": 1}
+            )
+            exit_app()           
+
         else:
             logger.error(
-                f"AWS error at [disassociate_ip_groups]: {error_code} - {error_message}", 
+                f"AWS error at [disassociate_ip_groups]: {e}", 
                 extra={"depth": 1}
             )
 
@@ -206,6 +213,7 @@ def delete_ip_acg(ip_acg_id: str) -> None:
                 f"Are you sure [{ip_acg_id}] actually exists in AWS?",
                 extra={"depth": 1}
             )
+            sys.exit(1)
         else:
             logger.error(
                 "AWS error at [delete_ip_acg]: "
