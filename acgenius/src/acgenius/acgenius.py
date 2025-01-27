@@ -1,12 +1,13 @@
+# TODO: - generally in AWS: create scenarios
+# TODO: - remove dirs, add 2 new dirs
+# TODO: - test with actual Amazon workspace
+# TODO: - catch specific instances of exceptions
+# TODO: - revisit 
+# TODO:   - generic
+# TODO:   - authorize IP group required?
+
 # TODO: test 
 # TODO: - UTs
-
-# TODO: - generally in AWS: create scenarios
-# TODO: remove dirs, add 2 new dirs
-# TODO: - test with actual workspace
-# TODO: - catch specific instances of exceptions
-# TODO: - let break neatly, not with full AWS stack error
-# TODO: - revisit - authorize IP group required?
 
 # TODO: finalize
 # TODO: - update docstrings
@@ -16,11 +17,8 @@
 # TODO:         - import order
 
 # TODO: update README.md
-# TODO: update CHANGELOG.md
-# TODO: update CONTRIBUTING.md
 
 
-# ======================================================================================
 import click
 
 from config import HR, setup_logger, click_help

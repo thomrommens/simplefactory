@@ -20,29 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - xx
 
 
-## [1.0.0] - 2025-01-01
+## [1.0.0] - 2025-01-28
 
 ### Added
 
-- xx
-
-### Fixed
-
-- xx
-
-### Changed
-
-- xx
-
-### Removed
-
-- xx
-
-
-## [0.0.1] - 2025-01-01
-
-### Added
-
-- This CHANGELOG file to hopefully serve as an evolving example of a
-  standardized open source project CHANGELOG.
-- xx
+- Initial release of app.
