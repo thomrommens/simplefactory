@@ -171,7 +171,7 @@ def update_rules(ip_acg: IP_ACG) -> None:
         extra={"depth": 2}
         )
         logger.info(
-            f"☑ Updated rules for IP ACG [{ip_acg.id} - {ip_acg.name}] updated.",
+            f"☑ Updated rules for IP ACG [{ip_acg.id} - {ip_acg.name}].",
             extra={"depth": 1}
         )
 
@@ -303,7 +303,7 @@ def delete_ip_acg(ip_acg_id: str) -> None:
             },
             "ResourceNotFoundException": {
                 "msg": f"{msg_generic} Could not find IP ACG in AWS. "
-                    "Double check if it has been created, and if not, "
+                    "Double check if it is created, and if not, "
                     f"do a 'create' run of this app. {STD_INSTR_README}",
                 "crash": True
             },

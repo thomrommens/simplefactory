@@ -175,7 +175,7 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
         map = {
             "IPACGDuplicateRulesException": {
                 "msg": f"{msg_generic} Duplicate rule(s) found: "
-                    f"{duplicates}. Note, this duplication might also been occurred "
+                    f"{duplicates}. Note, this duplication might also occur "
                     "due to the app's addition of /32 for a single IP address. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
@@ -186,11 +186,11 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
 
 def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]:
     """
-    Validate that number of rules does not exceed AWS maximum.
+    Validate that number of rules is larger than 0 and does not exceed AWS maximum.
 
     :param rule_list: List of rules to validate
     :param settings: Settings object containing validation rules
-    :raises IPACGAmtRulesException: If number of rules exceeds AWS maximum
+
     """
     amt_rules_max = settings.validation.rules_amt_max
 
@@ -199,19 +199,31 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
         extra={"depth": 5}
     ) 
     amt_rules = len(rule_list)
-    if not amt_rules <= amt_rules_max:
-        msg_generic = "IP ACG Rule properties validation failed."
-        code = "IPACGAmtRulesException"
-        map = {
-            "IPACGAmtRulesException": {
-                "msg": f"{msg_generic} The IP ACG contains "
-                    f"[{amt_rules}] rules; more than "
-                    f"the [{amt_rules_max}] IP rules "
-                    f"AWS allows per IP ACG."
-                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
-                "crash": True
-            }
-        }        
+
+    msg_generic = "IP ACG Rule properties validation failed."
+    map = {
+        "IPACGMinAmtRulesException": {
+            "msg": f"{msg_generic} The IP ACG in settings.yaml contains "
+                f"[{amt_rules}] rules; Please specify at least 1 rule per IP ACG. "
+                f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
+            "crash": True
+        },
+        "IPACGMaxAmtRulesException": {
+            "msg": f"{msg_generic} The IP ACG in settings.yaml contains "
+                f"[{amt_rules}] rules; more than "
+                f"the [{amt_rules_max}] IP rules "
+                f"AWS allows per IP ACG. "
+                f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
+            "crash": True
+        }
+    }           
+
+    if not amt_rules > 0:
+        code = "IPACGMinAmtRulesException"
+        process_error(map, code)
+
+    if not amt_rules <= amt_rules_max:        
+        code = "IPACGMaxAmtRulesException"
         process_error(map, code)
     
 
@@ -238,20 +250,17 @@ def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInst
             logger.debug(
                 f"Start: Rule: IP address [{rule.ip}]; description [{rule.desc}]...", 
                 extra={"depth": 4}
-            )       
-            
-            rule.ip = remove_whitespaces(rule)
-            
+            )                 
+            rule.ip = remove_whitespaces(rule)            
             val_ip_linebreaks_absent(rule)
 
-            ip, _ = split_ip_and_prefix(rule)
-            _, prefix = split_ip_and_prefix(rule)
-            
+            ip, prefix = split_ip_and_prefix(rule)            
             rule_list.append(f"{ip}/{prefix}")
 
             val_ip_format_correct(ip)
             val_ip_allowed(ip, settings)
             val_prefix_allowed(prefix, settings)
+            val_rule_desc_length(rule, settings)
             
         val_rule_unique(rule_list)
         val_amt_rules_allowed(rule_list, settings)

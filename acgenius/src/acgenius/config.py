@@ -27,7 +27,7 @@ EXC_RESOURCE_LIMIT = (
 )
 EXC_RESOURCE_NOT_FOUND = (
     "Could not find IP ACG and/or the directory in AWS. "
-    "Double check if they have been created, "
+    "Double check if they are created, "
     "and if not, do a 'create' run of this app."
 )
 EXC_RESOURCE_STATE = (

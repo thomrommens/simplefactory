@@ -76,7 +76,7 @@ def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
                     desc=rule.get("ruleDesc")
                 )
                 for rule 
-                in ip_acg.get("userRules")
+                in ip_acg.get("userRules", {})
             ]
         )
         for ip_acg in ip_acgs_inventory

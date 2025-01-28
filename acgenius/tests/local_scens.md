@@ -14,8 +14,8 @@ create
 ✅ create from scratch
 ✅ create again exact same
 ✅ create additional IP ACGs next to existing
-- too many rules
-- no rules
+✅ too many rules
+... no rules
 - no IP ACG desc
 
 update
@@ -24,7 +24,7 @@ update
 ✅ debug
 ✅ dryrun debug
 ✅ debug dryrun
-- too many rules
+✅ too many rules at update (originally fine)
 - no tag value
 - int instead of string value
 - try to update rules of non-existent ip acg
@@ -52,3 +52,7 @@ GENERAL
 - only directory id specified
 - unacceptable prefix
 - per validation specified
+
+- settings.yaml
+    - key empty
+    - key absent
