@@ -1,8 +1,3 @@
-# TODO: test 
-# TODO: - generally in AWS: create scenarios
-# TODO: - remove dirs, add 2 new dirs
-# TODO: - test with actual Amazon workspace
-# TODO: - catch specific instances of exceptions
 # TODO: - revisit 
 # TODO:   - generic
 # TODO:   - authorize IP group required?

@@ -69,7 +69,7 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
         map = {
             "IPACGNameDuplicateException": {
                 "msg": f"{msg_generic} Duplicate IP ACG name found: "
-                    f"{duplicates} {STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
+                    f"{duplicates}. {STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
@@ -128,8 +128,8 @@ def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkIn
         extra={"depth": 2}
         )
     
+    ip_acg_name_list = []
     for ip_acg in work_instruction.ip_acgs: 
-        ip_acg_name_list = []
         logger.debug(
             f"Start: IP ACG [{ip_acg.name}]...",
             extra={"depth": 3}

@@ -30,7 +30,7 @@ def val_ip_linebreaks_absent(rule) -> Optional[bool]:
         map = {
             "RuleLinebreakException": {
                 "msg": f"{msg_generic} "
-                    f"Line break found in IP rule [{rule.ip}]."
+                    f"Line break found in IP rule [{rule}]. "
                     f"{STD_INSTR_DEBUG}",
                 "crash": True
             }
@@ -58,7 +58,7 @@ def val_ip_format_correct(ip: str) -> Optional[bool]:
         code = "RuleIPV4FormatInvalidException"
         map = {
             "RuleIPV4FormatInvalidException": {
-                "msg": f"{msg_generic} IP address is invalid. "
+                "msg": f"{msg_generic} IP address does not meet IPv4 standard. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
@@ -90,7 +90,7 @@ def val_ip_allowed(ip: str, settings: Settings) -> Optional[bool]:
         code = "IPAddressInInvalidRange"
         map = {
             "IPAddressInInvalidRange": {
-                "msg": f"{msg_generic} IP address is in invalid range. "
+                "msg": f"{msg_generic} IP address [{ip}] is in invalid range. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
@@ -145,9 +145,9 @@ def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
         code = "RuleDescriptionLengthException"
         map = {
             "RuleDescriptionLengthException": {
-                "msg": f"{msg_generic} Rule description exceeds "
-                    f"AWS limit of [{rules_desc_length_max}] characters. "
-                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
+                "msg": f"{msg_generic} Rule description is [{len(rule.desc)}] characters, "
+                    f"so it exceeds the AWS limit of [{rules_desc_length_max}] "
+                    f"characters. {STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        

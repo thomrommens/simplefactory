@@ -18,8 +18,6 @@
 #    - specify a maximum of 10 rules.
 #    - a single rule can be a *single* IP address (prefix /32),
 #        or a *range* of IP addresses (prefix lower than /32). 
-#    - if no prefix is set, each rule will be automatically appended with 
-#       the prefix for a single IP address, i.e.,'/32'. 
 #    - set rules smartly using a prefix if you want to 
 #       cover multiple IP addresses within one group, e.g., add '/27'.
 #       - use https://www.cidr.xyz for a quick insight.
@@ -48,7 +46,14 @@
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ip_acgs:
 
-- name: ThatGroup4
+- name: ThatGroup100
+  desc: "Some"
+  origin: "XX"
+  rules: 
+  - "198.51.100.22/32": "This trusted series of hosts"
+  - "45.33.32.22": "That trusted host"
+
+- name: ThatGroup52
   desc: "Some"
   origin: "XX"
   rules: 
