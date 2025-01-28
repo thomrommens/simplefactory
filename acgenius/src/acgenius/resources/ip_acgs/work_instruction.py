@@ -1,4 +1,4 @@
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ParamValidationError
 
 import json
 import logging
@@ -64,6 +64,17 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         )        
         return ip_acg
     
+    except ParamValidationError as e:
+        msg_generic = f"Could not create IP ACG [{ip_acg.name}] in AWS."
+        code = "ParamValidationError"
+        map = {
+            "ParamValidationError": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            }
+        }
+        process_error(map, code, e)
+
     except ClientError as e:
         msg_generic = f"Could not create IP ACG [{ip_acg.name}] in AWS."
         code = e.response["Error"]["Code"]
@@ -116,6 +127,17 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
             extra={"depth": 2}
         )  
 
+    except ParamValidationError as e:
+        msg_generic = f"Could not associate IP ACGs with directory."
+        code = "ParamValidationError"
+        map = {
+            "ParamValidationError": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            }
+        }
+        process_error(map, code, e)
+    
     except ClientError as e:
         msg_generic = (
             f"Could not associate IP ACGs with directory [{directory.id}] in AWS."

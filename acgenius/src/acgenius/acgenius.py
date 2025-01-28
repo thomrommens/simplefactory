@@ -18,6 +18,7 @@
 # TODO:         - import order
 
 # TODO: update README.md
+# TODO final view settings.yaml
 
 
 import click

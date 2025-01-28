@@ -26,6 +26,11 @@
 #    - the program will append '/32' to a single IP address, if not done so
 #      also. Note that this can cause a duplicate.
 
+# - 'origin'
+#    - Mainly for your own administration in version control.
+#      I.e., which host accessing the directory has this IP address?
+#      Add it to 'tags' too if you like (default keeps origin out of tags)
+
 # - Update properties of the suggested IP ACGs that you want to apply 
 #   to each AWS directory, below.
 #   - An IP ACG id is never specified;
@@ -43,34 +48,14 @@
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ip_acgs:
 
-- name: "Here is my ACG 1"
-  desc: "Allowed inbound IP addresses from Domain 1"
-  origin: "This Department"
-  rules: 
-  - "104.27.176.220/32": "This trusted single host"
-  - "104.27.176.221": "This trusted single host"
-
-- name: "Here is my ACG 2"
-  desc: "Allowed inbound IP addresses from Domain 2"
-  origin: "That Department"
-  rules: 
-  - "198.51.100.44/32": "This trusted series of hosts"
-  - "45.33.32.44": "That trusted host"
-  - "67.207.82.44": "Yet another trusted host"
-
-- name: "Hey Im new"
-  desc: "Allowed inbound IP addresses from Domain 3"
-  origin: "That Department"
+- name: ThatGroup4
+  desc: "Some"
+  origin: "XX"
   rules: 
   - "198.51.100.22/30": "This trusted series of hosts"
   - "45.33.32.22": "That trusted host"
   - "67.207.82.22": "Yet another trusted host"
 
-- name: "Hey Im new too"
-  desc: "Allowed inbound IP addresses from Domain 3"
-  origin: "That Department"
-  rules: 
-  - "198.51.100.22/30": "This trusted series of hosts" 
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # tags
@@ -116,9 +101,8 @@ tags:
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 directories:
 
-- id: "d-9367bb1e39"
-  name: "ad.test.simplefactory.nl"
-
+- id: 
+  name: 
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # user_input_validation
@@ -184,4 +168,3 @@ user_input_validation:
       max: 10
     rules_desc_length:
       max: 255
-

@@ -79,7 +79,7 @@ def val_settings_ip_acg_structure(settings):
     are present.
     """
     logger.debug(
-        f"Validate settings[ip_acgs] of settings.yaml...", 
+        f"Validate settings['ip_acgs'] of settings.yaml...", 
         extra={"depth": 2}
     )
     ip_acg_keys = ["name", "desc", "origin", "rules"]
@@ -133,7 +133,7 @@ def get_work_instruction(settings: dict) -> WorkInstruction:
 
     return WorkInstruction(
         directories=[
-            Directory(id=directory["id"], name=directory["name"])
+            Directory(id=directory.get("id"), name=directory.get("name"))
             for directory in settings["directories"]
         ],
         ip_acgs=sorted(
@@ -141,20 +141,20 @@ def get_work_instruction(settings: dict) -> WorkInstruction:
                 IP_ACG(
                     name=ip_acg.get("name", ""),
                     desc=ip_acg.get("desc", ""),
+                    origin=ip_acg.get("origin", ""),
                     rules=[
                         Rule(
-                            ip=ip, 
+                            ip, 
                             desc=desc
                         )
                         for rule in (ip_acg.get("rules") or [])
                         if rule is not None
                         for ip, desc in (rule.items() if rule else {})
                     ],
-                    origin=ip_acg.get("origin", ""),
                 )
                 for ip_acg in (settings.get("ip_acgs") or [])
             ],
-            key=lambda x: x.name
+            key=lambda x: x.name or ""
         ),
         tags=settings["tags"]
     )

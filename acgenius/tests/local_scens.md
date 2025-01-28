@@ -15,8 +15,8 @@ create
 ✅ create again exact same
 ✅ create additional IP ACGs next to existing
 ✅ too many rules
-... no rules
-- no IP ACG desc
+✅ no rules
+✅ no IP ACG desc
 
 update
 ✅ plain
@@ -25,9 +25,10 @@ update
 ✅ dryrun debug
 ✅ debug dryrun
 ✅ too many rules at update (originally fine)
-- no tag value
-- int instead of string value
-- try to update rules of non-existent ip acg
+✅ no tag value
+✅ to tag keys
+✅ int instead of string value
+✅ try to update rules of non-existent ip acg
 
 delete
 ✅ plain
@@ -40,19 +41,17 @@ delete
 ✅one IP ACG could be deleted, other not (other not recognized)
 
 SETTINGS
-- only key
-- only value
-- none
+✅ only key
+✅ only value
+✅ none
 
 GENERAL
-- all combinations with --debug, --dryrun
+✅ all combinations with --debug, --dryrun
+✅ no directory specified
+✅ only directory id specified
+✅ unacceptable prefix
+... per validation specified
 
-
-- no directory specified
-- only directory id specified
-- unacceptable prefix
-- per validation specified
-
-- settings.yaml
+✅ settings.yaml
     - key empty
     - key absent

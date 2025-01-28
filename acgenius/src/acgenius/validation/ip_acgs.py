@@ -21,8 +21,21 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     )
     group_name_length_max = settings.validation.ip_acg_name_length_max
 
-    len_ip_acg_name = len(ip_acg.name)
+    if not ip_acg.name:
+        msg_generic = "IP ACG properties validation failed."
+        code = "IPACGNAmeNoneException"
+        map = {
+            "IPACGNAmeNoneException": {
+                "msg": f"{msg_generic} One IP ACG group in settings.yaml "
+                    "seems to have no name. "
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
 
+    len_ip_acg_name = len(str(ip_acg.name))
+    
     if not len_ip_acg_name <= group_name_length_max:
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGNameLengthException"
@@ -65,7 +78,8 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
 
 def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """
-    Validate if IP ACG description not longer than description length.
+    Validate if IP ACG description has a value and is not longer than allowed 
+    description length.
     """
     desc_length_max = settings.validation.rules_desc_length_max
 
@@ -74,13 +88,28 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
         f"is not longer than [{desc_length_max}] characters...",
         extra={"depth": 4}
     )
+    if not ip_acg.desc:
+        msg_generic = "IP ACG properties validation failed."
+        code = "IPACGDescriptionNoneException"
+        map = {
+            "IPACGDescriptionNoneException": {
+                "msg": f"{msg_generic} IP ACG group [{ip_acg.name}] "
+                    "seems to have no description. "
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
+
     len_ip_acg_desc = len(ip_acg.desc)
+
     if not len_ip_acg_desc <= desc_length_max:
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGDescriptionLengthException"
         map = {
             "IPACGDescriptionLengthException": {
-                "msg": f"{msg_generic} The IP ACG group description contains "
+                "msg": f"{msg_generic} The description "
+                    f"of IP ACG [{ip_acg.name}] contains "
                     f"[{len_ip_acg_desc}] characters; "
                     f"more than the [{desc_length_max}] characters AWS allows. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
@@ -138,8 +167,8 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
             "IPACGIdMatchException": {
                 "msg": f"{msg_generic} Could not match "
                     "all current IP ACGs from AWS with IP ACGs specified "
-                    "in settings.yaml. Are you sure you have specified "
-                    "the correct IP ACGs in settings.yaml?",
+                    "in settings.yaml. Please make sure your settings.yaml is "
+                    "in sync with the actual situation in AWS.",
                 "crash": True
             }
         }        

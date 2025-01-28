@@ -12,10 +12,10 @@ SETTINGS_FILE_PATH = os.path.join(
 
 STD_INSTR_SETTINGS = "Please revise settings.yaml."
 STD_INSTR_README = "See README.md for more info."
-STD_INSTR_DEBUG = "Enable app debug mode (--debug) for more info."
+STD_INSTR_DEBUG = "Enable app debug mode (--debug) for more detail."
 
 EXC_INVALID_PARAM = (
-    "Please check if you have any invalid characters "
+    "Please check if you have any empty values, or invalid characters "
     "in names, descriptions, or tags."  
 )
 EXC_ACCESS_DENIED = (
