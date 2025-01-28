@@ -28,10 +28,13 @@ def set_app_response(e: Optional[Exception] = None, crash: bool = True) -> None:
     """
     if e:
         if crash:        
-            logger.error(f"❌ Full error: {e}", extra={"depth": 1})
+            logger.error(f"Full error: {e}", extra={"depth": 1})
             logger.info(f"{EXIT_APP}", extra={"depth": 1})
             sys.exit(1)
         else:
             logger.warning(f"⚠️  Full warning: {e}", extra={"depth": 1})
     else:
-        logger.info(f"{EXIT_APP}", extra={"depth": 1})
+        if crash:
+            logger.info(f"{EXIT_APP}", extra={"depth": 1})
+            sys.exit(1)
+

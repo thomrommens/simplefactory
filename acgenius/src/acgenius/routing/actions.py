@@ -1,7 +1,7 @@
 import logging
 
 from validation.directories import val_directories_specified
-from config import STD_INSTRUCTION_README
+from config import STD_INSTR_README
 from routing.errors import process_error
 from resources.utils import create_report
 from resources.ip_acgs.work_instruction import (
@@ -110,7 +110,7 @@ def update(app_input: AppInput) -> None:
                 "msg": f"{msg_generic} No IP ACGs found in inventory. "
                     "Please make sure you have at least one IP ACG in AWS, "
                     "in order to update. "
-                    f"Run the 'create' action to create an IP ACG. {STD_INSTRUCTION_README}",
+                    f"Run the 'create' action to create an IP ACG. {STD_INSTR_README}",
                 "crash": True
             }
         }        
@@ -164,7 +164,7 @@ def delete(app_input: AppInput) -> None:
                     "but you have not properly specified which "
                     "IP ACG id(s) to delete. "
                     f"Please specify at least one IP ACG to delete. "
-                    f"{STD_INSTRUCTION_README}",
+                    f"{STD_INSTR_README}",
                 "crash": True
             }
         }        

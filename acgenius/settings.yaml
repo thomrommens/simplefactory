@@ -48,7 +48,7 @@ ip_acgs:
   origin: "This Department"
   rules: 
   - "104.27.176.222": "This trusted single host"
-  - "203.0.113.22/31": "That trusted series of hosts"
+  - "203.0.113.22/32": "That trusted series of hosts"
 
 - name: "Here is my ACG 2"
   desc: "Allowed inbound IP addresses from Domain 2"

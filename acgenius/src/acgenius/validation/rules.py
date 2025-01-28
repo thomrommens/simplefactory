@@ -3,8 +3,8 @@ import logging
 import re
 from typing import Optional
 
-from acgenius.src.acgenius.routing.errors import process_error
-from config import STD_INSTRUCTION_SETTINGS
+from routing.errors import process_error
+from config import STD_INSTR_DEBUG, STD_INSTR_SETTINGS
 
 from resources.models import Rule, Settings, WorkInstruction
 from .utils import remove_whitespaces, split_ip_and_prefix
@@ -30,7 +30,8 @@ def val_ip_linebreaks_absent(rule) -> Optional[bool]:
         map = {
             "RuleLinebreakException": {
                 "msg": f"{msg_generic} "
-                    f"Line break found in IP rule [{rule.ip}].",
+                    f"Line break found in IP rule [{rule.ip}]."
+                    f"{STD_INSTR_DEBUG}",
                 "crash": True
             }
         }        
@@ -58,7 +59,7 @@ def val_ip_format_correct(ip: str) -> Optional[bool]:
         map = {
             "RuleIPV4FormatInvalidException": {
                 "msg": f"{msg_generic} IP address is invalid. "
-                    f"{STD_INSTRUCTION_SETTINGS}",
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
@@ -79,11 +80,22 @@ def val_ip_allowed(ip: str, settings: Settings) -> Optional[bool]:
     )
 
     invalid_ips = [
-        rule.ip
-        for rule 
+        invalid_item.ip
+        for invalid_item
         in settings.validation.invalid_rules
-    ]    
-    return ip not in invalid_ips
+    ]
+
+    if ip in invalid_ips:
+        msg_generic = "IP ACG Rule properties validation failed."
+        code = "IPAddressInInvalidRange"
+        map = {
+            "IPAddressInInvalidRange": {
+                "msg": f"{msg_generic} IP address is in invalid range. "
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
 
 
 def val_prefix_allowed(prefix: int, settings: Settings) -> bool:
@@ -107,7 +119,7 @@ def val_prefix_allowed(prefix: int, settings: Settings) -> bool:
         map = {
             "RulePrefixInvalidException": {
                 "msg": f"{msg_generic} Prefix [{prefix}] is invalid. "
-                    f"{STD_INSTRUCTION_SETTINGS}",
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
@@ -135,7 +147,7 @@ def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
             "RuleDescriptionLengthException": {
                 "msg": f"{msg_generic} Rule description exceeds "
                     f"AWS limit of [{rules_desc_length_max}] characters. "
-                    f"{STD_INSTRUCTION_SETTINGS}",
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
@@ -165,7 +177,7 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
                 "msg": f"{msg_generic} Duplicate rule(s) found: "
                     f"{duplicates}. Note, this duplication might also been occurred "
                     "due to the app's addition of /32 for a single IP address. "
-                    f"{STD_INSTRUCTION_SETTINGS}",
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
@@ -195,12 +207,12 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
                 "msg": f"{msg_generic} The IP ACG contains "
                     f"[{amt_rules}] rules; more than "
                     f"the [{amt_rules_max}] IP rules "
-                    f"AWS allows per IP ACG.{STD_INSTRUCTION_SETTINGS}",
+                    f"AWS allows per IP ACG."
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
         process_error(map, code)
-
     
 
 def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:

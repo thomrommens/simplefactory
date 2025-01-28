@@ -10,4 +10,5 @@ def val_directories_specified(work_instruction: WorkInstruction) -> bool:
     return (
         work_instruction.directories[0].id 
         and work_instruction.directories[0].name
+        # TODO: extra log?
     )

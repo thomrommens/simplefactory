@@ -2,7 +2,7 @@ import logging
 from typing import Counter
 
 from routing.errors import process_error
-from config import STD_INSTRUCTION_SETTINGS
+from config import STD_INSTR_DEBUG, STD_INSTR_SETTINGS
 from resources.models import IP_ACG, Inventory, Settings, WorkInstruction
 
 
@@ -31,7 +31,7 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
                 "msg": f"{msg_generic} The IP ACG group name contains "
                     f"[{len_ip_acg_name}] characters; "
                     f"more than the [{group_name_length_max}] characters AWS allows. "
-                    f"{STD_INSTRUCTION_SETTINGS}",
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
@@ -56,7 +56,7 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
         map = {
             "IPACGNameDuplicateException": {
                 "msg": f"{msg_generic} Duplicate IP ACG name found: "
-                    f"{duplicates} {STD_INSTRUCTION_SETTINGS}",
+                    f"{duplicates} {STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
@@ -83,7 +83,7 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
                 "msg": f"{msg_generic} The IP ACG group description contains "
                     f"[{len_ip_acg_desc}] characters; "
                     f"more than the [{desc_length_max}] characters AWS allows. "
-                    f"{STD_INSTRUCTION_SETTINGS}",
+                    f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        

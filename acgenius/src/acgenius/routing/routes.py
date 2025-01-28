@@ -1,10 +1,10 @@
 import logging
 
-from config import STD_INSTRUCTION_README
+from config import STD_INSTR_README
 from resources.directories.inventory import show_directories
 from resources.ip_acgs.inventory import show_ip_acgs
 from resources.models import AppInput, Inventory, Settings
-from routing import actions
+from routing.actions import status, create, update, delete
 from routing.errors import process_error
 from validation import val_work_instruction
 from validation.utils import parse_settings
@@ -43,10 +43,10 @@ def run_selected_route(app_input: AppInput) -> None:
     logger.debug(f"Run selected route...", extra={"depth": 1})
 
     action_map = {
-        "status": actions.status,
-        "create": actions.create,
-        "update": actions.update,
-        "delete": actions.delete
+        "status": status,
+        "create": create,
+        "update": update,
+        "delete": delete
     }
     try:
         action = app_input.cli["action"]
@@ -58,7 +58,7 @@ def run_selected_route(app_input: AppInput) -> None:
             "UnexpectedException": {
                 "msg": (
                     f"{msg_generic} Are you sure you specified a valid route? "
-                    f"{STD_INSTRUCTION_README}"
+                    f"{STD_INSTR_README}"
                 ),
                 "crash": True
             },

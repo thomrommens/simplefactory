@@ -30,15 +30,14 @@ update
 - try to update rules of non-existent ip acg
 
 delete
-- plain
-- dryrun
-- debug
-- dryrun debug
-- debug dryrun
+✅ plain
+✅ dryrun
+✅ debug
+✅dryrun debug
+✅ debug dryrun
 
-- specify invalid ids for deletion in cli
-- one IP ACG could be deleted, other not
-    - other not recognized
+✅specify invalid ids for deletion in cli
+✅one IP ACG could be deleted, other not (other not recognized)
 
 SETTINGS
 - only key
@@ -52,3 +51,4 @@ GENERAL
 - no directory specified
 - only directory id specified
 - unacceptable prefix
+- per validation specified

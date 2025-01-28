@@ -10,8 +10,9 @@ SETTINGS_FILE_PATH = os.path.join(
     SETTINGS_FILE
 )
 
-STD_INSTRUCTION_SETTINGS = "Please revise settings.yaml."
-STD_INSTRUCTION_README = "See README.md for more info."
+STD_INSTR_SETTINGS = "Please revise settings.yaml."
+STD_INSTR_README = "See README.md for more info."
+STD_INSTR_DEBUG = "Enable app debug mode (--debug) for more info."
 
 EXC_INVALID_PARAM = (
     "Please check if you have any invalid characters "
@@ -35,7 +36,7 @@ EXC_RESOURCE_STATE = (
     "Please inspect these resources in the AWS console. "
 )
 EXC_OPERATION_NOT_SUPPORTED = "The operation is not supported."
-EXIT_APP = "Cannot continue. Exit app."
+EXIT_APP = "❌ Cannot continue. Exit app."
 
 
 HR = "┉" * 88

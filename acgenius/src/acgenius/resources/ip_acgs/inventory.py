@@ -3,7 +3,12 @@ import json
 import logging
 from typing import Optional
 
-from config import EXC_ACCESS_DENIED, EXC_INVALID_PARAM, STD_INSTRUCTION_README, workspaces
+from config import (
+    EXC_ACCESS_DENIED, 
+    EXC_INVALID_PARAM, 
+    STD_INSTR_README, 
+    workspaces
+)
 from resources.models import IP_ACG, Rule
 from resources.utils import create_report
 from routing.errors import process_error
@@ -42,7 +47,7 @@ def get_ip_acgs() -> list[IP_ACG]:
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
         }

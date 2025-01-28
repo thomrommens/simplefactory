@@ -13,7 +13,7 @@ from config import (
     EXC_RESOURCE_LIMIT, 
     EXC_RESOURCE_NOT_FOUND, 
     EXC_RESOURCE_STATE, 
-    STD_INSTRUCTION_README, 
+    STD_INSTR_README, 
     workspaces
 )
 
@@ -86,7 +86,7 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
         }
@@ -127,7 +127,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
                 "crash": True
             },
             "ResourceNotFoundException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_NOT_FOUND} {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} {EXC_RESOURCE_NOT_FOUND} {STD_INSTR_README}",
                 "crash": True
             },
             "ResourceLimitExceededException": {
@@ -139,7 +139,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             },
             "OperationNotSupportedException": {
@@ -171,7 +171,7 @@ def update_rules(ip_acg: IP_ACG) -> None:
         extra={"depth": 2}
         )
         logger.info(
-            f"Rules for IP ACG [{ip_acg.id} - {ip_acg.name}] updated.",
+            f"☑ Updated rules for IP ACG [{ip_acg.id} - {ip_acg.name}] updated.",
             extra={"depth": 1}
         )
 
@@ -202,7 +202,7 @@ def update_rules(ip_acg: IP_ACG) -> None:
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
         }
@@ -214,8 +214,8 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/disassociate_ip_groups.html
     """
     logger.debug(
-        f"Disassociate IP ACG [{ip_acg_ids_to_delete}] "
-        f"from directory [{directory.name}]...", 
+        f"Disassociate IP ACGs [{ip_acg_ids_to_delete}] "
+        f"from directory [{directory.id} - {directory.name}]...", 
         extra={"depth": 2}
     )
     try:
@@ -224,22 +224,30 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
             GroupIds=ip_acg_ids_to_delete
         )
         logger.debug(
-            f"Response of [disassociate_ip_acg]: {json.dumps(response, indent=4)}...",
+            "Response of [disassociate_ip_acg]: "
+            f"{json.dumps(response, indent=4)}...",
             extra={"depth": 2}
         )
+        logger.info(
+            f"☑ Disassociated IP ACGs {ip_acg_ids_to_delete} "
+            f"from directory [{directory.id} - {directory.name}].",
+            extra={"depth": 1}
+        )  
 
     except ClientError as e:
         msg_generic = (
-            f"Could not disassociate IP ACG from directory with name [{directory.name}] "
-            "and id [{directory.name}] in AWS."
+            f"Could not disassociate all IP ACGs "
+            f"from directory [{directory.id} - {directory.name}] in AWS."
         )
         code = e.response["Error"]["Code"]
         map = {
             "ValidationException": {  # TODO: check if this error is caught
                 "msg": (
-                    f"{msg_generic} Are you sure you specified a valid IP ACG? "
-                    "And does the IP ACG still exist? Please check the status in "
-                    f"a status run of the app. {STD_INSTRUCTION_README}"
+                    f"{msg_generic} Are you sure you specified "
+                    "a valid IP ACG id? "
+                    "And does the IP ACG still exist? "
+                    "Please check the status in "
+                    f"a status run of the app. {STD_INSTR_README}"
                 ),
                 "crash": True
             },
@@ -256,7 +264,7 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             },
             "OperationNotSupportedException": {
@@ -283,7 +291,7 @@ def delete_ip_acg(ip_acg_id: str) -> None:
             f"Response of [delete_ip_acg]: {json.dumps(response, indent=4)}",
             extra={"depth": 2}
         )
-        logger.info(f"Deleted IP ACG [{ip_acg_id}].", extra={"depth": 1})
+        logger.info(f"☑ Deleted IP ACG [{ip_acg_id}].", extra={"depth": 1})
 
     except ClientError as e:
         msg_generic = f"Could not delete IP ACG [{ip_acg_id}] in AWS."
@@ -294,8 +302,9 @@ def delete_ip_acg(ip_acg_id: str) -> None:
                 "crash": True
             },
             "ResourceNotFoundException": {
-                "msg": f"{msg_generic} Could not find IP ACG in AWS. Double check if it "
-                    f"has been created, and if not, do a 'create' run of this app.  {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} Could not find IP ACG in AWS. "
+                    "Double check if it has been created, and if not, "
+                    f"do a 'create' run of this app. {STD_INSTR_README}",
                 "crash": True
             },
             "ResourceAssociatedException": {
@@ -307,7 +316,7 @@ def delete_ip_acg(ip_acg_id: str) -> None:
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
         }
