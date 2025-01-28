@@ -5,7 +5,8 @@ from typing import Optional
 
 from config import EXC_INVALID_PARAM, workspaces
 from resources.models import Directory
-from resources.utils import create_report, process_error
+from resources.utils import create_report
+from routing.errors import process_error
 
 
 logger = logging.getLogger("acgenius")
@@ -17,7 +18,7 @@ def get_directories() -> Optional[list[dict]]:
     # else, get from AWS
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_workspace_directories.html
     """
-    logger.debug(f"Call: [describe_workspace_directories]...", extra={"depth": 2})
+    logger.debug(f"Call [describe_workspace_directories]...", extra={"depth": 2})
     
     try:
         response = workspaces.describe_workspace_directories()
@@ -31,14 +32,14 @@ def get_directories() -> Optional[list[dict]]:
 
     except ClientError as e:
         msg_generic = "Could not get directories from AWS."
-        
-        error_map = {
+        code = e.response["Error"]["Code"]
+        map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
             }
         }
-        process_error(error_map, e)
+        process_error(map, code, e)
 
 
 def sel_directories(directories_inventory: dict) -> list[Directory]:

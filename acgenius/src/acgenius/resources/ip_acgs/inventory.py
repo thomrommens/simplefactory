@@ -5,7 +5,8 @@ from typing import Optional
 
 from config import EXC_ACCESS_DENIED, EXC_INVALID_PARAM, STD_INSTRUCTION_README, workspaces
 from resources.models import IP_ACG, Rule
-from resources.utils import create_report, process_error, set_app_response
+from resources.utils import create_report
+from routing.errors import process_error
 
 
 logger = logging.getLogger("acgenius")
@@ -18,7 +19,7 @@ def get_ip_acgs() -> list[IP_ACG]:
 
     :return: List of IP_ACG objects containing the IP ACGs found in AWS
     """
-    logger.debug(f"Call: [describe_ip_groups]...", extra={"depth": 2})
+    logger.debug(f"Call [describe_ip_groups]...", extra={"depth": 2})
 
     try:
         response = workspaces.describe_ip_groups()
@@ -34,8 +35,8 @@ def get_ip_acgs() -> list[IP_ACG]:
 
     except ClientError as e:
         msg_generic = "Could not get IP ACGs from AWS."
-
-        error_map = {
+        code = e.response["Error"]["Code"]
+        map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -45,7 +46,7 @@ def get_ip_acgs() -> list[IP_ACG]:
                 "crash": True
             }
         }
-        process_error(error_map, e)
+        process_error(map, code, e)
 
 
 def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:

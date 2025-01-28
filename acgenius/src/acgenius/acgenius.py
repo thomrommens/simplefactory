@@ -1,3 +1,4 @@
+# TODO: test 
 # TODO: - generally in AWS: create scenarios
 # TODO: - remove dirs, add 2 new dirs
 # TODO: - test with actual Amazon workspace
@@ -6,8 +7,8 @@
 # TODO:   - generic
 # TODO:   - authorize IP group required?
 
-# TODO: test 
-# TODO: - UTs
+# TODO: unit tests
+# TODO: integration tests
 
 # TODO: finalize
 # TODO: - update docstrings
@@ -72,7 +73,7 @@ def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool) ->
     run_selected_route(app_input)
 
     logger.info(HR) 
-    logger.info(f"FINISH APP: ACGENIE.")
+    logger.info(f"FINISH APP: ACGENIUS.")
     logger.info(HR) 
     
 

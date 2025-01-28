@@ -13,8 +13,13 @@ SETTINGS_FILE_PATH = os.path.join(
 STD_INSTRUCTION_SETTINGS = "Please revise settings.yaml."
 STD_INSTRUCTION_README = "See README.md for more info."
 
-EXC_INVALID_PARAM = "Did you specify any parameters in describe_workspace_directories?"
-EXC_ACCESS_DENIED = "It seems you do not have all permissions. Please check your IAM role."
+EXC_INVALID_PARAM = (
+    "Please check if you have any invalid characters "
+    "in names, descriptions, or tags."  
+)
+EXC_ACCESS_DENIED = (
+    "It seems you do not have all permissions. Please check your IAM role."
+)
 EXC_RESOURCE_LIMIT = (
     "It seems you have attempted to many calls in a short amount of time. "
     "Please try again later."
@@ -30,9 +35,10 @@ EXC_RESOURCE_STATE = (
     "Please inspect these resources in the AWS console. "
 )
 EXC_OPERATION_NOT_SUPPORTED = "The operation is not supported."
+EXIT_APP = "Cannot continue. Exit app."
 
 
-HR = "=" * 88
+HR = "┉" * 88
 
 workspaces = boto3.client("workspaces", region_name="eu-west-1")
 
@@ -47,59 +53,6 @@ click_help = {
         "This will show more detailed information in the logs."
     ),
 }
-
-
-class UnexpectedException(Exception):
-    pass
-
-
-class RuleLinebreakException(Exception):
-    pass
-
-
-class RuleIPV4FormatInvalidException(Exception):
-    pass
-
-
-class RulePrefixInvalidException(Exception):
-    pass
-
-
-class RuleDescriptionLengthException(Exception):
-    pass
-
-
-class IPACGNoneFoundException(Exception):
-    pass
-
-
-class IPACGNoneSpecifiedForDeleteException(Exception):
-    pass
-
-
-class IPACGDuplicateRulesException(Exception):
-    pass
-
-
-class IPACGAmtRulesException(Exception):
-    pass
-
-
-class IPACGNameDuplicateException(Exception):
-    pass
-
-
-class IPACGNameLengthException(Exception):
-    pass
-
-
-class IPACGDescriptionLengthException(Exception):
-    pass
-
-
-class IPACGIdMatchException(Exception):
-    pass
-
 
 
 class DepthFormatter(logging.Formatter):

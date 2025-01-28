@@ -1,13 +1,8 @@
 import logging
 from typing import Counter
 
-from config import (
-    IPACGDescriptionLengthException,
-    IPACGIdMatchException,
-    IPACGNameDuplicateException,
-    IPACGNameLengthException,
-    STD_INSTRUCTION_SETTINGS
-)
+from routing.errors import process_error
+from config import STD_INSTRUCTION_SETTINGS
 from resources.models import IP_ACG, Inventory, Settings, WorkInstruction
 
 
@@ -27,13 +22,20 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     group_name_length_max = settings.validation.ip_acg_name_length_max
 
     len_ip_acg_name = len(ip_acg.name)
+
     if not len_ip_acg_name <= group_name_length_max:
-        raise IPACGNameLengthException(
-            "The IP ACG group name contains "
-            f"[{len_ip_acg_name}] characters; "
-            f"more than the [{group_name_length_max}] characters AWS allows. "
-            f"{STD_INSTRUCTION_SETTINGS}",
-        ) 
+        msg_generic = "IP ACG properties validation failed."
+        code = "IPACGNameLengthException"
+        map = {
+            "IPACGNameLengthException": {
+                "msg": f"{msg_generic} The IP ACG group name contains "
+                    f"[{len_ip_acg_name}] characters; "
+                    f"more than the [{group_name_length_max}] characters AWS allows. "
+                    f"{STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
 
 
 def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
@@ -48,11 +50,17 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
 
     duplicates = [k for k, v in Counter(ip_acg_name_list).items() if v > 1]
         
-    if len(duplicates) > 0:        
-        raise IPACGNameDuplicateException(
-            f"Duplicate IP ACG name found: {duplicates}. "
-            f"{STD_INSTRUCTION_SETTINGS}"
-        )
+    if len(duplicates) > 0:
+        msg_generic = "IP ACG properties validation failed."
+        code = "IPACGNameDuplicateException"
+        map = {
+            "IPACGNameDuplicateException": {
+                "msg": f"{msg_generic} Duplicate IP ACG name found: "
+                    f"{duplicates} {STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
     
 
 def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
@@ -68,12 +76,18 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
     )
     len_ip_acg_desc = len(ip_acg.desc)
     if not len_ip_acg_desc <= desc_length_max:
-        raise IPACGDescriptionLengthException(
-            "The IP ACG group description contains "
-            f"[{len_ip_acg_desc}] characters; "
-            f"more than the [{desc_length_max}] characters AWS allows. "
-            f"{STD_INSTRUCTION_SETTINGS}"
-        ) 
+        msg_generic = "IP ACG properties validation failed."
+        code = "IPACGDescriptionLengthException"
+        map = {
+            "IPACGDescriptionLengthException": {
+                "msg": f"{msg_generic} The IP ACG group description contains "
+                    f"[{len_ip_acg_desc}] characters; "
+                    f"more than the [{desc_length_max}] characters AWS allows. "
+                    f"{STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
 
 
 def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:
@@ -118,8 +132,15 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
         f"Inventory [ip_acgs] length: [{len(inventory.ip_acgs)}]...", extra={"depth": 1}
     )
     if not matches == len(inventory.ip_acgs):
-        raise IPACGIdMatchException(
-            "Could not match all current IP ACGs from AWS with IP ACGs specified "
-            "in settings.yaml. Are you sure you have the correct IP ACGs specified "
-            "in settings.yaml?"
-        )
+        msg_generic = "IP ACG properties validation failed."
+        code = "IPACGIdMatchException"
+        map = {
+            "IPACGIdMatchException": {
+                "msg": f"{msg_generic} Could not match "
+                    "all current IP ACGs from AWS with IP ACGs specified "
+                    "in settings.yaml. Are you sure you have specified "
+                    "the correct IP ACGs in settings.yaml?",
+                "crash": True
+            }
+        }        
+        process_error(map, code)

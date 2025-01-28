@@ -1,10 +1,11 @@
 import logging
 
-from config import UnexpectedException
+from config import STD_INSTRUCTION_README
 from resources.directories.inventory import show_directories
 from resources.ip_acgs.inventory import show_ip_acgs
 from resources.models import AppInput, Inventory, Settings
 from routing import actions
+from routing.errors import process_error
 from validation import val_work_instruction
 from validation.utils import parse_settings
 
@@ -51,7 +52,18 @@ def run_selected_route(app_input: AppInput) -> None:
         action = app_input.cli["action"]
         
     except Exception as e:
-        raise UnexpectedException(f"Unexpected error: {e}") 
+        msg_generic = f"Could not run selected route."
+        code = e.response["Error"]["Code"]
+        map = {
+            "UnexpectedException": {
+                "msg": (
+                    f"{msg_generic} Are you sure you specified a valid route? "
+                    f"{STD_INSTRUCTION_README}"
+                ),
+                "crash": True
+            },
+        }
+        process_error(map, code, e)
     
     cli = app_input.cli    
     

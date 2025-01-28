@@ -4,7 +4,8 @@ import json
 import logging
 from typing import Optional
 
-from resources.utils import process_error
+from routing.errors import process_error
+
 from config import (
     EXC_ACCESS_DENIED, 
     EXC_INVALID_PARAM, 
@@ -58,15 +59,15 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         )
         ip_acg.id = response.get("GroupId")
         logger.info(
-            f"Created IP ACG [{ip_acg.name}] with id [{ip_acg.id}].",
+            f"☑ Created IP ACG [{ip_acg.name}] with id [{ip_acg.id}].",
             extra={"depth": 2}
         )        
         return ip_acg
     
     except ClientError as e:
         msg_generic = f"Could not create IP ACG [{ip_acg.name}] in AWS."
-
-        error_map = {
+        code = e.response["Error"]["Code"]
+        map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -76,12 +77,12 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
                 "crash": True
             },
             "ResourceAlreadyExistsException": {
-                "msg": f"{msg_generic} It seems the IP ACG already exists. Skip creation",
+                "msg": f"{msg_generic} It seems the IP ACG already exists. ",
                 "crash": False
             },
             "ResourceCreationFailedException": {
                 "msg": f"{msg_generic} Something went wrong internally at AWS. "
-                "Please try again later.",
+                    "Please try again later.",
                 "crash": True
             },
             "AccessDeniedException": {
@@ -89,7 +90,7 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
                 "crash": True
             }
         }
-        process_error(error_map, e)
+        process_error(map, code, e)
  
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
@@ -110,12 +111,17 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
             f"Response of [associate_ip_acg]: {json.dumps(response, indent=4)}",
             extra={"depth": 2}
         )
+        logger.info(
+            f"☑ Associated IP ACGs with directory [{directory.id} - {directory.name}].",
+            extra={"depth": 2}
+        )  
 
     except ClientError as e:
         msg_generic = (
             f"Could not associate IP ACGs with directory [{directory.id}] in AWS."
         )
-        error_map = {
+        code = e.response["Error"]["Code"]
+        map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -141,7 +147,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
                 "crash": True
             },
         }
-        process_error(error_map, e)
+        process_error(map, code, e)
 
 
 def update_rules(ip_acg: IP_ACG) -> None:
@@ -165,16 +171,17 @@ def update_rules(ip_acg: IP_ACG) -> None:
         extra={"depth": 2}
         )
         logger.info(
-            f"Rules for IP ACG with name[{ip_acg.name}] and id [{ip_acg.id}] updated.",
+            f"Rules for IP ACG [{ip_acg.id} - {ip_acg.name}] updated.",
             extra={"depth": 1}
         )
 
     except ClientError as e:
         msg_generic = (
-            f"Could not update rules of IP ACG [{ip_acg.name}] 
-            and id [{ip_acg.id}] in AWS."
+            f"Could not update rules of IP ACG [{ip_acg.name}] "
+            "and id [{ip_acg.id}] in AWS."
         )
-        error_map = {
+        code = e.response["Error"]["Code"]
+        map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -199,7 +206,7 @@ def update_rules(ip_acg: IP_ACG) -> None:
                 "crash": True
             }
         }
-        process_error(error_map, e)
+        process_error(map, code, e)
 
 
 def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> None:
@@ -223,15 +230,16 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
 
     except ClientError as e:
         msg_generic = (
-            f"Could not disassociate IP ACG from directory with name [{directory.name}] 
-            and id [{directory.name}] in AWS."
+            f"Could not disassociate IP ACG from directory with name [{directory.name}] "
+            "and id [{directory.name}] in AWS."
         )
-        error_map = {
+        code = e.response["Error"]["Code"]
+        map = {
             "ValidationException": {  # TODO: check if this error is caught
                 "msg": (
-                    f"{msg_generic} Are you sure you specified a valid IP ACG?
-                    And does the IP ACG still exist? Please check the status in 
-                    a status run of the app. {STD_INSTRUCTION_README}"
+                    f"{msg_generic} Are you sure you specified a valid IP ACG? "
+                    "And does the IP ACG still exist? Please check the status in "
+                    f"a status run of the app. {STD_INSTRUCTION_README}"
                 ),
                 "crash": True
             },
@@ -256,7 +264,7 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
                 "crash": True
             }
         }
-        process_error(error_map, e)
+        process_error(map, code, e)
 
 
 def delete_ip_acg(ip_acg_id: str) -> None:
@@ -279,21 +287,22 @@ def delete_ip_acg(ip_acg_id: str) -> None:
 
     except ClientError as e:
         msg_generic = f"Could not delete IP ACG [{ip_acg_id}] in AWS."
-        error_map = {
+        code = e.response["Error"]["Code"]
+        map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
             },
             "ResourceNotFoundException": {
-                "msg": f"{msg_generic} Could not find IP ACG in AWS. Double check if it 
-                 has have been created, and if not, do a 'create' run of this app.  {STD_INSTRUCTION_README}",
+                "msg": f"{msg_generic} Could not find IP ACG in AWS. Double check if it "
+                    f"has been created, and if not, do a 'create' run of this app.  {STD_INSTRUCTION_README}",
                 "crash": True
             },
             "ResourceAssociatedException": {
                 "msg": (
-                    f"{msg_generic} The IP ACG is still associated 
-                    with a directory in AWS. Please retry a 'delete' run first.
-                    Otherwise, please inspect in the AWS console."
+                    f"{msg_generic} The IP ACG is still associated " 
+                    "with a directory in AWS. Please retry a 'delete' run first. " 
+                    "Otherwise, please inspect in the AWS console."
                 ),
                 "crash": True
             },
@@ -302,4 +311,4 @@ def delete_ip_acg(ip_acg_id: str) -> None:
                 "crash": True
             }
         }
-        process_error(error_map, e)
+        process_error(map, code, e)

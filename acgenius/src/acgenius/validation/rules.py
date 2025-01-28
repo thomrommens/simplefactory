@@ -3,15 +3,8 @@ import logging
 import re
 from typing import Optional
 
-from config import (
-    IPACGAmtRulesException,
-    IPACGDuplicateRulesException,
-    RuleDescriptionLengthException,
-    RuleIPV4FormatInvalidException,
-    RuleLinebreakException,
-    RulePrefixInvalidException,
-    STD_INSTRUCTION_SETTINGS
-)
+from acgenius.src.acgenius.routing.errors import process_error
+from config import STD_INSTRUCTION_SETTINGS
 
 from resources.models import Rule, Settings, WorkInstruction
 from .utils import remove_whitespaces, split_ip_and_prefix
@@ -32,7 +25,16 @@ def val_ip_linebreaks_absent(rule) -> Optional[bool]:
     )
     
     if "\n" in rule.ip:
-        raise RuleLinebreakException(f"Line break found in IP rule [{rule.ip}].")
+        msg_generic = "IP ACG Rule properties validation failed."
+        code = "RuleLinebreakException"
+        map = {
+            "RuleLinebreakException": {
+                "msg": f"{msg_generic} "
+                    f"Line break found in IP rule [{rule.ip}].",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
     
 
 def val_ip_format_correct(ip: str) -> Optional[bool]:
@@ -51,9 +53,16 @@ def val_ip_format_correct(ip: str) -> Optional[bool]:
     pattern = r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$"
 
     if not re.match(pattern, ip):
-        raise RuleIPV4FormatInvalidException(
-            f"IP address is invalid. {STD_INSTRUCTION_SETTINGS}"
-        )
+        msg_generic = "IP ACG Rule properties validation failed."
+        code = "RuleIPV4FormatInvalidException"
+        map = {
+            "RuleIPV4FormatInvalidException": {
+                "msg": f"{msg_generic} IP address is invalid. "
+                    f"{STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
 
 
 def val_ip_allowed(ip: str, settings: Settings) -> Optional[bool]:
@@ -93,9 +102,16 @@ def val_prefix_allowed(prefix: int, settings: Settings) -> bool:
         extra={"depth": 5}
     )
     if not prefix_min <= prefix <= prefix_default:
-        raise RulePrefixInvalidException(
-            f"Prefix [{prefix}] is invalid. {STD_INSTRUCTION_SETTINGS}"
-        )
+        msg_generic = "IP ACG Rule properties validation failed."
+        code = "RulePrefixInvalidException"
+        map = {
+            "RulePrefixInvalidException": {
+                "msg": f"{msg_generic} Prefix [{prefix}] is invalid. "
+                    f"{STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
     
 
 def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
@@ -113,10 +129,17 @@ def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
         extra={"depth": 5}
     )
     if len(rule.desc) > rules_desc_length_max:
-        raise RuleDescriptionLengthException(
-            f"Rule description exceeds AWS limit of [{rules_desc_length_max}] characters. "
-            f"{STD_INSTRUCTION_SETTINGS}"
-        )
+        msg_generic = "IP ACG Rule properties validation failed."
+        code = "RuleDescriptionLengthException"
+        map = {
+            "RuleDescriptionLengthException": {
+                "msg": f"{msg_generic} Rule description exceeds "
+                    f"AWS limit of [{rules_desc_length_max}] characters. "
+                    f"{STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
 
 
 def val_rule_unique(rule_list: list) -> Optional[bool]:
@@ -134,14 +157,20 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
 
     duplicates = [k for k, v in Counter(rule_list).items() if v > 1]
         
-    if len(duplicates) > 0:        
-        raise IPACGDuplicateRulesException(
-            f"Duplicate rule(s) found: {duplicates}. "
-            "Note, this might also been due to the app's addition "
-            "of /32 for a single IP address. "
-            f"{STD_INSTRUCTION_SETTINGS}"
-        )
-    
+    if len(duplicates) > 0:
+        msg_generic = "IP ACG Rule properties validation failed."
+        code = "IPACGDuplicateRulesException"
+        map = {
+            "IPACGDuplicateRulesException": {
+                "msg": f"{msg_generic} Duplicate rule(s) found: "
+                    f"{duplicates}. Note, this duplication might also been occurred "
+                    "due to the app's addition of /32 for a single IP address. "
+                    f"{STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
+
 
 def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]:
     """
@@ -159,11 +188,19 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
     ) 
     amt_rules = len(rule_list)
     if not amt_rules <= amt_rules_max:
-        raise IPACGAmtRulesException(
-            f"The IP ACG contains [{amt_rules}] rules; "
-            f"more than the [{amt_rules_max}] IP rules AWS allows per IP ACG."
-            f"{STD_INSTRUCTION_SETTINGS}"
-        ) 
+        msg_generic = "IP ACG Rule properties validation failed."
+        code = "IPACGAmtRulesException"
+        map = {
+            "IPACGAmtRulesException": {
+                "msg": f"{msg_generic} The IP ACG contains "
+                    f"[{amt_rules}] rules; more than "
+                    f"the [{amt_rules_max}] IP rules "
+                    f"AWS allows per IP ACG.{STD_INSTRUCTION_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(map, code)
+
     
 
 def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:

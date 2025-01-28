@@ -1,5 +1,4 @@
 import logging
-import sys
 from textwrap import indent
 from typing import Union
 import pandas as pd
@@ -16,7 +15,7 @@ def specify_report(item: Union[Directory, IP_ACG]) -> dict:
     """
     xx
     """
-    logger.debug(f"Specify report...", extra={"depth": 2})
+    logger.debug(f"Set report specs...", extra={"depth": 2})
     
     if isinstance(item, IP_ACG):
         return {
@@ -77,42 +76,3 @@ def create_report(
 
     else:
         logger.warning(f"No item found for report.", extra={"depth": 1})
-
-
-def process_error(error_map, e):
-    """
-    xx
-    """
-    code = e.response["Error"]["Code"]
-
-    msg = error_map.get(
-        code, {}
-        ).get("msg", "Unexpected AWS error.")
-    crash = error_map.get(
-        code, {}
-        ).get("crash", True)
-
-    logger.info(f"{code} | {msg}", extra={"depth": 1})
-    set_app_response(e, crash)
-
-
-def set_app_response(e: Exception, crash: bool = True) -> None:
-    """
-    Standard response (preventing full stack trace)
-    """
-    if not crash:
-        logger.warning(
-            f"⚠️ Full error: {e}",                
-            extra={"depth": 1}
-        )   
-        return     
-
-    logger.error(
-        f"❌ Full error: {e}",                
-        extra={"depth": 1}
-    )        
-    logger.info(
-        f"Cannot continue. Exit app.",                
-        extra={"depth": 1}
-    )
-    sys.exit(1)

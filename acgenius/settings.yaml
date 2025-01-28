@@ -43,15 +43,23 @@
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ip_acgs:
 
-- name: "Domain C"
-  desc: "Allowed inbound IP addresses from Domain C"
+- name: "Here is my ACG 1"
+  desc: "Allowed inbound IP addresses from Domain 1"
   origin: "This Department"
   rules: 
   - "104.27.176.222": "This trusted single host"
   - "203.0.113.22/31": "That trusted series of hosts"
 
-- name: "Domain D"
-  desc: "Allowed inbound IP addresses from Domain D"
+- name: "Here is my ACG 2"
+  desc: "Allowed inbound IP addresses from Domain 2"
+  origin: "That Department"
+  rules: 
+  - "198.51.100.22/30": "This trusted series of hosts"
+  - "45.33.32.22": "That trusted host"
+  - "67.207.82.22": "Yet another trusted host"
+
+- name: "Hey Im new"
+  desc: "Allowed inbound IP addresses from Domain 3"
   origin: "That Department"
   rules: 
   - "198.51.100.22/30": "This trusted series of hosts"
@@ -74,7 +82,7 @@ tags:
   Environment: "test"
   Department: "ThatDepartment"
   CostCenter: "ThatCostCenter"
-  CreatedBy: "ACGenius"
+  CreatedBy: "acgenius"
 
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
