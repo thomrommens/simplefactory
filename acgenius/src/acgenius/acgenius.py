@@ -2,8 +2,7 @@
 # TODO:   - generic
 # TODO:   - authorize IP group required?
 
-# TODO: unit tests
-# TODO: integration tests
+# TODO: UTs: revise, remove comments, debug
 
 # TODO: finalize
 # TODO: - update docstrings

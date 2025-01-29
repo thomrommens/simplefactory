@@ -63,7 +63,7 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
             state=directory.get("State"),
             ip_acgs=directory.get("ipGroupIds"),
         )
-    directories.append(directory)
+        directories.append(directory)
 
     return directories
 
