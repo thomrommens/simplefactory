@@ -156,6 +156,7 @@ def delete(app_input: AppInput) -> None:
                     delete_ip_acg(ip_acg_id)
 
     else:
+        msg_generic = "Could not delete IP ACGs."
         error_code = "IPACGNoneSpecifiedForDeleteException"
         error_map = {
             "IPACGNoneSpecifiedForDeleteException": {
@@ -167,7 +168,7 @@ def delete(app_input: AppInput) -> None:
                 "crash": True
             }
         }        
-        process_error(error_map, error_code)
+        process_error(error_map, error_code, msg_generic)
     
     logger.info(
         f"✅ Completed action: delete IP ACGs"
