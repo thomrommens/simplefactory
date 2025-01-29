@@ -31,13 +31,13 @@ def get_settings() -> dict:
     except yaml.parser.ParserError as e:
         msg_generic = "Could not load settings.yaml. Is the structure still correct?"
         code = "SettingsYAMLParserError"
-        map = {
+        error_map = {
             "SettingsYAMLParserError": {
                 "msg": f"{msg_generic} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }
-        process_error(map, code, e)
+        process_error(error_map, code, e)
 
 
 def val_settings_main_structure(settings):
@@ -61,7 +61,7 @@ def val_settings_main_structure(settings):
         if not isinstance(settings.get(k), v):
             msg_generic = "Generic structure validation of settings.yaml failed."
             code = "SettingsYAMLExpectedKeyException"
-            map = {
+            error_map = {
                 "SettingsYAMLExpectedKeyException": {
                     "msg": f"{msg_generic} Value of key [{k}] is expected to be "
                         f"of type [{v.__name__}], "
@@ -70,7 +70,7 @@ def val_settings_main_structure(settings):
                     "crash": True
                 }
             }        
-            process_error(map, code)
+            process_error(error_map, code)
 
 
 def val_settings_ip_acg_structure(settings):
@@ -91,7 +91,7 @@ def val_settings_ip_acg_structure(settings):
                     "Specific IP ACG structure validation of settings.yaml failed."    
                 )
                 code = "SettingsYAMLIPACGExpectedKeyException"
-                map = {
+                error_map = {
                     "SettingsYAMLIPACGExpectedKeyException": {
                         "msg": f"{msg_generic} Key [{ip_acg_key}] is expected to be "
                             f"part of the IP ACGs in settings.yaml, but was not found. "
@@ -99,7 +99,7 @@ def val_settings_ip_acg_structure(settings):
                         "crash": True
                     }
                 }        
-                process_error(map, code)
+                process_error(error_map, code)
 
 
 def get_validation_baseline(settings: dict) -> Validation:

@@ -24,7 +24,7 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     if not ip_acg.name:
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGNAmeNoneException"
-        map = {
+        error_map = {
             "IPACGNAmeNoneException": {
                 "msg": f"{msg_generic} One IP ACG group in settings.yaml "
                     "seems to have no name. "
@@ -32,14 +32,14 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
     len_ip_acg_name = len(str(ip_acg.name))
     
     if not len_ip_acg_name <= group_name_length_max:
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGNameLengthException"
-        map = {
+        error_map = {
             "IPACGNameLengthException": {
                 "msg": f"{msg_generic} The IP ACG group name contains "
                     f"[{len_ip_acg_name}] characters; "
@@ -48,7 +48,7 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
 
 def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
@@ -66,14 +66,14 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
     if len(duplicates) > 0:
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGNameDuplicateException"
-        map = {
+        error_map = {
             "IPACGNameDuplicateException": {
                 "msg": f"{msg_generic} Duplicate IP ACG name found: "
                     f"{duplicates}. {STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
     
 
 def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
@@ -91,7 +91,7 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
     if not ip_acg.desc:
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGDescriptionNoneException"
-        map = {
+        error_map = {
             "IPACGDescriptionNoneException": {
                 "msg": f"{msg_generic} IP ACG group [{ip_acg.name}] "
                     "seems to have no description. "
@@ -99,14 +99,14 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
     len_ip_acg_desc = len(ip_acg.desc)
 
     if not len_ip_acg_desc <= desc_length_max:
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGDescriptionLengthException"
-        map = {
+        error_map = {
             "IPACGDescriptionLengthException": {
                 "msg": f"{msg_generic} The description "
                     f"of IP ACG [{ip_acg.name}] contains "
@@ -116,7 +116,7 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
 
 def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:
@@ -163,7 +163,7 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
     if not matches == len(inventory.ip_acgs):
         msg_generic = "IP ACG properties validation failed."
         code = "IPACGIdMatchException"
-        map = {
+        error_map = {
             "IPACGIdMatchException": {
                 "msg": f"{msg_generic} Could not match "
                     "all current IP ACGs from AWS with IP ACGs specified "
@@ -172,4 +172,4 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)

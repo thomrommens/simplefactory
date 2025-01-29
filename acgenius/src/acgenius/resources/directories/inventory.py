@@ -3,7 +3,7 @@ import json
 import logging
 from typing import Optional
 
-from config import EXC_INVALID_PARAM, workspaces
+from config import EXC_INVALID_PARAM, EXC_UNEXPECTED, workspaces
 from resources.models import Directory
 from resources.utils import create_report
 from routing.errors import process_error
@@ -29,17 +29,25 @@ def get_directories() -> Optional[list[dict]]:
         )
         if response["Directories"]:
             return response["Directories"]
-
-    except ClientError as e:
+        
+    except (ClientError, Exception) as e:
         msg_generic = "Could not get directories from AWS."
-        code = e.response["Error"]["Code"]
-        map = {
+        error_map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
+            },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
             }
-        }
-        process_error(map, code, e)
+        }       
+
+        if isinstance(e, ClientError):
+            code = e.response["Error"]["Code"]
+        else:
+            code = "UnexpectedException"
+        process_error(error_map, code, e)
 
 
 def sel_directories(directories_inventory: dict) -> list[Directory]:
@@ -76,7 +84,6 @@ def show_directories() -> list[Directory]:
     and display them in a formatted table.
 
     :returns: List of Directory objects containing directory information
-    :raises: ClientError: If there is an error calling AWS WorkSpaces API
     """
     logger.info("Current directories (before execution of action):", extra={"depth": 1})  
 

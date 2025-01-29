@@ -105,7 +105,7 @@ def update(app_input: AppInput) -> None:
     else:
         msg_generic = "Could not update IP ACGs."
         code = "IPACGNoneFoundException"
-        map = {
+        error_map = {
             "IPACGNoneFoundException": {
                 "msg": f"{msg_generic} No IP ACGs found in inventory. "
                     "Please make sure you have at least one IP ACG in AWS, "
@@ -114,7 +114,7 @@ def update(app_input: AppInput) -> None:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
        
     logger.info(
         f"✅ Completed action: update IP ACGs"
@@ -158,7 +158,7 @@ def delete(app_input: AppInput) -> None:
     else:
         msg_generic = "Could not delete IP ACGs."
         code = "IPACGNoneSpecifiedForDeleteException"
-        map = {
+        error_map = {
             "IPACGNoneSpecifiedForDeleteException": {
                 "msg": f"{msg_generic} You specified the 'delete' action, "
                     "but you have not properly specified which "
@@ -168,7 +168,7 @@ def delete(app_input: AppInput) -> None:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
     
     logger.info(
         f"✅ Completed action: delete IP ACGs"

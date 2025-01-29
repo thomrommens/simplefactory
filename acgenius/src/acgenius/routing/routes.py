@@ -54,7 +54,7 @@ def run_selected_route(app_input: AppInput) -> None:
     except Exception as e:
         msg_generic = f"Could not run selected route."
         code = e.response["Error"]["Code"]
-        map = {
+        error_map = {
             "UnexpectedException": {
                 "msg": (
                     f"{msg_generic} Are you sure you specified a valid route? "
@@ -63,7 +63,7 @@ def run_selected_route(app_input: AppInput) -> None:
                 "crash": True
             },
         }
-        process_error(map, code, e)
+        process_error(error_map, code, e)
     
     cli = app_input.cli    
     

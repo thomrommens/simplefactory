@@ -12,7 +12,8 @@ from config import (
     EXC_OPERATION_NOT_SUPPORTED, 
     EXC_RESOURCE_LIMIT, 
     EXC_RESOURCE_NOT_FOUND, 
-    EXC_RESOURCE_STATE, 
+    EXC_RESOURCE_STATE,
+    EXC_UNEXPECTED, 
     STD_INSTR_README, 
     workspaces
 )
@@ -64,21 +65,13 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         )        
         return ip_acg
     
-    except ParamValidationError as e:
+    except (ParamValidationError, ClientError, Exception) as e:
         msg_generic = f"Could not create IP ACG [{ip_acg.name}] in AWS."
-        code = "ParamValidationError"
-        map = {
+        error_map = {
             "ParamValidationError": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
-            }
-        }
-        process_error(map, code, e)
-
-    except ClientError as e:
-        msg_generic = f"Could not create IP ACG [{ip_acg.name}] in AWS."
-        code = e.response["Error"]["Code"]
-        map = {
+            },
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -99,10 +92,21 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
             "AccessDeniedException": {
                 "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
+            },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
             }
         }
-        process_error(map, code, e)
- 
+
+        if isinstance(e, ParamValidationError):
+            code = "ParamValidationError"
+        elif isinstance(e, ClientError):
+            code = e.response["Error"]["Code"]
+        else:
+           code = "UnexpectedException"
+        process_error(error_map, code, e)
+
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     """
@@ -125,25 +129,18 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
         logger.info(
             f"☑ Associated IP ACGs with directory [{directory.id} - {directory.name}].",
             extra={"depth": 2}
-        )  
+        )
 
-    except ParamValidationError as e:
-        msg_generic = f"Could not associate IP ACGs with directory."
-        code = "ParamValidationError"
-        map = {
+    except (ParamValidationError, ClientError, Exception) as e:
+        msg_generic = (
+            f"Could not associate IP ACGs with directory "
+            f"[{directory.id} - {directory.name}] in AWS."
+        )
+        error_map = {
             "ParamValidationError": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
-            }
-        }
-        process_error(map, code, e)
-    
-    except ClientError as e:
-        msg_generic = (
-            f"Could not associate IP ACGs with directory [{directory.id}] in AWS."
-        )
-        code = e.response["Error"]["Code"]
-        map = {
+            },
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -168,8 +165,19 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
                 "msg": f"{msg_generic} {EXC_OPERATION_NOT_SUPPORTED}",
                 "crash": True
             },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
+            }
         }
-        process_error(map, code, e)
+
+        if isinstance(e, ParamValidationError):
+            code = "ParamValidationError"
+        elif isinstance(e, ClientError):
+            code = e.response["Error"]["Code"]
+        else:
+           code = "UnexpectedException"
+        process_error(error_map, code, e)      
 
 
 def update_rules(ip_acg: IP_ACG) -> None:
@@ -197,14 +205,16 @@ def update_rules(ip_acg: IP_ACG) -> None:
             extra={"depth": 1}
         )
 
-    except ClientError as e:
+    except (ParamValidationError, ClientError, Exception) as e:
         msg_generic = (
-            f"Could not update rules of IP ACG [{ip_acg.name}] "
-            "and id [{ip_acg.id}] in AWS."
+            f"Could not update rules of IP ACG [{ip_acg.id} - {ip_acg.name}] in AWS."
         )
-        code = e.response["Error"]["Code"]
-        map = {
-            "InvalidParameterValuesException": {
+        error_map = {
+            "ParamValidationError": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
+           "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
             },
@@ -226,9 +236,20 @@ def update_rules(ip_acg: IP_ACG) -> None:
             "AccessDeniedException": {
                 "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
+            },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
             }
         }
-        process_error(map, code, e)
+
+        if isinstance(e, ParamValidationError):
+            code = "ParamValidationError"
+        elif isinstance(e, ClientError):
+            code = e.response["Error"]["Code"]
+        else:
+           code = "UnexpectedException"
+        process_error(error_map, code, e)
 
 
 def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> None:
@@ -254,15 +275,18 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
             f"☑ Disassociated IP ACGs {ip_acg_ids_to_delete} "
             f"from directory [{directory.id} - {directory.name}].",
             extra={"depth": 1}
-        )  
+        )
 
-    except ClientError as e:
+    except (ParamValidationError, ClientError, Exception) as e:
         msg_generic = (
             f"Could not disassociate all IP ACGs "
             f"from directory [{directory.id} - {directory.name}] in AWS."
         )
-        code = e.response["Error"]["Code"]
-        map = {
+        error_map = {
+            "ParamValidationError": {
+                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "crash": True
+            },
             "ValidationException": {  # TODO: check if this error is caught
                 "msg": (
                     f"{msg_generic} Are you sure you specified "
@@ -292,9 +316,20 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
             "OperationNotSupportedException": {
                 "msg": f"{msg_generic} {EXC_OPERATION_NOT_SUPPORTED}",
                 "crash": True
+            },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
             }
         }
-        process_error(map, code, e)
+
+        if isinstance(e, ParamValidationError):
+            code = "ParamValidationError"
+        elif isinstance(e, ClientError):
+            code = e.response["Error"]["Code"]
+        else:
+           code = "UnexpectedException"
+        process_error(error_map, code, e)
 
 
 def delete_ip_acg(ip_acg_id: str) -> None:
@@ -315,10 +350,9 @@ def delete_ip_acg(ip_acg_id: str) -> None:
         )
         logger.info(f"☑ Deleted IP ACG [{ip_acg_id}].", extra={"depth": 1})
 
-    except ClientError as e:
+    except (ParamValidationError, ClientError, Exception) as e:
         msg_generic = f"Could not delete IP ACG [{ip_acg_id}] in AWS."
-        code = e.response["Error"]["Code"]
-        map = {
+        error_map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -340,6 +374,17 @@ def delete_ip_acg(ip_acg_id: str) -> None:
             "AccessDeniedException": {
                 "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
+            },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
             }
         }
-        process_error(map, code, e)
+
+        if isinstance(e, ParamValidationError):
+            code = "ParamValidationError"
+        elif isinstance(e, ClientError):
+            code = e.response["Error"]["Code"]
+        else:
+           code = "UnexpectedException"
+        process_error(error_map, code, e)

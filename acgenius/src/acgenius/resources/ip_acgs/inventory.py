@@ -5,7 +5,8 @@ from typing import Optional
 
 from config import (
     EXC_ACCESS_DENIED, 
-    EXC_INVALID_PARAM, 
+    EXC_INVALID_PARAM,
+    EXC_UNEXPECTED, 
     STD_INSTR_README, 
     workspaces
 )
@@ -38,10 +39,9 @@ def get_ip_acgs() -> list[IP_ACG]:
 
         logger.info("No IP ACGs found in AWS.", extra={"depth": 2})
 
-    except ClientError as e:
+    except (ClientError, Exception) as e:
         msg_generic = "Could not get IP ACGs from AWS."
-        code = e.response["Error"]["Code"]
-        map = {
+        error_map = {
             "InvalidParameterValuesException": {
                 "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
                 "crash": True
@@ -49,9 +49,18 @@ def get_ip_acgs() -> list[IP_ACG]:
             "AccessDeniedException": {
                 "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
+            },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
             }
-        }
-        process_error(map, code, e)
+        }       
+
+        if isinstance(e, ClientError):
+            code = e.response["Error"]["Code"]
+        else:
+            code = "UnexpectedException"
+        process_error(error_map, code, e)
 
 
 def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:

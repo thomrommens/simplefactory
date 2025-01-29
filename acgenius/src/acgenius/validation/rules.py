@@ -27,7 +27,7 @@ def val_ip_linebreaks_absent(rule) -> Optional[bool]:
     if "\n" in rule.ip:
         msg_generic = "IP ACG Rule properties validation failed."
         code = "RuleLinebreakException"
-        map = {
+        error_map = {
             "RuleLinebreakException": {
                 "msg": f"{msg_generic} "
                     f"Line break found in IP rule [{rule}]. "
@@ -35,7 +35,7 @@ def val_ip_linebreaks_absent(rule) -> Optional[bool]:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
     
 
 def val_ip_format_correct(ip: str) -> Optional[bool]:
@@ -56,14 +56,14 @@ def val_ip_format_correct(ip: str) -> Optional[bool]:
     if not re.match(pattern, ip):
         msg_generic = "IP ACG Rule properties validation failed."
         code = "RuleIPV4FormatInvalidException"
-        map = {
+        error_map = {
             "RuleIPV4FormatInvalidException": {
                 "msg": f"{msg_generic} IP address does not meet IPv4 standard. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
 
 def val_ip_allowed(ip: str, settings: Settings) -> Optional[bool]:
@@ -88,14 +88,14 @@ def val_ip_allowed(ip: str, settings: Settings) -> Optional[bool]:
     if ip in invalid_ips:
         msg_generic = "IP ACG Rule properties validation failed."
         code = "IPAddressInInvalidRange"
-        map = {
+        error_map = {
             "IPAddressInInvalidRange": {
                 "msg": f"{msg_generic} IP address [{ip}] is in invalid range. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
 
 def val_prefix_allowed(prefix: int, settings: Settings) -> bool:
@@ -116,14 +116,14 @@ def val_prefix_allowed(prefix: int, settings: Settings) -> bool:
     if not prefix_min <= prefix <= prefix_default:
         msg_generic = "IP ACG Rule properties validation failed."
         code = "RulePrefixInvalidException"
-        map = {
+        error_map = {
             "RulePrefixInvalidException": {
                 "msg": f"{msg_generic} Prefix [{prefix}] is invalid. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
     
 
 def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
@@ -143,7 +143,7 @@ def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
     if len(rule.desc) > rules_desc_length_max:
         msg_generic = "IP ACG Rule properties validation failed."
         code = "RuleDescriptionLengthException"
-        map = {
+        error_map = {
             "RuleDescriptionLengthException": {
                 "msg": f"{msg_generic} Rule description is [{len(rule.desc)}] characters, "
                     f"so it exceeds the AWS limit of [{rules_desc_length_max}] "
@@ -151,7 +151,7 @@ def val_rule_desc_length(rule: Rule, settings: Settings) -> Optional[bool]:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
 
 def val_rule_unique(rule_list: list) -> Optional[bool]:
@@ -172,7 +172,7 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
     if len(duplicates) > 0:
         msg_generic = "IP ACG Rule properties validation failed."
         code = "IPACGDuplicateRulesException"
-        map = {
+        error_map = {
             "IPACGDuplicateRulesException": {
                 "msg": f"{msg_generic} Duplicate rule(s) found: "
                     f"{duplicates}. Note, this duplication might also occur "
@@ -181,7 +181,7 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
                 "crash": True
             }
         }        
-        process_error(map, code)
+        process_error(error_map, code)
 
 
 def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]:
@@ -201,7 +201,7 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
     amt_rules = len(rule_list)
 
     msg_generic = "IP ACG Rule properties validation failed."
-    map = {
+    error_map = {
         "IPACGMinAmtRulesException": {
             "msg": f"{msg_generic} The IP ACG in settings.yaml contains "
                 f"[{amt_rules}] rules; Please specify at least 1 rule per IP ACG. "
@@ -220,11 +220,11 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
 
     if not amt_rules > 0:
         code = "IPACGMinAmtRulesException"
-        process_error(map, code)
+        process_error(error_map, code)
 
     if not amt_rules <= amt_rules_max:        
         code = "IPACGMaxAmtRulesException"
-        process_error(map, code)
+        process_error(error_map, code)
     
 
 def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:

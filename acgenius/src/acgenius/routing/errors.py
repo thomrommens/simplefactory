@@ -8,15 +8,15 @@ from config import EXIT_APP
 logger = logging.getLogger("acgenius")
 
 
-def process_error(map: dict, code: str, e: Optional[Exception] = None):
+def process_error(error_map: dict, code: str, e: Optional[Exception] = None):
     """
     e for AWS calls; not for own custom exceptions
     """
-    crash = map.get(code, {}).get("crash", True)
-    msg = map.get(code, {}).get("msg", "Unexpected error.")
+    crash = error_map.get(code, {}).get("crash", True)
+    msg = error_map.get(code, {}).get("msg", "Unexpected error.")
     
     if e:
-        msg = map.get(code, {}).get("msg", "Unexpected AWS error.")
+        msg = error_map.get(code, {}).get("msg", "Unexpected AWS error.")
 
     logger.info(f"{msg}", extra={"depth": 1})
     set_app_response(e, crash)
@@ -37,4 +37,3 @@ def set_app_response(e: Optional[Exception] = None, crash: bool = True) -> None:
         if crash:
             logger.info(f"{EXIT_APP}", extra={"depth": 1})
             sys.exit(1)
-

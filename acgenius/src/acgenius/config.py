@@ -36,6 +36,8 @@ EXC_RESOURCE_STATE = (
     "Please inspect these resources in the AWS console. "
 )
 EXC_OPERATION_NOT_SUPPORTED = "The operation is not supported."
+EXC_UNEXPECTED = "An unexpected exception occurred."
+
 EXIT_APP = "❌ Cannot continue. Exit app."
 
 
