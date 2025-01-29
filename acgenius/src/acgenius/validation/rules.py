@@ -13,7 +13,7 @@ logger = logging.getLogger("acgenius")
 MSG_GENERIC = "IP ACG Rule properties validation failed."
 
 
-def val_ip_linebreaks_absent(rule) -> Optional[bool]:
+def val_ip_linebreaks_absent(rule: Rule) -> Optional[bool]:
     """
     Validate that no linebreaks exist in the IP rule.
 

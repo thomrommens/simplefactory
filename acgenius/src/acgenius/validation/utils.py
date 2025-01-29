@@ -46,7 +46,7 @@ def get_settings() -> dict:
         process_error(error_map, error_code, msg_generic, e)
 
 
-def val_settings_main_structure(settings):
+def val_settings_main_structure(settings: dict) -> None:
     """
     Validate if expected 'main' keys of settings.yaml have at least an empty value
     in the expected type.
@@ -79,7 +79,7 @@ def val_settings_main_structure(settings):
             process_error(error_map, error_code, msg_generic)
 
 
-def val_settings_ip_acg_structure(settings):
+def val_settings_ip_acg_structure(settings: dict) -> None:
     """
     Validate if keys expected in settings["ip_acgs"] of settings.yaml 
     are present.
@@ -108,7 +108,7 @@ def val_settings_ip_acg_structure(settings):
                 process_error(error_map, error_code, msg_generic)
 
 
-def get_validation_baseline(settings: dict) -> Validation:
+def get_validation_baseline(settings: Settings) -> Validation:
     """
     Get validation baseline (settings to validate user input against)from settings.yaml.
     """
@@ -130,7 +130,7 @@ def get_validation_baseline(settings: dict) -> Validation:
     )
 
 
-def get_work_instruction(settings: dict) -> WorkInstruction:
+def get_work_instruction(settings: Settings) -> WorkInstruction:
     """
     Parse retrieved settings to a WorkInstruction object.
     Make sure IP ACGs are sorted by name.

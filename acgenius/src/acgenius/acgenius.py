@@ -6,14 +6,13 @@
 
 # TODO: finalize
 # TODO: - update docstrings
-# TODO: - update typing
 # TODO: - Ruff
 # TODO:     - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/
 # TODO:         - import order
 
 # TODO: update README.md
 # TODO final view settings.yaml
-# TODO: update UT config settings: .env, PYTHONPATH, conftest.py
+# TODO: update UT config settings: .env, PYTHONPATH, conftest.py, __main__.py
 
 
 import click

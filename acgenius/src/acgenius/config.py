@@ -77,10 +77,10 @@ class DepthFormatter(logging.Formatter):
         [2023-01-01 12:00:01] [INFO] | Processing item 1
         [2023-01-01 12:00:02] [INFO] | | Validating item 1
     """
-    def __init__(self, fmt=None, datefmt=None, style="%") -> None:
+    def __init__(self, fmt: str = None, datefmt: str = None, style: str = "%") -> None:
         super().__init__(fmt, datefmt, style)
 
-    def format(self, record) -> str:
+    def format(self, record: logging.LogRecord) -> str:
         pipes = " |" * getattr(record, "depth", 0)
         record.msg = f"{pipes}{' ' if pipes else ''}{record.msg}"
         return super().format(record)
