@@ -1,22 +1,40 @@
+from botocore.exceptions import ClientError
 import logging
 import sys
 from typing import Optional
 
-from config import EXIT_APP
+from acgenius.config import EXC_UNEXPECTED_GENERIC, EXIT_APP
 
 
 logger = logging.getLogger("acgenius")
 
 
-def process_error(error_map: dict, code: str, e: Optional[Exception] = None):
+def get_error_code(e):
+    """
+    xx
+    """
+    exception_type = type(e).__name__
+
+    error_code = str(exception_type)
+    print("ERROR CODE FOUND:", error_code)  
+    if exception_type == ClientError:
+        error_code = e.response["Error"]["Code"]
+
+    return error_code
+
+
+def process_error(
+        error_map: dict, 
+        code: str, 
+        msg_generic: str,
+        e: Optional[Exception] = None
+    ):
     """
     e for AWS calls; not for own custom exceptions
     """
     crash = error_map.get(code, {}).get("crash", True)
-    msg = error_map.get(code, {}).get("msg", "Unexpected error.")
-    
-    if e:
-        msg = error_map.get(code, {}).get("msg", "Unexpected AWS error.")
+    msg_specific = error_map.get(code, {}).get("msg", EXC_UNEXPECTED_GENERIC)
+    msg = f"{msg_generic} {msg_specific}"
 
     logger.info(f"{msg}", extra={"depth": 1})
     set_app_response(e, crash)

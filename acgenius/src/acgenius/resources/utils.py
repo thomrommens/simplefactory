@@ -4,8 +4,8 @@ from typing import Union
 import pandas as pd
 from tabulate import tabulate
 
-from resources.ip_acgs.utils import format_rules
-from resources.models import Directory, IP_ACG
+from acgenius.resources.ip_acgs.utils import format_rules
+from acgenius.resources.models import Directory, IP_ACG
 
 
 logger = logging.getLogger("acgenius")

@@ -6,7 +6,7 @@ from pathlib import Path
 
 SETTINGS_FILE = "settings.yaml"
 SETTINGS_FILE_PATH = os.path.join(
-    Path().resolve().parent.parent, 
+    Path().resolve().parent, 
     SETTINGS_FILE
 )
 
@@ -36,7 +36,7 @@ EXC_RESOURCE_STATE = (
     "Please inspect these resources in the AWS console. "
 )
 EXC_OPERATION_NOT_SUPPORTED = "The operation is not supported."
-EXC_UNEXPECTED = "An unexpected exception occurred."
+EXC_UNEXPECTED_GENERIC = "An unexpected exception occurred."
 
 EXIT_APP = "❌ Cannot continue. Exit app."
 

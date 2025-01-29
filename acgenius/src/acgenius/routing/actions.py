@@ -1,18 +1,18 @@
 import logging
 
-from validation.directories import val_directories_specified
-from config import STD_INSTR_README
-from routing.errors import process_error
-from resources.utils import create_report
-from resources.ip_acgs.work_instruction import (
+from acgenius.validation.directories import val_directories_specified
+from acgenius.config import STD_INSTR_README
+from acgenius.routing.errors import process_error
+from acgenius.resources.utils import create_report
+from acgenius.resources.ip_acgs.work_instruction import (
     associate_ip_acg, 
     create_ip_acg, 
     delete_ip_acg, 
     disassociate_ip_acg
 )
-from resources.ip_acgs.work_instruction import update_rules
-from resources.ip_acgs.utils import match_ip_acgs
-from resources.models import AppInput
+from acgenius.resources.ip_acgs.work_instruction import update_rules
+from acgenius.resources.ip_acgs.utils import match_ip_acgs
+from acgenius.resources.models import AppInput
 
 
 logger = logging.getLogger("acgenius")
@@ -104,17 +104,17 @@ def update(app_input: AppInput) -> None:
 
     else:
         msg_generic = "Could not update IP ACGs."
-        code = "IPACGNoneFoundException"
+        error_code = "IPACGNoneFoundException"
         error_map = {
             "IPACGNoneFoundException": {
-                "msg": f"{msg_generic} No IP ACGs found in inventory. "
+                "msg": "No IP ACGs found in inventory. "
                     "Please make sure you have at least one IP ACG in AWS, "
                     "in order to update. "
                     f"Run the 'create' action to create an IP ACG. {STD_INSTR_README}",
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code, msg_generic)
        
     logger.info(
         f"✅ Completed action: update IP ACGs"
@@ -156,11 +156,10 @@ def delete(app_input: AppInput) -> None:
                     delete_ip_acg(ip_acg_id)
 
     else:
-        msg_generic = "Could not delete IP ACGs."
-        code = "IPACGNoneSpecifiedForDeleteException"
+        error_code = "IPACGNoneSpecifiedForDeleteException"
         error_map = {
             "IPACGNoneSpecifiedForDeleteException": {
-                "msg": f"{msg_generic} You specified the 'delete' action, "
+                "msg": "You specified the 'delete' action, "
                     "but you have not properly specified which "
                     "IP ACG id(s) to delete. "
                     f"Please specify at least one IP ACG to delete. "
@@ -168,7 +167,7 @@ def delete(app_input: AppInput) -> None:
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code)
     
     logger.info(
         f"✅ Completed action: delete IP ACGs"

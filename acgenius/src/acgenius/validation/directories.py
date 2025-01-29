@@ -1,5 +1,5 @@
 import logging
-from resources.models import WorkInstruction
+from acgenius.resources.models import WorkInstruction
 
 
 logger = logging.getLogger("acgenius")

@@ -1,13 +1,12 @@
 import logging
 
-from config import STD_INSTR_README
-from resources.directories.inventory import show_directories
-from resources.ip_acgs.inventory import show_ip_acgs
-from resources.models import AppInput, Inventory, Settings
-from routing.actions import status, create, update, delete
-from routing.errors import process_error
-from validation import val_work_instruction
-from validation.utils import parse_settings
+from acgenius.resources.directories.inventory import show_directories
+from acgenius.resources.ip_acgs.inventory import show_ip_acgs
+from acgenius.resources.models import AppInput, Inventory, Settings
+from acgenius.routing.actions import status, create, update, delete
+from acgenius.routing.errors import get_error_code, process_error
+from acgenius.validation import val_work_instruction
+from acgenius.validation.utils import parse_settings
 
 
 logger = logging.getLogger("acgenius")
@@ -53,17 +52,9 @@ def run_selected_route(app_input: AppInput) -> None:
         
     except Exception as e:
         msg_generic = f"Could not run selected route."
-        code = e.response["Error"]["Code"]
-        error_map = {
-            "UnexpectedException": {
-                "msg": (
-                    f"{msg_generic} Are you sure you specified a valid route? "
-                    f"{STD_INSTR_README}"
-                ),
-                "crash": True
-            },
-        }
-        process_error(error_map, code, e)
+        error_map = {}
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e)
     
     cli = app_input.cli    
     

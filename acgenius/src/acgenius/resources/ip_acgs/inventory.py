@@ -3,16 +3,15 @@ import json
 import logging
 from typing import Optional
 
-from config import (
+from acgenius.config import (
     EXC_ACCESS_DENIED, 
     EXC_INVALID_PARAM,
-    EXC_UNEXPECTED, 
     STD_INSTR_README, 
     workspaces
 )
-from resources.models import IP_ACG, Rule
-from resources.utils import create_report
-from routing.errors import process_error
+from acgenius.resources.models import IP_ACG, Rule
+from acgenius.resources.utils import create_report
+from acgenius.routing.errors import get_error_code, process_error
 
 
 logger = logging.getLogger("acgenius")
@@ -43,23 +42,16 @@ def get_ip_acgs() -> list[IP_ACG]:
         msg_generic = "Could not get IP ACGs from AWS."
         error_map = {
             "InvalidParameterValuesException": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
-                "crash": True
-            },
-            "UnexpectedException": {
-                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
-        }       
-        if isinstance(e, ClientError):
-            code = e.response["Error"]["Code"]
-        else:
-            code = "UnexpectedException"
-        process_error(error_map, code, e)
+        }
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e)
 
 
 def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
