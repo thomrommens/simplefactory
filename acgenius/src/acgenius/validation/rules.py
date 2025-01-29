@@ -58,7 +58,7 @@ def val_ip_format_correct(ip: str) -> Optional[bool]:
         code = "RuleIPV4FormatInvalidException"
         error_map = {
             "RuleIPV4FormatInvalidException": {
-                "msg": f"{msg_generic} IP address does not meet IPv4 standard. "
+                "msg": f"{msg_generic} IP address [{ip}] does not meet IPv4 standard. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }

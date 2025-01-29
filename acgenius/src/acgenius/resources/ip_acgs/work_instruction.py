@@ -98,13 +98,12 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
                 "crash": True
             }
         }
-
         if isinstance(e, ParamValidationError):
             code = "ParamValidationError"
         elif isinstance(e, ClientError):
             code = e.response["Error"]["Code"]
         else:
-           code = "UnexpectedException"
+            code = "UnexpectedException"
         process_error(error_map, code, e)
 
 
@@ -170,13 +169,12 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
                 "crash": True
             }
         }
-
         if isinstance(e, ParamValidationError):
             code = "ParamValidationError"
         elif isinstance(e, ClientError):
             code = e.response["Error"]["Code"]
         else:
-           code = "UnexpectedException"
+            code = "UnexpectedException"
         process_error(error_map, code, e)      
 
 
@@ -242,13 +240,12 @@ def update_rules(ip_acg: IP_ACG) -> None:
                 "crash": True
             }
         }
-
         if isinstance(e, ParamValidationError):
             code = "ParamValidationError"
         elif isinstance(e, ClientError):
             code = e.response["Error"]["Code"]
         else:
-           code = "UnexpectedException"
+            code = "UnexpectedException"
         process_error(error_map, code, e)
 
 
@@ -322,13 +319,12 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
                 "crash": True
             }
         }
-
         if isinstance(e, ParamValidationError):
             code = "ParamValidationError"
         elif isinstance(e, ClientError):
             code = e.response["Error"]["Code"]
         else:
-           code = "UnexpectedException"
+            code = "UnexpectedException"
         process_error(error_map, code, e)
 
 
@@ -380,11 +376,10 @@ def delete_ip_acg(ip_acg_id: str) -> None:
                 "crash": True
             }
         }
-
         if isinstance(e, ParamValidationError):
             code = "ParamValidationError"
         elif isinstance(e, ClientError):
             code = e.response["Error"]["Code"]
         else:
-           code = "UnexpectedException"
+            code = "UnexpectedException"
         process_error(error_map, code, e)

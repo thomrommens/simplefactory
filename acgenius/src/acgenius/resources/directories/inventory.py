@@ -41,8 +41,7 @@ def get_directories() -> Optional[list[dict]]:
                 "msg": f"{msg_generic} {EXC_UNEXPECTED}",
                 "crash": True
             }
-        }       
-
+        }     
         if isinstance(e, ClientError):
             code = e.response["Error"]["Code"]
         else:

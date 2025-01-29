@@ -4,7 +4,7 @@ import logging
 import yaml
 
 from routing.errors import process_error
-from config import SETTINGS_FILE_PATH, STD_INSTR_SETTINGS
+from config import EXC_UNEXPECTED, SETTINGS_FILE_PATH, STD_INSTR_SETTINGS
 from resources.models import (
     IP_ACG, 
     Directory, 
@@ -131,33 +131,58 @@ def get_work_instruction(settings: dict) -> WorkInstruction:
     """
     logger.debug(f"Get work instruction from settings...", extra={"depth": 2})
 
-    return WorkInstruction(
-        directories=[
-            Directory(id=directory.get("id"), name=directory.get("name"))
-            for directory in settings["directories"]
-        ],
-        ip_acgs=sorted(
-            [
-                IP_ACG(
-                    name=ip_acg.get("name", ""),
-                    desc=ip_acg.get("desc", ""),
-                    origin=ip_acg.get("origin", ""),
-                    rules=[
-                        Rule(
-                            ip, 
-                            desc=desc
-                        )
-                        for rule in (ip_acg.get("rules") or [])
-                        if rule is not None
-                        for ip, desc in (rule.items() if rule else {})
-                    ],
-                )
-                for ip_acg in (settings.get("ip_acgs") or [])
+    try: 
+        work_instruction = WorkInstruction(
+            directories=[
+                Directory(id=directory.get("id"), name=directory.get("name"))
+                for directory in settings["directories"]
             ],
-            key=lambda x: x.name or ""
-        ),
-        tags=settings["tags"]
-    )
+            ip_acgs=sorted(
+                [
+                    IP_ACG(
+                        name=ip_acg.get("name", ""),
+                        desc=ip_acg.get("desc", ""),
+                        origin=ip_acg.get("origin", ""),
+                        rules=[
+                            Rule(
+                                ip, 
+                                desc=desc
+                            )
+                            for rule in (ip_acg.get("rules") or [])
+                            if rule is not None
+                            for ip, desc in (rule.items() if rule else {})
+                        ],
+                    )
+                    for ip_acg in (settings.get("ip_acgs") or [])
+                ],
+                key=lambda x: x.name or ""
+            ),
+            tags=settings["tags"]
+        )
+        
+        return work_instruction
+    
+    except (TypeError, Exception) as e:
+        msg_generic = "Could parse settings to work instruction."
+        error_map = {
+            "TypeError": {
+                "msg": (
+                    f"{msg_generic} Please verify if all values in settings.yaml, "
+                    "especially the name of the IP ACG, are encapsulated "
+                    "with double quotes."
+                ),
+                "crash": True
+            },
+            "UnexpectedException": {
+                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "crash": True
+            }
+        }
+        if isinstance(e, TypeError):
+            code = "TypeError"
+        else:
+            code = "UnexpectedException"
+        process_error(error_map, code, e)
 
 
 def parse_settings() -> Settings:

@@ -55,7 +55,6 @@ def get_ip_acgs() -> list[IP_ACG]:
                 "crash": True
             }
         }       
-
         if isinstance(e, ClientError):
             code = e.response["Error"]["Code"]
         else:
