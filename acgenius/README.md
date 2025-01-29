@@ -106,3 +106,5 @@ crud
 add red warning for delete
 
 settings.yaml validated in all routes, so keep it tidy
+
+`simplefactory\acgenius\src>python -m acgenius create --dryrun

@@ -16,7 +16,6 @@ def get_error_code(e):
     exception_type = type(e).__name__
 
     error_code = str(exception_type)
-    print("ERROR CODE FOUND:", error_code)  
     if exception_type == ClientError:
         error_code = e.response["Error"]["Code"]
 

@@ -14,6 +14,7 @@
 
 # TODO: update README.md
 # TODO final view settings.yaml
+# TODO: update UT config settings: .env, PYTHONPATH, conftest.py
 
 
 import click

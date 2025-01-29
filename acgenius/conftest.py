@@ -1,4 +1,6 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
+src_path = os.path.join(os.path.dirname(__file__), 'src')
+sys.path.append(src_path)
+print(f"Added to Python path: {src_path}")
