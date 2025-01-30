@@ -5,8 +5,7 @@ import pandas as pd
 from tabulate import tabulate
 
 from acgenius.resources.ip_acgs.utils import format_rules
-from acgenius.resources.models import Directory, IP_ACG
-
+from acgenius.resources.models import IP_ACG, Directory
 
 logger = logging.getLogger("acgenius")
 

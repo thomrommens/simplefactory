@@ -8,7 +8,6 @@ from acgenius.resources.models import Directory
 from acgenius.resources.utils import create_report
 from acgenius.routing.errors import get_error_code, process_error
 
-
 logger = logging.getLogger("acgenius")
 
 

@@ -1,10 +1,10 @@
-from botocore.exceptions import ClientError
 import logging
 import sys
 from typing import Optional
 
-from acgenius.config import EXC_UNEXPECTED_GENERIC, EXIT_APP
+from botocore.exceptions import ClientError
 
+from acgenius.config import EXC_UNEXPECTED_GENERIC, EXIT_APP
 
 logger = logging.getLogger("acgenius")
 

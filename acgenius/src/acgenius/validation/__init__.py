@@ -4,7 +4,6 @@ from acgenius.resources.models import Settings, WorkInstruction
 from acgenius.validation.ip_acgs import val_ip_acgs
 from acgenius.validation.rules import val_rules
 
-
 logger = logging.getLogger("acgenius")
 
 

@@ -1,11 +1,11 @@
-from collections import Counter
 import logging
 import re
+from collections import Counter
 from typing import Optional
 
-from acgenius.routing.errors import process_error
 from acgenius.config import STD_INSTR_DEBUG, STD_INSTR_SETTINGS
 from acgenius.resources.models import Rule, Settings, WorkInstruction
+from acgenius.routing.errors import process_error
 from acgenius.validation.utils import remove_whitespaces, split_ip_and_prefix
 
 logger = logging.getLogger("acgenius")

@@ -5,9 +5,9 @@
 
 import click
 
-from acgenius.config import HR, setup_logger, click_help
-from acgenius.routing.routes import run_common_route, run_selected_route
+from acgenius.config import HR, click_help, setup_logger
 from acgenius.resources.models import AppInput
+from acgenius.routing.routes import run_common_route, run_selected_route
 
 
 @click.command()

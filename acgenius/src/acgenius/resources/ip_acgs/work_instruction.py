@@ -1,9 +1,9 @@
-from botocore.exceptions import ClientError, ParamValidationError
 import json
 import logging
 from typing import Optional
 
-from acgenius.routing.errors import get_error_code, process_error
+from botocore.exceptions import ClientError, ParamValidationError
+
 from acgenius.config import (
     EXC_ACCESS_DENIED,
     EXC_INVALID_PARAM,
@@ -14,9 +14,9 @@ from acgenius.config import (
     STD_INSTR_README,
     workspaces,
 )
-from acgenius.resources.models import Directory, IP_ACG
-from acgenius.resources.ip_acgs.utils import format_rules, format_tags, extend_tags
-
+from acgenius.resources.ip_acgs.utils import extend_tags, format_rules, format_tags
+from acgenius.resources.models import IP_ACG, Directory
+from acgenius.routing.errors import get_error_code, process_error
 
 logger = logging.getLogger("acgenius")
 

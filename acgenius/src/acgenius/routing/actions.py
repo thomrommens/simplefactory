@@ -1,19 +1,18 @@
 import logging
 
-from acgenius.validation.directories import val_directories_specified
 from acgenius.config import STD_INSTR_README
-from acgenius.routing.errors import process_error
-from acgenius.resources.utils import create_report
+from acgenius.resources.ip_acgs.utils import match_ip_acgs
 from acgenius.resources.ip_acgs.work_instruction import (
     associate_ip_acg,
     create_ip_acg,
     delete_ip_acg,
     disassociate_ip_acg,
+    update_rules,
 )
-from acgenius.resources.ip_acgs.work_instruction import update_rules
-from acgenius.resources.ip_acgs.utils import match_ip_acgs
 from acgenius.resources.models import AppInput
-
+from acgenius.resources.utils import create_report
+from acgenius.routing.errors import process_error
+from acgenius.validation.directories import val_directories_specified
 
 logger = logging.getLogger("acgenius")
 

@@ -1,7 +1,8 @@
-from botocore.exceptions import ClientError
 import json
 import logging
 from typing import Optional
+
+from botocore.exceptions import ClientError
 
 from acgenius.config import (
     EXC_ACCESS_DENIED,
@@ -12,7 +13,6 @@ from acgenius.config import (
 from acgenius.resources.models import IP_ACG, Rule
 from acgenius.resources.utils import create_report
 from acgenius.routing.errors import get_error_code, process_error
-
 
 logger = logging.getLogger("acgenius")
 

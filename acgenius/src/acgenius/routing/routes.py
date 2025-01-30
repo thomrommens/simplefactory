@@ -3,11 +3,10 @@ import logging
 from acgenius.resources.directories.inventory import show_directories
 from acgenius.resources.ip_acgs.inventory import show_ip_acgs
 from acgenius.resources.models import AppInput, Inventory, Settings
-from acgenius.routing.actions import status, create, update, delete
+from acgenius.routing.actions import create, delete, status, update
 from acgenius.routing.errors import get_error_code, process_error
 from acgenius.validation import val_work_instruction
 from acgenius.validation.utils import parse_settings
-
 
 logger = logging.getLogger("acgenius")
 
