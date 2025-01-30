@@ -69,9 +69,9 @@ def val_settings_main_structure(settings: dict) -> None:
             error_code = "SettingsYAMLExpectedKeyException"
             error_map = {
                 "SettingsYAMLExpectedKeyException": {
-                    "msg": f"Value of key [{k}] is expected to be "
+                    "msg": f"Value of key [{k}] is expected to be present, and "
                         f"of type [{v.__name__}], "
-                        f"but seems to be of a different type. "
+                        f"but seems to be absent, or of a different type. "
                         f"{STD_INSTR_SETTINGS}",
                     "crash": True
                 }
@@ -89,22 +89,33 @@ def val_settings_ip_acg_structure(settings: dict) -> None:
         extra={"depth": 2}
     )
     ip_acg_keys = ["name", "desc", "origin", "rules"]
+    msg_generic = "Specific IP ACG structure validation of settings.yaml failed."
+
+
+    if settings["ip_acgs"] == [None]:
+        error_code = "SettingsYAMLIPACGNoKeysException"
+        error_map = {
+            "SettingsYAMLIPACGNoKeysException": {
+                "msg": f"{msg_generic} No IP ACGs were found in settings.yaml. "
+                    "Are you sure you have added at least one IP ACG? "
+                    f"{STD_INSTR_SETTINGS}",
+                "crash": True
+            }
+        }
+        process_error(error_map, error_code, msg_generic)
 
     for ip_acg in settings["ip_acgs"]:    
         for ip_acg_key in ip_acg_keys:      
-            if ip_acg_key not in ip_acg.keys():
-                msg_generic = (
-                    "Specific IP ACG structure validation of settings.yaml failed."    
-                )
-                error_code = "SettingsYAMLIPACGExpectedKeyException"
+            if not ip_acg_key in ip_acg.keys():                
+                error_code = "SettingsYAMLIPACGExpectedKeyException"   
                 error_map = {
                     "SettingsYAMLIPACGExpectedKeyException": {
-                        "msg": f"Key [{ip_acg_key}] is expected to be "
-                            f"part of the IP ACGs in settings.yaml, but was not found. "
-                            f"{STD_INSTR_SETTINGS}",
+                        "msg": f"{msg_generic} Key [{ip_acg_key}] is expected to be "
+                        f"part of the IP ACGs in settings.yaml, but was not found. "
+                        f"{STD_INSTR_SETTINGS}",
                         "crash": True
                     }
-                }        
+                }
                 process_error(error_map, error_code, msg_generic)
 
 
@@ -126,7 +137,8 @@ def get_validation_baseline(settings: Settings) -> Validation:
         rules_desc_length_max=ui["ip_acg"]["rules_desc_length"]["max"],
         prefix_default=ui["ip_address"]["prefix"]["default"],
         prefix_min=ui["ip_address"]["prefix"]["min"],
-        ip_acg_name_length_max=ui["ip_acg"]["name_length"]["max"]
+        ip_acg_name_length_max=ui["ip_acg"]["name_length"]["max"],
+        groups_per_directory_amt_max=ui["ip_acg"]["groups_per_directory_amt"]["max"]
     )
 
 

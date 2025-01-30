@@ -61,7 +61,7 @@ ip_acgs:
   - "198.51.100.22/30": "This trusted series of hosts"
   - "45.33.32.22": "That trusted host"
   - "67.207.82.22": "Yet another trusted host"
-
+  
 - name: ThatGroup5333
   desc: "Some"
   origin: "XX"
@@ -182,3 +182,6 @@ user_input_validation:
       max: 10
     rules_desc_length:
       max: 255
+    groups_per_directory_amt:
+      max: 25
+    

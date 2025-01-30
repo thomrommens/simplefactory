@@ -11,6 +11,37 @@ logger = logging.getLogger("acgenius")
 MSG_GENERIC = "IP ACG properties validation failed."
 
 
+def val_amt_groups_per_directory_allowed(
+        ip_acg_name_list: list, 
+        settings: Settings
+    ) -> None:
+    """
+    Validate that the number of groups per directory specified in the work instruction
+    does not exceed the maximum number of groups per directory allowed.
+    """
+    amt_groups_per_directory_max = settings.validation.groups_per_directory_amt_max
+
+    logger.debug(
+        "Validate that the maximum number "
+        f"of groups per directory is [{amt_groups_per_directory_max}] or less...", 
+        extra={"depth": 4}
+    ) 
+
+    amt_groups = len(ip_acg_name_list)
+
+    if not amt_groups <= amt_groups_per_directory_max:
+        error_code = "IPACGMaxAmtGroupsPerDirectoryException"
+        error_map = {
+            "IPACGMaxAmtGroupsPerDirectoryException": {
+                "msg": f"You specified [{amt_groups}] groups; "
+                    f"more than the [{amt_groups_per_directory_max}] AWS allows. "
+                    f"{STD_INSTR_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(error_map, error_code, MSG_GENERIC)
+
+
 def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """
     Validate that IP ACG name is not longer than the AWS imposed limit.
@@ -118,7 +149,7 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
 
 def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:
     """
-    xx
+    Integrate all IP ACG validations.
     """
     logger.debug(
         "Start: validate IP ACG properties of settings.yaml...",
@@ -132,6 +163,7 @@ def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkIn
             extra={"depth": 3}
         )   
         ip_acg_name_list.append(ip_acg.name)
+        val_amt_groups_per_directory_allowed(ip_acg_name_list, settings)
         val_ip_acg_name_unique(ip_acg_name_list)     
         val_ip_acg_name_length_allowed(ip_acg, settings)
         val_ip_acg_description_length_allowed(ip_acg, settings)

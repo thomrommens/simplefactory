@@ -4,7 +4,6 @@
 
 # TODO: UTs: revise, remove comments, debug
 
-# TODO: finalize
 # TODO: - update docstrings
 # TODO: - Ruff
 # TODO:     - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/

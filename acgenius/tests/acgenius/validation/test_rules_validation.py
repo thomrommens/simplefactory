@@ -19,6 +19,7 @@ class MockValidation:
     prefix_default: int
     rules_desc_length_max: int
     rules_amt_max: int
+    groups_per_directory_amt_max: int
 
 @dataclass
 class MockSettings:
@@ -72,7 +73,8 @@ def test_val_ip_allowed(ip, invalid_ips, expected):
             prefix_min=16,
             prefix_default=32,
             rules_desc_length_max=100,
-            rules_amt_max=60
+            rules_amt_max=60,
+            groups_per_directory_amt_max=25
         )
     )
     if expected == SystemExit:
@@ -100,7 +102,8 @@ def test_val_prefix_allowed(prefix, prefix_min, prefix_default, expected):
             prefix_min=prefix_min,
             prefix_default=prefix_default,
             rules_desc_length_max=100,
-            rules_amt_max=60
+            rules_amt_max=60,
+            groups_per_directory_amt_max=25
         )
     )
     if expected == SystemExit:
@@ -125,7 +128,8 @@ def test_val_rule_desc_length(desc, max_length, expected):
             prefix_min=16,
             prefix_default=32,
             rules_desc_length_max=max_length,
-            rules_amt_max=60
+            rules_amt_max=60,
+            groups_per_directory_amt_max=25
         )
     )
     if expected == SystemExit:
@@ -169,7 +173,8 @@ def test_val_amt_rules_allowed(rule_count, max_rules, expected):
             prefix_min=16,
             prefix_default=32,
             rules_desc_length_max=100,
-            rules_amt_max=max_rules
+            rules_amt_max=max_rules,
+            groups_per_directory_amt_max=25
         )
     )
     if expected == SystemExit:
@@ -193,7 +198,8 @@ def test_val_rules(rules, expected):
             prefix_min=16,
             prefix_default=32,
             rules_desc_length_max=100,
-            rules_amt_max=60
+            rules_amt_max=60,
+            groups_per_directory_amt_max=25
         )
     )
     ip_acg = IP_ACG(name="test_acg", desc="test", rules=rules)

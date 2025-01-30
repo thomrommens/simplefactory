@@ -15,9 +15,30 @@ An in-depth paragraph about your project and overview of use.
 
 ### Usage
 
-* update overwrite existing IP ACGs
+Warnings:
+- overwrite
+- delete:
+    - in general
+    - interval between creating old and new; preferably create new IP ACG first and delete old IP ACG afterward.
+
+settings.yaml validated in all routes, so keep it tidy
+
+delete action separately to
+- keep delete separated from create/update, otherwise confusing
+- no accidental deletes
+
+`{YOUR_PROJECT_FOLDER}\simplefactory\acgenius\src>python -m acgenius create --dryrun`
+`{YOUR_PROJECT_FOLDER}\simplefactory\acgenius\src>pytest \tests`
+
 ```
-code blocks for commands
+python -m acgenius status 
+python -m acgenius create 
+python -m acgenius update 
+python -m acgenius delete 1234567890 1234567891
+
+python -m acgenius create --dryrun
+python -m acgenius update --dryrun --debug
+python -m acgenius delete wsipg-1234567 wsipg-1234567891 --debug --dryrun 
 ```
 
 ## Documentation reference
@@ -40,31 +61,10 @@ Thom Rommens, [Simplefactory](https://simplefactory.substack.com)
 ## Misc add
 directory = always WorkSpace directory here; explain technically
 
-
-#   - if you *create* IP ACGs, you don't know the 'id' yet.
-#     Leave "placeholder" as is.
-#   - if you update existing IP ACGs, technically the existing IP ACG
-#     will be disassciated from the directory, and deleted, before
-#     a new IP ACG will be created.
-# -> at update possible to keep, right?
-
-# dry run for validating settings.yaml
-
-
 IP Access Control Groups per Directory: You can associate up to 25 IP access control groups with a single directory
-
 IP Access Control Groups per Region: You can create up to 100 IP access control groups per AWS region
+-> as we just add all IP ACGs to each directory, the only validation we need is that the number of IP ACGs per directory does not exceed the maximum number of IP ACGs per directory allowed.
 
-
-python script_name.py --delete-list d-1234567890 d-0987654321 d-1122334455
-
-delete-list, to
-- keep delete separated from create/update, otherwise confusing
-- no accidental deletes
-- 
-
-
-use cases
 
 - generic
 
@@ -80,6 +80,9 @@ use cases
 
 - update
 
+    - make sure the settings.yaml is in sync with your AWS target. In other words,
+    IP ACGs specified in settings.yaml should be present in AWS, for an update to succeed.
+    If they do not exist yet, run a `create` action first
     - update rules of existing IP ACGs
         - update rules in the settings.yaml
 
@@ -92,21 +95,3 @@ use cases
     - some IP ACGs
         - specify some in delete action
         - remove applicable ones from settings.yaml
-
-# - python -m acgenius status 
-# - python -m acgenius create 
-# - python -m acgenius update 
-# - python -m acgenius delete 1234567890, 1234567891
-# - python -m acgenius action --debug 
-# - python -m acgenius action --dryrun -->
-
-
-crud
-
-add red warning for delete
-
-settings.yaml validated in all routes, so keep it tidy
-
-`simplefactory\acgenius\src>python -m acgenius create --dryrun`
-
-`simplefactory\acgenius\src>pytest simplefactory\acgenius\tests`

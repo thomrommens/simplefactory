@@ -1,6 +1,7 @@
 import pytest
 from acgenius.resources.models import IP_ACG, Settings, WorkInstruction, Inventory, Validation
 from acgenius.validation.ip_acgs import (
+    val_amt_groups_per_directory_allowed,
     val_ip_acg_name_length_allowed,
     val_ip_acg_name_unique,
     val_ip_acg_description_length_allowed,
@@ -16,11 +17,58 @@ def settings():
         invalid_rules=[],
         rules_amt_max=10,
         prefix_default="default_prefix",
-        prefix_min=1
+        prefix_min=1,
+        groups_per_directory_amt_max=25
     )
     return Settings(validation=validation_settings)
 
-@pytest.mark.parametrize("name, max_length, should_raise", [
+
+@pytest.mark.parametrize(
+    "ip_acg_name_list,max_groups,should_raise",
+    [
+        # Empty list - valid
+        ([], 5, False),
+        # Single group - valid
+        (["group1"], 5, False),
+        # Multiple groups within limit - valid
+        (["group1", "group2", "group3"], 5, False),
+        # Exact limit - valid
+        (["group1", "group2", "group3", "group4", "group5"], 5, False),
+        # Exceeds limit by 1 - invalid
+        (["group1", "group2", "group3", "group4", "group5", "group6"], 5, True),
+        # Significantly exceeds limit - invalid
+        (["group1", "group2", "group3", "group4", "group5", "group6", "group7", "group8"], 5, True),
+    ]
+)
+def test_val_amt_groups_per_directory_allowed(ip_acg_name_list, max_groups, should_raise, settings):
+    settings.validation.groups_per_directory_amt_max = max_groups
+    
+    if should_raise:
+        with pytest.raises(SystemExit):
+            val_amt_groups_per_directory_allowed(ip_acg_name_list, settings)
+    else:
+        val_amt_groups_per_directory_allowed(ip_acg_name_list, settings)
+
+@pytest.mark.parametrize(
+    "max_groups",
+    [
+        # Zero limit
+        0,
+        # Small limit
+        1,
+        # Large limit
+        100,
+    ]
+)
+def test_val_amt_groups_per_directory_allowed_different_limits(max_groups, settings):
+    settings.validation.groups_per_directory_amt_max = max_groups
+    ip_acg_name_list = ["group1"] * (max_groups + 1)  # Adjusted to exceed the limit
+    
+    with pytest.raises(SystemExit):
+        val_amt_groups_per_directory_allowed(ip_acg_name_list, settings)
+
+
+@pytest.mark.parametrize("name, max_length, should_raise", [        
     ("valid_name", 32, False),
     ("", 32, True),
     (None, 32, True),
