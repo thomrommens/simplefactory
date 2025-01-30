@@ -2,11 +2,13 @@ import pytest
 from botocore.exceptions import ClientError
 from unittest.mock import patch
 
-from acgenius.resources.directories.inventory import get_directories, sel_directories, show_directories
+from acgenius.resources.directories.inventory import (
+    get_directories, sel_directories, show_directories
+)
 from acgenius.resources.models import Directory
 
 
-@pytest.mark.parametrize("aws_response,expected_result", [
+@pytest.mark.parametrize("aws_response, expected_result", [
     # Happy path - returns directories
     ({"Directories": [{"dir": "data"}]}, [{"dir": "data"}]),
     # Empty directories list
@@ -17,7 +19,7 @@ def test_get_directories_success(aws_response, expected_result):
         mock_workspaces.describe_workspace_directories.return_value = aws_response
         assert get_directories() == expected_result
 
-@pytest.mark.parametrize("exception,expected_crash", [
+@pytest.mark.parametrize("exception, expected_crash", [
     # Invalid parameter exception
     (ClientError({"Error": {"Code": "InvalidParameterValuesException"}}, "operation"), True),
     # Generic client error

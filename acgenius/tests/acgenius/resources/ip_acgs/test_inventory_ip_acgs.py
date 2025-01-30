@@ -1,6 +1,6 @@
 import pytest
 from botocore.exceptions import ClientError
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from acgenius.config import EXC_ACCESS_DENIED, EXC_INVALID_PARAM, STD_INSTR_README
 from acgenius.resources.ip_acgs.inventory import get_ip_acgs, sel_ip_acgs, show_ip_acgs

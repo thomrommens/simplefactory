@@ -1,7 +1,11 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
+
 from acgenius.routing.actions import status, create, update, delete
-from acgenius.resources.models import AppInput, Settings, WorkInstruction, Inventory, IP_ACG, Directory
+from acgenius.resources.models import (
+    AppInput, Settings, WorkInstruction, Inventory, IP_ACG, Directory
+)
+
 
 @pytest.mark.parametrize("app_input", [
     # Basic status check
@@ -132,4 +136,3 @@ def test_delete(app_input, should_raise):
             if not app_input.cli["dryrun"]:
                 assert mock_disassociate.call_count == len(app_input.inventory.directories)
                 assert mock_delete.call_count == len(app_input.cli["ip_acg_ids_to_delete"])
-

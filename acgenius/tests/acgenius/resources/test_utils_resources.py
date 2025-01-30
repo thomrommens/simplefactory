@@ -1,6 +1,8 @@
 import pytest
+
 from acgenius.resources.utils import specify_report, create_report
 from acgenius.resources.models import Directory, IP_ACG, Rule
+
 
 @pytest.mark.parametrize(
     "input_item, expected_output",
@@ -43,7 +45,7 @@ def test_specify_report_returns_correct_dict(input_item, expected_output):
             desc="test description",
             rules=[
                 Rule(
-                    ip="10.0.0.0/24",  # Changed from ipRule to ip
+                    ip="10.0.0.0/24",
                     desc="test rule"
                 )
             ]
@@ -62,7 +64,7 @@ def test_specify_report_returns_correct_dict(input_item, expected_output):
             desc="test description",
             rules=[
                 Rule(
-                    ip="10.0.0.0/24",  # Changed from ipRule to ip
+                    ip="10.0.0.0/24",
                     desc="test rule"
                 )
             ]
@@ -93,11 +95,11 @@ def test_create_report_prints_correctly(capsys, subject, origin):
             desc="test description", 
             rules=[
                 Rule(
-                    ip="10.0.0.0/24",  # Changed from ipRule to ip
+                    ip="10.0.0.0/24",
                     desc="test rule 1"
                 ),
                 Rule(
-                    ip="192.168.0.0/24",  # Changed from ipRule to ip
+                    ip="192.168.0.0/24",
                     desc="test rule 2"
                 )
             ]
@@ -108,11 +110,11 @@ def test_create_report_prints_correctly(capsys, subject, origin):
             desc="test description",
             rules=[
                 Rule(
-                    ip="10.0.0.0/24",  # Changed from ipRule to ip
+                    ip="10.0.0.0/24",
                     desc="test rule 1"
                 ),
                 Rule(
-                    ip="192.168.0.0/24",  # Changed from ipRule to ip
+                    ip="192.168.0.0/24",
                     desc="test rule 2"
                 )
             ]
@@ -126,51 +128,3 @@ def test_create_report_multiple_rules(capsys, subject, origin):
     assert "test rule 2" in captured.out
     assert "10.0.0.0/24" in captured.out
     assert "192.168.0.0/24" in captured.out
-
-# @pytest.mark.parametrize(
-#     "subject, origin",
-#     [
-#         ([
-#             Directory(
-#                 id="dir1",
-#                 name="test_dir1",
-#                 type="group",
-#                 state="active",
-#                 ip_acgs=["acg1"]
-#             ),
-#             Directory(
-#                 id="dir2",
-#                 name="test_dir2",
-#                 type="user",
-#                 state="inactive",
-#                 ip_acgs=["acg2"]
-#             )
-#         ], "work_instruction"),
-#         ([
-#             Directory(
-#                 id="dir1",
-#                 name="test_dir1",
-#                 type="group",
-#                 state="active",
-#                 ip_acgs=["acg1"]
-#             ),
-#             Directory(
-#                 id="dir2",
-#                 name="test_dir2",
-#                 type="user",
-#                 state="inactive",
-#                 ip_acgs=["acg2"]
-#             )
-#         ], "other")
-#     ]
-# )
-# def test_create_report_multiple_directories(capsys, subject, origin):
-#     create_report(subject, origin)
-#     captured = capsys.readouterr()
-#     assert "test_dir1" in captured.out
-#     assert "test_dir2" in captured.out
-#     assert "group" in captured.out
-#     assert "user" in captured.out
-#     assert "active" in captured.out
-#     assert "inactive" in captured.out
-#     assert "ip_acgs_associated" in captured.out

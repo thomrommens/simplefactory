@@ -1,6 +1,7 @@
 import pytest
 from dataclasses import dataclass
-from acgenius.resources.models import Rule, Settings, WorkInstruction, IP_ACG, Validation
+
+from acgenius.resources.models import Rule, WorkInstruction, IP_ACG
 from acgenius.validation.rules import (
     val_ip_linebreaks_absent,
     val_ip_format_correct,

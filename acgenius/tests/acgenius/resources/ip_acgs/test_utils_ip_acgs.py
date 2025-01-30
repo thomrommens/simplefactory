@@ -1,45 +1,50 @@
 import pytest
 from datetime import datetime
-from dataclasses import dataclass
+from unittest import TestCase
 
 from acgenius.resources.models import IP_ACG, Rule, Inventory, WorkInstruction
-from acgenius.resources.ip_acgs.utils import match_ip_acgs, format_rules, extend_tags, format_tags
+from acgenius.resources.ip_acgs.utils import (
+    match_ip_acgs, format_rules, extend_tags, format_tags
+)
 
 
-# @pytest.mark.parametrize("inventory_ip_acgs,work_instruction_ip_acgs,expected_ids", [
-#     # Single match
-#     ([IP_ACG(id="123", name="test1", desc="description1", rules=[])], 
-#      [IP_ACG(id=None, name="test1", desc="description1", rules=[])],
-#      ["123"]),
-    
-#     # Multiple matches
-#     ([IP_ACG(id="123", name="test1", desc="description1", rules=[]), 
-#       IP_ACG(id="456", name="test2", desc="description2", rules=[])],
-#      [IP_ACG(id=None, name="test1", desc="description1", rules=[]),
-#       IP_ACG(id=None, name="test2", desc="description2", rules=[])],
-#      ["123", "456"]),
-    
-#     # No matches
-#     ([IP_ACG(id="123", name="test1", desc="description1", rules=[])],
-#      [IP_ACG(id=None, name="test2", desc="description2", rules=[])],
-#      [None]),
-    
-#     # Empty lists
-#     ([], [], []),
-# ])
-# def test_match_ip_acgs(inventory_ip_acgs, work_instruction_ip_acgs, expected_ids):
-#     inventory = Inventory(ip_acgs=inventory_ip_acgs, directories=[])
-#     work_instruction = WorkInstruction(ip_acgs=work_instruction_ip_acgs, directories=[], tags=[])
+class TestIPACGUtils(TestCase):
+    def test_match_ip_acgs(self):
 
-#     if len(work_instruction_ip_acgs) > 0:
-#         with pytest.raises(SystemExit):
-#             match_ip_acgs(inventory, work_instruction)
+        inventory_ip_acgs = [
+            IP_ACG(id="123", name="acg1", desc="description1", rules=[]),
+            IP_ACG(id="456", name="acg2", desc="description2", rules=[])
+        ]
+        inventory = Inventory(ip_acgs=inventory_ip_acgs, directories=[])
 
-#     if len(inventory_ip_acgs) > 0:
-#         result = match_ip_acgs(inventory, work_instruction)
-#         for ip_acg, expected_id in zip(result.ip_acgs, expected_ids):
-#             assert ip_acg.id == expected_id
+        work_instruction_ip_acgs = [
+            IP_ACG(id=None, name="acg1", desc="description1", rules=[]),
+            IP_ACG(id=None, name="acg2", desc="description2", rules=[])
+        ]
+        work_instruction = WorkInstruction(ip_acgs=work_instruction_ip_acgs, directories=[], tags={})
+        result = match_ip_acgs(inventory, work_instruction)
 
+        self.assertEqual(len(result.ip_acgs), 2)
+        self.assertEqual(result.ip_acgs[0].id, "123")
+        self.assertEqual(result.ip_acgs[1].id, "456")
+        self.assertEqual(result.ip_acgs[0].name, "acg1")
+        self.assertEqual(result.ip_acgs[1].name, "acg2")
+
+    def test_match_ip_acgs_no_matches(self):
+
+        inventory_ip_acgs = [
+            IP_ACG(id="123", name="acg1", desc="description1", rules=[]),
+            IP_ACG(id="456", name="acg2", desc="description2", rules=[])
+        ]
+        inventory = Inventory(ip_acgs=inventory_ip_acgs, directories=[])
+
+        work_instruction_ip_acgs = [
+            IP_ACG(id=None, name="acg3", desc="description3", rules=[]), 
+        ]
+        work_instruction = WorkInstruction(ip_acgs=work_instruction_ip_acgs, directories=[], tags={})
+
+        with self.assertRaises(SystemExit):
+            match_ip_acgs(inventory, work_instruction)
 
 @pytest.mark.parametrize("rules,expected", [
     # Single rule

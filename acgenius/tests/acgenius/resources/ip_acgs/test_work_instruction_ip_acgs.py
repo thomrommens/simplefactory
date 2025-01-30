@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
-from acgenius.resources.models import WorkInstruction
 from acgenius.resources.ip_acgs.work_instruction import delete_ip_acg
+
 
 @pytest.mark.parametrize("ip_acg_id,expected_msg", [
     # Valid deletion

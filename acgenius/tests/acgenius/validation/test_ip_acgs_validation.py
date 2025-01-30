@@ -1,5 +1,8 @@
 import pytest
-from acgenius.resources.models import IP_ACG, Settings, WorkInstruction, Inventory, Validation
+
+from acgenius.resources.models import (
+    IP_ACG, Settings, WorkInstruction, Inventory, Validation
+)
 from acgenius.validation.ip_acgs import (
     val_amt_groups_per_directory_allowed,
     val_ip_acg_name_length_allowed,
@@ -8,6 +11,7 @@ from acgenius.validation.ip_acgs import (
     val_ip_acgs,
     val_ip_acgs_match_inventory
 )
+
 
 @pytest.fixture
 def settings():
@@ -62,7 +66,7 @@ def test_val_amt_groups_per_directory_allowed(ip_acg_name_list, max_groups, shou
 )
 def test_val_amt_groups_per_directory_allowed_different_limits(max_groups, settings):
     settings.validation.groups_per_directory_amt_max = max_groups
-    ip_acg_name_list = ["group1"] * (max_groups + 1)  # Adjusted to exceed the limit
+    ip_acg_name_list = ["group1"] * (max_groups + 1)
     
     with pytest.raises(SystemExit):
         val_amt_groups_per_directory_allowed(ip_acg_name_list, settings)

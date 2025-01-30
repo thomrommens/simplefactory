@@ -1,9 +1,10 @@
 import pytest
 from click.testing import CliRunner
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from acgenius.acgenius import main
 from acgenius.resources.models import AppInput, Settings, Inventory
+
 
 @pytest.mark.parametrize(
     "action,ip_acg_ids,dryrun,debug,expected_app_input,mock_settings,mock_inventory", [
@@ -11,41 +12,41 @@ from acgenius.resources.models import AppInput, Settings, Inventory
         ("status", (), False, False, 
          AppInput(cli={"action": "status", "dryrun": False, "ip_acg_ids_to_delete": ()}, 
                  settings=Settings(validation=None), 
-                 inventory=Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+                 inventory=Inventory(directories=[], ip_acgs=[])),
          Settings(validation=None),
-         Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+         Inventory(directories=[], ip_acgs=[])),
         
         # Create with dryrun
         ("create", (), True, False,
          AppInput(cli={"action": "create", "dryrun": True, "ip_acg_ids_to_delete": ()},
                  settings=Settings(validation=None),
-                 inventory=Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+                 inventory=Inventory(directories=[], ip_acgs=[])),
          Settings(validation=None),
-         Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+         Inventory(directories=[], ip_acgs=[])),
         
         # Update with debug
         ("update", (), False, True,
          AppInput(cli={"action": "update", "dryrun": False, "ip_acg_ids_to_delete": ()},
                  settings=Settings(validation=None),
-                 inventory=Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+                 inventory=Inventory(directories=[], ip_acgs=[])),
          Settings(validation=None),
-         Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+         Inventory(directories=[], ip_acgs=[])),
         
         # Delete with IP ACG IDs
         ("delete", ("acg1", "acg2"), False, False,
          AppInput(cli={"action": "delete", "dryrun": False, "ip_acg_ids_to_delete": ("acg1", "acg2")},
                  settings=Settings(validation=None),
-                 inventory=Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+                 inventory=Inventory(directories=[], ip_acgs=[])),
          Settings(validation=None),
-         Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+         Inventory(directories=[], ip_acgs=[])),
         
         # All options enabled with delete
         ("delete", ("acg1",), True, True,
          AppInput(cli={"action": "delete", "dryrun": True, "ip_acg_ids_to_delete": ("acg1",)},
                  settings=Settings(validation=None),
-                 inventory=Inventory(directories=[], ip_acgs=[])),  # Added required arguments
+                 inventory=Inventory(directories=[], ip_acgs=[])),
          Settings(validation=None),
-         Inventory(directories=[], ip_acgs=[]))  # Added required arguments
+         Inventory(directories=[], ip_acgs=[]))
     ]
 )
 def test_main_valid_inputs(action, ip_acg_ids, dryrun, debug, expected_app_input, 

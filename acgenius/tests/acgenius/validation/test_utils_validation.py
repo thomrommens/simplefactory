@@ -1,7 +1,5 @@
 import pytest
-from pathlib import Path
 import yaml
-import sys
 from dataclasses import asdict
 
 from acgenius.validation.utils import (
@@ -14,7 +12,10 @@ from acgenius.validation.utils import (
     split_ip_and_prefix,
     remove_whitespaces
 )
-from acgenius.resources.models import Rule, IP_ACG, Directory, WorkInstruction, Validation, Settings
+from acgenius.resources.models import (
+    Rule, IP_ACG, Directory, WorkInstruction, Validation, Settings
+)
+
 
 @pytest.fixture
 def valid_settings():
@@ -30,7 +31,8 @@ def valid_settings():
             "ip_acg": {
                 "rules_amt": {"max": 100},
                 "rules_desc_length": {"max": 50},
-                "name_length": {"max": 30}
+                "name_length": {"max": 30},
+                "groups_per_directory_amt": {"max": 25}
             }
         }
     }
@@ -141,16 +143,16 @@ def test_val_settings_ip_acg_structure_invalid(settings, expected_error):
         val_settings_ip_acg_structure(settings)
 
 
-# def test_get_validation_baseline(valid_settings):
-#     result = get_validation_baseline(valid_settings)
-#     assert isinstance(result, Validation)
-#     assert len(result.invalid_rules) == 1
-#     assert result.rules_amt_max == 100
-#     assert result.rules_desc_length_max == 50
-#     assert result.prefix_default == 32
-#     assert result.prefix_min == 24
-#     assert result.ip_acg_name_length_max == 30
-#     assert result.groups_per_directory_amt_max == 25
+def test_get_validation_baseline(valid_settings):
+    result = get_validation_baseline(valid_settings)
+    assert isinstance(result, Validation)
+    assert len(result.invalid_rules) == 1
+    assert result.rules_amt_max == 100
+    assert result.rules_desc_length_max == 50
+    assert result.prefix_default == 32
+    assert result.prefix_min == 24
+    assert result.ip_acg_name_length_max == 30
+    assert result.groups_per_directory_amt_max == 25
 
 @pytest.mark.parametrize("settings_input,expected_result", [
     # Empty lists and dicts
@@ -186,19 +188,19 @@ def test_get_work_instruction(settings_input, expected_result):
     result = get_work_instruction(settings_input)
     assert asdict(result) == asdict(expected_result)
 
-# def test_parse_settings(valid_settings, monkeypatch):
-#     def mock_get_settings():
-#         return {
-#             **valid_settings,
-#             "groups_per_directory_amt_max": 25
-#         }
+def test_parse_settings(valid_settings, monkeypatch):
+    def mock_get_settings():
+        return {
+            **valid_settings,
+            "groups_per_directory_amt_max": 25
+        }
     
-#     monkeypatch.setattr('acgenius.validation.utils.get_settings', mock_get_settings)
+    monkeypatch.setattr('acgenius.validation.utils.get_settings', mock_get_settings)
     
-#     result = parse_settings()
-#     assert isinstance(result, Settings)
-#     assert isinstance(result.validation, Validation)
-#     assert isinstance(result.work_instruction, WorkInstruction)
+    result = parse_settings()
+    assert isinstance(result, Settings)
+    assert isinstance(result.validation, Validation)
+    assert isinstance(result.work_instruction, WorkInstruction)
 
 @pytest.mark.parametrize("rule,expected_ip,expected_prefix", [
     # IP with prefix
