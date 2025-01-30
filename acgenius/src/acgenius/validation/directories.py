@@ -7,11 +7,9 @@ logger = logging.getLogger("acgenius")
 
 def val_directories_specified(work_instruction: WorkInstruction) -> bool:
     """
-    See if any directory is specified in the work instruction.
-    If yes, downstream IP ACGs will be associated
-    with that specified directory.
-    If not, downstream IP ACGs will be associated
-    with all directories found in the inventory.
+    See if any directory is specified in the work instruction:
+    - yes: downstream IP ACGs will be associated with *specified* directories only.
+    - no:  downstream IP ACGs will be associated with *all* directories from inventory.
     """
     logger.debug(
         "Validate if any directory specified in settings.yml...", extra={"depth": 1}

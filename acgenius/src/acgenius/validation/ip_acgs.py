@@ -14,7 +14,7 @@ def val_amt_groups_per_directory_allowed(
     ip_acg_name_list: list, settings: Settings
 ) -> None:
     """
-    Validate that the number of groups per directory specified in the work instruction
+    Validate that the number of IP ACGs per directory
     does not exceed the maximum number of groups per directory allowed.
     """
     amt_groups_per_directory_max = settings.validation.groups_per_directory_amt_max
@@ -148,7 +148,7 @@ def val_ip_acgs(
     work_instruction: WorkInstruction, settings: Settings
 ) -> WorkInstruction:
     """
-    Integrate all IP ACG validations.
+    Integrate all IP ACG validations (IP ACG level).
     """
     logger.debug(
         "Start: validate IP ACG properties of settings.yaml...", extra={"depth": 2}

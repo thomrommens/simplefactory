@@ -12,7 +12,10 @@ logger = logging.getLogger("acgenius")
 
 
 def run_common_route() -> tuple[Settings, Inventory]:
-    """ """
+    """ 
+    Run route for all actions.
+    Whatever action is picked, inventory and settings are always retrieved.
+    """
     logger.debug("Run common route...", extra={"depth": 1})
 
     directories = show_directories()
@@ -31,7 +34,7 @@ def run_common_route() -> tuple[Settings, Inventory]:
 
 def run_selected_route(app_input: AppInput) -> None:
     """
-    xx
+    Run selected route.
     """
     logger.debug("Run selected route...", extra={"depth": 1})
 

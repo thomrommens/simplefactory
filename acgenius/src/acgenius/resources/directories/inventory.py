@@ -13,9 +13,9 @@ logger = logging.getLogger("acgenius")
 
 def get_directories() -> Optional[list[dict]]:
     """
-    # if value in work_instruction for Directory, follow
-    # else, get from AWS
-    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_workspace_directories.html
+    Get directories from AWS WorkSpaces.
+
+    :returns: list of directories
     """
     logger.debug("Call [describe_workspace_directories]...", extra={"depth": 2})
 
@@ -40,6 +40,8 @@ def get_directories() -> Optional[list[dict]]:
 
 def sel_directories(directories_inventory: dict) -> list[Directory]:
     """
+    Select relevant directory info from retrieved directories.
+
     There might currently be no IP ACG in a directory.
     Then, for that directory, the key `ipGroupIds`
     is not present in the response.
@@ -66,10 +68,7 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
 
 def show_directories() -> list[Directory]:
     """
-    Get and display the current directories in AWS WorkSpaces.
-
-    Retrieve directories from AWS, process the response into Directory objects,
-    and display them in a formatted table.
+    Get and display the current, processed directories in AWS WorkSpaces.
 
     :returns: List of Directory objects containing directory information
     """

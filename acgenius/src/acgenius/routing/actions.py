@@ -19,23 +19,14 @@ logger = logging.getLogger("acgenius")
 
 def status(app_input: AppInput) -> None:
     """
-    Placeholder
+    Display status of current situation for IP ACGs.
     """
     logger.info("✅ Completed display of status.", extra={"depth": 1})
 
 
 def create(app_input: AppInput) -> None:
     """
-    Creates new IP Access Control Groups in AWS based on the work instruction.
-
-    If not in dryrun mode:
-    - Creates each IP ACG specified in the work instruction
-    - Applies the tags from the work instruction
-    - Associates the created IP ACGs with specified directories
-
-    :param app_input: Contains CLI arguments, settings and inventory data
-    :return: None
-    :raises: Various AWS exceptions during creation and association
+    Create new IP ACGs.
     """
     logger.debug("Action: create IP ACGs...", extra={"depth": 1})
 
@@ -71,16 +62,8 @@ def create(app_input: AppInput) -> None:
 
 def update(app_input: AppInput) -> None:
     """
-    Updates existing IP Access Control Groups in AWS with new rules.
+    Update rules of existing IP ACGs.
 
-    If not in dryrun mode:
-    - Matches IP ACGs from work instruction to existing ones in AWS
-    - Updates the rules for each matched IP ACG
-
-    :param app_input: Contains CLI arguments, settings and inventory data
-    :return: None
-    :raises: IPACGIdMatchException if IP ACGs cannot be matched
-    :raises: Various AWS exceptions during update
     """
     logger.debug("Action: update IP ACGs...", extra={"depth": 1})
 
@@ -118,16 +101,9 @@ def update(app_input: AppInput) -> None:
 
 def delete(app_input: AppInput) -> None:
     """
-    Deletes specified IP Access Control Groups from AWS.
+    Delete specified IP ACGs.
 
-    If not in dryrun mode:
-    - Disassociates IP ACGs from their directories
-    - Deletes each IP ACG specified in the delete list
-
-    :param app_input: Contains CLI arguments, settings and inventory data
-    :return: None
-    :raises: IPACGNoneSpecifiedForDeleteException if no IP ACGs specified for deletion
-    :raises: Various AWS exceptions during disassociation and deletion
+    This 'delete' route operates independently of 'settings.yaml'.
     """
     cli = app_input.cli
     inventory = app_input.inventory

@@ -38,7 +38,7 @@ def val_ip_linebreaks_absent(rule: Rule) -> Optional[bool]:
 
 def val_ip_format_correct(ip: str) -> Optional[bool]:
     """
-    Validate that IP address follows correct IPv4 format using regex pattern.
+    Validate that IP address follows IPv4 format.
 
     :param ip: IP address string to validate
     :raises RuleIPV4FormatInvalidException: If IP address format is invalid
@@ -212,12 +212,8 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
 
 def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:
     """
-    Validate all IP rules in the work instruction against AWS requirements.
+    Integrate all Rule validations (Rule level).
 
-    :param work_instruction: Work instruction containing IP ACGs and rules to validate
-    :param settings: Settings object containing validation rules
-    :return: Validated work instruction
-    :raises: Various exceptions for rule validation failures
     """
     logger.debug("Start: validate IP rules of settings.yaml...", extra={"depth": 2})
     for ip_acg in work_instruction.ip_acgs:

@@ -90,12 +90,6 @@ def setup_logger(name: str, debug: bool) -> logging.Logger:
     :param name: Name of the logger to create
     :param debug: Whether to enable debug logging level
     :return: Configured logger instance with appropriate handler and formatter
-
-    The logger is configured with:
-    - Log level set to DEBUG if debug=True, otherwise INFO
-    - StreamHandler for console output
-    - Custom DepthFormatter for hierarchical formatting
-    - Handler only added if logger doesn't already have handlers
     """
     logger = logging.getLogger(name)
 

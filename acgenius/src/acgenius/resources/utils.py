@@ -12,7 +12,9 @@ logger = logging.getLogger("acgenius")
 
 def specify_report(item: Union[Directory, IP_ACG]) -> dict:
     """
-    xx
+    Specify report for a given item (in order to add to generic report downstream).
+
+    param item: Directory or IP_ACG
     """
     logger.debug("Set report specs...", extra={"depth": 2})
 
@@ -30,8 +32,10 @@ def specify_report(item: Union[Directory, IP_ACG]) -> dict:
 
 def create_report(subject: Union[list[Directory], list[IP_ACG]], origin: str) -> None:
     """
-    Report a ...
-    Rules is nested within IP_ACG, so no separate argument.
+    Create a report for a given subject.
+
+    param subject: list of Directories or IP_ACGs
+    param origin: origin of the report
     """
     logger.debug("Create report...", extra={"depth": 1})
 

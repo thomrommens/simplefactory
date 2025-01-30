@@ -23,6 +23,8 @@ logger = logging.getLogger("acgenius")
 
 def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
     """
+    Create an IP ACG in AWS WorkSpaces.
+
     Skip (not error out) at trying to create existing
     :return: updated IP ACG
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/create_ip_group.html
@@ -83,6 +85,8 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     """
+    Associate IP ACG to directory in AWS WorkSpaces.
+
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/associate_ip_groups.html
     """
     logger.debug(
@@ -138,6 +142,9 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
 
 def update_rules(ip_acg: IP_ACG) -> None:
     """
+    Update rules of IP ACG in AWS WorkSpaces. 
+    This replaces all rules in the target, with rules specified.
+
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.html
     """
     rules_formatted = format_rules(ip_acg)
@@ -193,6 +200,9 @@ def update_rules(ip_acg: IP_ACG) -> None:
 
 def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> None:
     """
+    Disassociate IP ACGs from directory in AWS WorkSpaces. 
+    If the IP ACG is not recognized, the AWS disassociation call silently passes.
+
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/disassociate_ip_groups.html
     """
     logger.debug(
@@ -253,8 +263,10 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
 
 def delete_ip_acg(ip_acg_id: str) -> None:
     """
-    needs disassociate first.
-    Unrelated to settings.yaml
+    Delete an IP ACG in AWS WorkSpaces.
+    Before an IP ACG can be deleted, it needs to be disassociated 
+    from directories first.
+
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/delete_ip_group.html
     """
     logger.debug(f"Delete IP ACG [{ip_acg_id}]...", extra={"depth": 1})

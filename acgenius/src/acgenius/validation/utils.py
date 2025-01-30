@@ -118,7 +118,8 @@ def val_settings_ip_acg_structure(settings: dict) -> None:
 
 def get_validation_baseline(settings: Settings) -> Validation:
     """
-    Get validation baseline (settings to validate user input against)from settings.yaml.
+    Get validation baseline: settings to validate user input against,
+    from settings.yaml.
     """
     logger.debug("Get validation baseline from settings.yaml...", extra={"depth": 2})
 
@@ -141,7 +142,7 @@ def get_validation_baseline(settings: Settings) -> Validation:
 
 def get_work_instruction(settings: Settings) -> WorkInstruction:
     """
-    Parse retrieved settings to a WorkInstruction object.
+    Parse retrieved settings to a WorkInstruction.
     Make sure IP ACGs are sorted by name.
     """
     logger.debug("Get work instruction from settings...", extra={"depth": 2})
@@ -192,7 +193,7 @@ def get_work_instruction(settings: Settings) -> WorkInstruction:
 
 def parse_settings() -> Settings:
     """
-    xx
+    Integrate parsing of settings.
     """
     logger.debug("Parse settings...", extra={"depth": 1})
 

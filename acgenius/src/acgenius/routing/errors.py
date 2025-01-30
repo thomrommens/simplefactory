@@ -11,7 +11,7 @@ logger = logging.getLogger("acgenius")
 
 def get_error_code(e: Exception) -> str:
     """
-    xx
+    Get error code in exception style.
     """
     exception_type = type(e).__name__
 
@@ -24,7 +24,7 @@ def get_error_code(e: Exception) -> str:
 
 def set_app_response(e: Optional[Exception] = None, crash: bool = True) -> None:
     """
-    Standard response (preventing full stack trace)
+    Formulate response to an error; soft landing instead of displaying hard error.
     """
     if e:
         if crash:
@@ -43,7 +43,7 @@ def process_error(
     error_map: dict, error_code: str, msg_generic: str, e: Optional[Exception] = None
 ) -> None:
     """
-    e for AWS calls; not for own custom exceptions
+    Integrate steps for app to process an error: set up message and take action.
     """
     crash = error_map.get(error_code, {}).get("crash", True)
     msg_specific = error_map.get(error_code, {}).get("msg", EXC_UNEXPECTED_GENERIC)

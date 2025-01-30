@@ -4,7 +4,13 @@ from typing import Optional
 
 @dataclass
 class Rule:
-    """Rule = IP address + prefix"""
+    """
+    Represent a rule for an IP Access Control Group (IP ACG).
+
+    Attributes:
+        ip: IP address
+        desc: Description of the rule
+    """
 
     ip: str
     desc: str
@@ -13,14 +19,14 @@ class Rule:
 @dataclass
 class IP_ACG:
     """
-    Represent an IP Access Control Group for AWS WorkSpaces.
+    Represent an IP Access Control Group (IP ACG).
 
     Attributes:
         name: Name of the IP ACG
         desc: Description of the IP ACG
         rules: List of Rule objects containing IP addresses and descriptions
-        id: Optional AWS resource ID of the IP ACG
-        origin: Optional source/origin of the IP ACG configuration
+        id: AWS resource ID of the IP ACG
+        origin: Origin of the IP ACG configuration in the organization
     """
 
     name: str
@@ -33,7 +39,7 @@ class IP_ACG:
 @dataclass
 class Directory:
     """
-    Represent an AWS Directory Service directory.
+    Represent an AWS Directory Service directory, active and registered for WorkSpaces.
 
     Attributes:
         id: AWS resource ID of the directory
@@ -73,7 +79,7 @@ class Validation:
 @dataclass
 class WorkInstruction:
     """
-    Represent desired configuration state for directories and IP ACGs.
+    Represent configuration for directories and IP ACGs, originating from settings.yaml.
 
     Attributes:
         directories: List of Directory objects to configure

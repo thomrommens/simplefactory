@@ -56,7 +56,8 @@ def get_ip_acgs() -> list[IP_ACG]:
 
 def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     """
-    Make sure ip_acgs are sorted by name.
+    Select relevant IP ACG info from retrieved IP ACGs, and sort by name.
+
     """
     logger.debug(
         "Select relevant IP ACG info from retrieved IP ACGs, and sort by name...",
@@ -84,13 +85,8 @@ def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
 
 def show_ip_acgs() -> Optional[list[IP_ACG]]:
     """
-    Show the current IP Access Control Groups in AWS.
+    Get and display the current IP ACGs in AWS WorkSpaces.
 
-    Retrieve IP ACGs from AWS, process them into internal format, and display a report.
-    Log the raw and processed IP ACGs at debug level.
-
-    :returns: List of IP_ACG objects if any exist in AWS, None otherwise
-    :raises: Any exceptions from get_ip_acgs() or sel_ip_acgs() are propagated
     """
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
