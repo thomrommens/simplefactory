@@ -1,6 +1,3 @@
-
-# TODO: - Ruff
-# TODO:     - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/
 # TODO:         - import order
 
 # TODO: - update docstrings
