@@ -14,7 +14,7 @@ def val_directories_specified(work_instruction: WorkInstruction) -> bool:
     with all directories found in the inventory.
     """
     logger.debug(
-        f"Validate if any directory specified in settings.yml...", 
+        "Validate if any directory specified in settings.yml...", 
         extra={"depth": 1}
     )
 

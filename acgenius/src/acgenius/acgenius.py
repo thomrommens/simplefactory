@@ -1,18 +1,10 @@
-# TODO: - revisit 
-# TODO:   - generic
-# TODO:   - authorize IP group required?
 
-# TODO: UTs: revise, remove comments, debug
-
-# TODO: - update docstrings
 # TODO: - Ruff
 # TODO:     - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/
 # TODO:         - import order
 
+# TODO: - update docstrings
 # TODO: update README.md
-# TODO final view settings.yaml
-# TODO: update UT config settings: .env, PYTHONPATH, conftest.py, __main__.py
-
 
 import click
 
