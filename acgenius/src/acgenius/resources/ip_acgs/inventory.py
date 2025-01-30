@@ -24,7 +24,7 @@ def get_ip_acgs() -> list[IP_ACG]:
 
     :return: List of IP_ACG objects containing the IP ACGs found in AWS
     """
-    logger.debug(f"Call [describe_ip_groups]...", extra={"depth": 2})
+    logger.debug("Call [describe_ip_groups]...", extra={"depth": 2})
 
     try:
         response = workspaces.describe_ip_groups()
@@ -59,7 +59,7 @@ def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     Make sure ip_acgs are sorted by name.
     """
     logger.debug(
-        f"Select relevant IP ACG info from retrieved IP ACGs, and sort by name...", 
+        "Select relevant IP ACG info from retrieved IP ACGs, and sort by name...", 
         extra={"depth": 2}
     )
     

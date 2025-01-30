@@ -157,7 +157,7 @@ def val_rule_unique(rule_list: list) -> Optional[bool]:
     :raises IPACGDuplicateRulesException: If duplicate rules are found
     """
     logger.debug(
-        f"Validate that there are no duplicate rules within the IP ACG...", 
+        "Validate that there are no duplicate rules within the IP ACG...", 
         extra={"depth": 4}
     )
     logger.debug(f"Rule list: {rule_list}", extra={"depth": 5})
@@ -202,7 +202,7 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
             "crash": True
         },
         "IPACGMaxAmtRulesException": {
-            "msg": f"The IP ACG in settings.yaml contains "
+            "msg": "The IP ACG in settings.yaml contains "
                 f"[{amt_rules}] rules; more than "
                 f"the [{amt_rules_max}] IP rules "
                 "AWS allows per IP ACG. "
@@ -230,7 +230,7 @@ def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInst
     :raises: Various exceptions for rule validation failures
     """
     logger.debug(
-        f"Start: validate IP rules of settings.yaml...", 
+        "Start: validate IP rules of settings.yaml...", 
         extra={"depth": 2}
     )
     for ip_acg in work_instruction.ip_acgs:      
@@ -262,8 +262,6 @@ def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInst
             extra={"depth": 3}
         )
 
-    logger.debug(
-        f"Finish: validate IP rules of settings.yaml...", 
-        extra={"depth": 2}
-        )
+    logger.debug("Finish: validate IP rules of settings.yaml...", extra={"depth": 2})
+    
     return work_instruction

@@ -97,6 +97,9 @@ IP Access Control Groups per Region: You can create up to 100 IP access control 
         - remove applicable ones from settings.yaml
 
 
-run test
+run tests
+`pytest {YOUR_PROJECT_FOLDER}\simplefactory\acgenius\tests`
+
+
 ruff check
 ruff check {specify folder / file}

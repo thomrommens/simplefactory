@@ -18,7 +18,7 @@ def get_directories() -> Optional[list[dict]]:
     # else, get from AWS
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_workspace_directories.html
     """
-    logger.debug(f"Call [describe_workspace_directories]...", extra={"depth": 2})
+    logger.debug("Call [describe_workspace_directories]...", extra={"depth": 2})
     
     try:
         response = workspaces.describe_workspace_directories()
@@ -49,7 +49,7 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
     is not present in the response.
     """
     logger.debug(
-        f"Select relevant directory info from retrieved directories...", 
+        "Select relevant directory info from retrieved directories...", 
         extra={"depth": 2}
     )
     

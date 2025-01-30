@@ -15,7 +15,7 @@ logger = logging.getLogger("acgenius")
 def run_common_route() -> tuple[Settings, Inventory]:
     """
     """
-    logger.debug(f"Run common route...", extra={"depth": 1})
+    logger.debug("Run common route...", extra={"depth": 1})
 
     directories = show_directories()
     ip_acgs = show_ip_acgs()
@@ -39,7 +39,7 @@ def run_selected_route(app_input: AppInput) -> None:
     """
     xx
     """
-    logger.debug(f"Run selected route...", extra={"depth": 1})
+    logger.debug("Run selected route...", extra={"depth": 1})
 
     action_map = {
         "status": status,
@@ -51,7 +51,7 @@ def run_selected_route(app_input: AppInput) -> None:
         action = app_input.cli["action"]
         
     except Exception as e:
-        msg_generic = f"Could not run selected route."
+        msg_generic = "Could not run selected route."
         error_map = {}
         error_code = get_error_code(e)
         process_error(error_map, error_code, msg_generic, e)

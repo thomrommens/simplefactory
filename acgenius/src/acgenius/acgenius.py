@@ -36,7 +36,7 @@ def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool) ->
     logger = setup_logger("acgenius", debug)
 
     logger.info(HR)
-    logger.info(f"START APP: ACGENIUS...")
+    logger.info("START APP: ACGENIUS...")
     logger.info(HR)
 
     logger.info(f"Selected action:        [{action}]", extra={"depth": 1})
@@ -59,7 +59,7 @@ def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool) ->
     run_selected_route(app_input)
 
     logger.info(HR) 
-    logger.info(f"FINISH APP: ACGENIUS.")
+    logger.info("FINISH APP: ACGENIUS.")
     logger.info(HR) 
     
 

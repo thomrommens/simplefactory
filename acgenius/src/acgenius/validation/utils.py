@@ -21,7 +21,7 @@ def get_settings() -> dict:
     """
     Get settings from settings.yaml.
     """
-    logger.debug(f"Get settings from settings.yaml...", extra={"depth": 2})
+    logger.debug("Get settings from settings.yaml...", extra={"depth": 2})
 
     try:
         with open(SETTINGS_FILE_PATH, "r") as settings_file:
@@ -52,7 +52,7 @@ def val_settings_main_structure(settings: dict) -> None:
     in the expected type.
     """
     logger.debug(
-        f"Validate if expected 'main' keys of settings.yaml "
+        "Validate if expected 'main' keys of settings.yaml "
         "have at least an empty value in the expected type...", 
         extra={"depth": 2}
     )
@@ -71,7 +71,7 @@ def val_settings_main_structure(settings: dict) -> None:
                 "SettingsYAMLExpectedKeyException": {
                     "msg": f"Value of key [{k}] is expected to be present, and "
                         f"of type [{v.__name__}], "
-                        f"but seems to be absent, or of a different type. "
+                        "but seems to be absent, or of a different type. "
                         f"{STD_INSTR_SETTINGS}",
                     "crash": True
                 }
@@ -85,7 +85,7 @@ def val_settings_ip_acg_structure(settings: dict) -> None:
     are present.
     """
     logger.debug(
-        f"Validate settings['ip_acgs'] of settings.yaml...", 
+        "Validate settings['ip_acgs'] of settings.yaml...", 
         extra={"depth": 2}
     )
     ip_acg_keys = ["name", "desc", "origin", "rules"]
@@ -106,12 +106,12 @@ def val_settings_ip_acg_structure(settings: dict) -> None:
 
     for ip_acg in settings["ip_acgs"]:    
         for ip_acg_key in ip_acg_keys:      
-            if not ip_acg_key in ip_acg.keys():                
+            if ip_acg_key not in ip_acg.keys():                
                 error_code = "SettingsYAMLIPACGExpectedKeyException"   
                 error_map = {
                     "SettingsYAMLIPACGExpectedKeyException": {
                         "msg": f"{msg_generic} Key [{ip_acg_key}] is expected to be "
-                        f"part of the IP ACGs in settings.yaml, but was not found. "
+                        "part of the IP ACGs in settings.yaml, but was not found. "
                         f"{STD_INSTR_SETTINGS}",
                         "crash": True
                     }
@@ -123,7 +123,7 @@ def get_validation_baseline(settings: Settings) -> Validation:
     """
     Get validation baseline (settings to validate user input against)from settings.yaml.
     """
-    logger.debug(f"Get validation baseline from settings.yaml...", extra={"depth": 2})
+    logger.debug("Get validation baseline from settings.yaml...", extra={"depth": 2})
 
     ui = settings["user_input_validation"]
 
@@ -147,7 +147,7 @@ def get_work_instruction(settings: Settings) -> WorkInstruction:
     Parse retrieved settings to a WorkInstruction object.
     Make sure IP ACGs are sorted by name.
     """
-    logger.debug(f"Get work instruction from settings...", extra={"depth": 2})
+    logger.debug("Get work instruction from settings...", extra={"depth": 2})
 
     try: 
         work_instruction = WorkInstruction(
@@ -200,7 +200,7 @@ def parse_settings() -> Settings:
     """
     xx
     """
-    logger.debug(f"Parse settings...", extra={"depth": 1})
+    logger.debug("Parse settings...", extra={"depth": 1})
 
     settings = get_settings()
     val_settings_main_structure(settings)
@@ -236,7 +236,7 @@ def split_ip_and_prefix(rule: Rule) -> tuple[str, int]:
     """
     Split IP address and prefix.
     """
-    logger.debug(f"Split IP address and prefix...", extra={"depth": 5})
+    logger.debug("Split IP address and prefix...", extra={"depth": 5})
 
     fwd_slash = rule.ip.find("/")
 
@@ -255,6 +255,6 @@ def remove_whitespaces(rule: Rule) -> Rule:
     """
     Remove whitespaces from IP address.
     """
-    logger.debug(f"Remove whitespaces if any...", extra={"depth": 5})
+    logger.debug("Remove whitespaces if any...", extra={"depth": 5})
     
     return rule.ip.replace(" ", "")

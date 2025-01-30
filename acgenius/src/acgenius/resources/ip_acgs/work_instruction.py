@@ -242,7 +242,8 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
         )
         logger.info(
             f"☑ Disassociated IP ACGs {ip_acg_ids_to_delete} "
-            f"from directory [{directory.id} - {directory.name}].",
+            f"from directory [{directory.id} - {directory.name}], "
+            "for those IP ACGs existent and associated.",
             extra={"depth": 1}
         )
 

@@ -46,15 +46,15 @@
 ip_acgs:
 
 - name: "ThatGroup1"
-  desc: "Some description"
+  desc: "Some description 1"
   origin: "Security department"
   rules: 
   - "45.33.32.22": "That trusted host"
   - "198.51.100.22/32": "This trusted series of hosts"
-  - "198.51.100.22": "This trusted series of hosts"
+  - "198.51.101.22": "This trusted series of hosts"
 
-- name: "ThatGroup1"
-  desc: "Some description"
+- name: "ThatGroup2"
+  desc: "Some description 2"
   origin: "Internal control department"
   rules: 
   - "45.33.32.23": "That trusted host"

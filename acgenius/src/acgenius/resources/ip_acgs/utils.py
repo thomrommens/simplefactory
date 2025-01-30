@@ -23,8 +23,7 @@ def match_ip_acgs(
     Update the input WorkInstruction with these ids.
     """
     logger.debug(
-        f"Try to match IP ACGs from work instruction "
-        f"with IP ACGs from inventory...", 
+        "Try to match IP ACGs from work instruction with IP ACGs from inventory...", 
         extra={"depth": 5}
     )
     logger.debug(
@@ -101,8 +100,5 @@ def format_tags(tags: dict) -> list[dict]:
     """
     xx
     """
-    logger.debug(
-        f"Format tags...", 
-        extra={"depth": 2}
-    )
+    logger.debug("Format tags...", extra={"depth": 2})
     return [{"Key": k, "Value": v} for k, v in tags.items()]

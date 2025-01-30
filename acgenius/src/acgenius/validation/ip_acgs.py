@@ -49,7 +49,7 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     logger.debug(
         f"Validate that IP ACG name [{ip_acg.name}] "
         f"is not longer than [{settings.validation.ip_acg_name_length_max}] "
-        f"characters...",
+        "characters...",
         extra={"depth": 4}
     )
     group_name_length_max = settings.validation.ip_acg_name_length_max
@@ -87,7 +87,7 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
     Validate that the IP ACG name is unique in the list of all IP ACGs.
     """
     logger.debug(
-        f"Validate that the IP ACG name is not a duplicate...", 
+        "Validate that the IP ACG name is not a duplicate...", 
         extra={"depth": 4}
     )
     logger.debug(f"IP ACG name list: {ip_acg_name_list}", extra={"depth": 5})
@@ -168,10 +168,7 @@ def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkIn
         val_ip_acg_name_length_allowed(ip_acg, settings)
         val_ip_acg_description_length_allowed(ip_acg, settings)
 
-    logger.debug(
-        f"Finish: validate IP rules of settings.yaml...", 
-        extra={"depth": 2}
-        )
+    logger.debug("Finish: validate IP rules of settings.yaml...", extra={"depth": 2})
 
     return work_instruction
 
