@@ -4,25 +4,24 @@ import json
 import logging
 from typing import Optional
 
-from routing.errors import process_error
+from acgenius.routing.errors import get_error_code, process_error
 
-from config import (
+from acgenius.config import (
     EXC_ACCESS_DENIED, 
     EXC_INVALID_PARAM, 
     EXC_OPERATION_NOT_SUPPORTED, 
     EXC_RESOURCE_LIMIT, 
     EXC_RESOURCE_NOT_FOUND, 
     EXC_RESOURCE_STATE,
-    EXC_UNEXPECTED, 
     STD_INSTR_README, 
     workspaces
 )
 
-from resources.models import (
+from acgenius.resources.models import (
     Directory,
     IP_ACG
 )
-from resources.ip_acgs.utils import (
+from acgenius.resources.ip_acgs.utils import (
     format_rules,
     format_tags,
     extend_tags
@@ -69,42 +68,33 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
         msg_generic = f"Could not create IP ACG [{ip_acg.name}] in AWS."
         error_map = {
             "ParamValidationError": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "InvalidParameterValuesException": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "ResourceLimitExceededException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_LIMIT}",
+                "msg": EXC_RESOURCE_LIMIT,
                 "crash": True
             },
             "ResourceAlreadyExistsException": {
-                "msg": f"{msg_generic} It seems the IP ACG already exists. ",
+                "msg": "It seems the IP ACG already exists. ",
                 "crash": False
             },
             "ResourceCreationFailedException": {
-                "msg": f"{msg_generic} Something went wrong internally at AWS. "
+                "msg": "Something went wrong internally at AWS. "
                     "Please try again later.",
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
-                "crash": True
-            },
-            "UnexpectedException": {
-                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
         }
-        if isinstance(e, ParamValidationError):
-            code = "ParamValidationError"
-        elif isinstance(e, ClientError):
-            code = e.response["Error"]["Code"]
-        else:
-            code = "UnexpectedException"
-        process_error(error_map, code, e)
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e)
 
 
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
@@ -137,45 +127,36 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
         )
         error_map = {
             "ParamValidationError": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "InvalidParameterValuesException": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "ResourceNotFoundException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_NOT_FOUND} {STD_INSTR_README}",
+                "msg": f"{EXC_RESOURCE_NOT_FOUND} {STD_INSTR_README}",
                 "crash": True
             },
             "ResourceLimitExceededException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_LIMIT}",
+                "msg": EXC_RESOURCE_LIMIT,
                 "crash": True
             },
             "InvalidResourceStateException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_STATE}",
+                "msg": EXC_RESOURCE_STATE,
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
+                "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             },
             "OperationNotSupportedException": {
-                "msg": f"{msg_generic} {EXC_OPERATION_NOT_SUPPORTED}",
-                "crash": True
-            },
-            "UnexpectedException": {
-                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "msg": EXC_OPERATION_NOT_SUPPORTED,
                 "crash": True
             }
         }
-        if isinstance(e, ParamValidationError):
-            code = "ParamValidationError"
-        elif isinstance(e, ClientError):
-            code = e.response["Error"]["Code"]
-        else:
-            code = "UnexpectedException"
-        process_error(error_map, code, e)      
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e) 
 
 
 def update_rules(ip_acg: IP_ACG) -> None:
@@ -209,44 +190,35 @@ def update_rules(ip_acg: IP_ACG) -> None:
         )
         error_map = {
             "ParamValidationError": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
            "InvalidParameterValuesException": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "ResourceNotFoundException": {
-                "msg": f"{msg_generic} Could not find the IP ACG. Are you sure it exists?",
+                "msg": "Could not find the IP ACG. Are you sure it exists?",
                 "crash": True
             },
             "ResourceLimitExceededException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_LIMIT}",
+                "msg": EXC_RESOURCE_LIMIT,
                 "crash": True
             },
             "InvalidResourceStateException": {
                 "msg": (
-                    f"{msg_generic} The IP ACG is in an unexpected state. "
+                    "The IP ACG is in an unexpected state. "
                     "Please inspect it in the AWS console. "
                 ),
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
-                "crash": True
-            },
-            "UnexpectedException": {
-                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
         }
-        if isinstance(e, ParamValidationError):
-            code = "ParamValidationError"
-        elif isinstance(e, ClientError):
-            code = e.response["Error"]["Code"]
-        else:
-            code = "UnexpectedException"
-        process_error(error_map, code, e)
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e)
 
 
 def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> None:
@@ -281,12 +253,12 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
         )
         error_map = {
             "ParamValidationError": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "ValidationException": {  # TODO: check if this error is caught
                 "msg": (
-                    f"{msg_generic} Are you sure you specified "
+                    "Are you sure you specified "
                     "a valid IP ACG id? "
                     "And does the IP ACG still exist? "
                     "Please check the status in "
@@ -295,37 +267,28 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
                 "crash": True
             },
             "InvalidParameterValuesException": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "ResourceNotFoundException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_NOT_FOUND}",
+                "msg": EXC_RESOURCE_NOT_FOUND,
                 "crash": True
             },
             "InvalidResourceStateException": {
-                "msg": f"{msg_generic} {EXC_RESOURCE_STATE}",
+                "msg": EXC_RESOURCE_STATE,
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
+                "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             },
             "OperationNotSupportedException": {
-                "msg": f"{msg_generic} {EXC_OPERATION_NOT_SUPPORTED}",
-                "crash": True
-            },
-            "UnexpectedException": {
-                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "msg": EXC_OPERATION_NOT_SUPPORTED,
                 "crash": True
             }
         }
-        if isinstance(e, ParamValidationError):
-            code = "ParamValidationError"
-        elif isinstance(e, ClientError):
-            code = e.response["Error"]["Code"]
-        else:
-            code = "UnexpectedException"
-        process_error(error_map, code, e)
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e)
 
 
 def delete_ip_acg(ip_acg_id: str) -> None:
@@ -350,36 +313,27 @@ def delete_ip_acg(ip_acg_id: str) -> None:
         msg_generic = f"Could not delete IP ACG [{ip_acg_id}] in AWS."
         error_map = {
             "InvalidParameterValuesException": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             },
             "ResourceNotFoundException": {
-                "msg": f"{msg_generic} Could not find IP ACG in AWS. "
+                "msg": "Could not find IP ACG in AWS. "
                     "Double check if it is created, and if not, "
                     f"do a 'create' run of this app. {STD_INSTR_README}",
                 "crash": True
             },
             "ResourceAssociatedException": {
                 "msg": (
-                    f"{msg_generic} The IP ACG is still associated " 
+                    "The IP ACG is still associated " 
                     "with a directory in AWS. Please retry a 'delete' run first. " 
                     "Otherwise, please inspect in the AWS console."
                 ),
                 "crash": True
             },
             "AccessDeniedException": {
-                "msg": f"{msg_generic} {EXC_ACCESS_DENIED} {STD_INSTR_README}",
-                "crash": True
-            },
-            "UnexpectedException": {
-                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
                 "crash": True
             }
         }
-        if isinstance(e, ParamValidationError):
-            code = "ParamValidationError"
-        elif isinstance(e, ClientError):
-            code = e.response["Error"]["Code"]
-        else:
-            code = "UnexpectedException"
-        process_error(error_map, code, e)
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e)

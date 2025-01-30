@@ -3,10 +3,10 @@ import json
 import logging
 from typing import Optional
 
-from config import EXC_INVALID_PARAM, EXC_UNEXPECTED, workspaces
-from resources.models import Directory
-from resources.utils import create_report
-from routing.errors import process_error
+from acgenius.config import EXC_INVALID_PARAM, workspaces
+from acgenius.resources.models import Directory
+from acgenius.resources.utils import create_report
+from acgenius.routing.errors import get_error_code, process_error
 
 
 logger = logging.getLogger("acgenius")
@@ -34,19 +34,12 @@ def get_directories() -> Optional[list[dict]]:
         msg_generic = "Could not get directories from AWS."
         error_map = {
             "InvalidParameterValuesException": {
-                "msg": f"{msg_generic} {EXC_INVALID_PARAM}",
-                "crash": True
-            },
-            "UnexpectedException": {
-                "msg": f"{msg_generic} {EXC_UNEXPECTED}",
+                "msg": EXC_INVALID_PARAM,
                 "crash": True
             }
-        }     
-        if isinstance(e, ClientError):
-            code = e.response["Error"]["Code"]
-        else:
-            code = "UnexpectedException"
-        process_error(error_map, code, e)
+        }
+        error_code = get_error_code(e)
+        process_error(error_map, error_code, msg_generic, e)
 
 
 def sel_directories(directories_inventory: dict) -> list[Directory]:
@@ -70,7 +63,7 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
             state=directory.get("State"),
             ip_acgs=directory.get("ipGroupIds"),
         )
-    directories.append(directory)
+        directories.append(directory)
 
     return directories
 

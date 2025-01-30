@@ -1,26 +1,16 @@
-# TODO: - revisit 
-# TODO:   - generic
-# TODO:   - authorize IP group required?
 
-# TODO: unit tests
-# TODO: integration tests
-
-# TODO: finalize
-# TODO: - update docstrings
-# TODO: - update typing
 # TODO: - Ruff
 # TODO:     - Black (part of Ruff?) https://docs.astral.sh/ruff/configuration/
 # TODO:         - import order
 
+# TODO: - update docstrings
 # TODO: update README.md
-# TODO final view settings.yaml
-
 
 import click
 
-from config import HR, setup_logger, click_help
-from routing.routes import run_common_route, run_selected_route
-from resources.models import AppInput
+from acgenius.config import HR, setup_logger, click_help
+from acgenius.routing.routes import run_common_route, run_selected_route
+from acgenius.resources.models import AppInput
 
 
 @click.command()

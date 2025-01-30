@@ -3,13 +3,16 @@ from dataclasses import asdict
 import json
 import logging
 
-from validation.ip_acgs import val_ip_acgs_match_inventory
-from resources.models import IP_ACG, Inventory, WorkInstruction
+from acgenius.validation.ip_acgs import val_ip_acgs_match_inventory
+from acgenius.resources.models import IP_ACG, Inventory, WorkInstruction
 
 logger = logging.getLogger("acgenius")
 
 
-def match_ip_acgs(inventory: Inventory, work_instruction: WorkInstruction) -> WorkInstruction:
+def match_ip_acgs(
+        inventory: Inventory, 
+        work_instruction: WorkInstruction
+    ) -> WorkInstruction:
     """
     1 - Get the current IP ACGs from the inventory.
     2 - Get the to-be-updated IP ACGs from the work instruction.

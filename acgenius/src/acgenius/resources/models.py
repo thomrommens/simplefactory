@@ -63,6 +63,7 @@ class Validation:
     prefix_default: str 
     prefix_min: str
     ip_acg_name_length_max: int
+    groups_per_directory_amt_max: int
 
 
 @dataclass

@@ -1,12 +1,45 @@
 import logging
 from typing import Counter
 
-from routing.errors import process_error
-from config import STD_INSTR_DEBUG, STD_INSTR_SETTINGS
-from resources.models import IP_ACG, Inventory, Settings, WorkInstruction
+from acgenius.routing.errors import process_error
+from acgenius.config import STD_INSTR_DEBUG, STD_INSTR_SETTINGS
+from acgenius.resources.models import IP_ACG, Inventory, Settings, WorkInstruction
 
 
 logger = logging.getLogger("acgenius")
+
+MSG_GENERIC = "IP ACG properties validation failed."
+
+
+def val_amt_groups_per_directory_allowed(
+        ip_acg_name_list: list, 
+        settings: Settings
+    ) -> None:
+    """
+    Validate that the number of groups per directory specified in the work instruction
+    does not exceed the maximum number of groups per directory allowed.
+    """
+    amt_groups_per_directory_max = settings.validation.groups_per_directory_amt_max
+
+    logger.debug(
+        "Validate that the maximum number "
+        f"of groups per directory is [{amt_groups_per_directory_max}] or less...", 
+        extra={"depth": 4}
+    ) 
+
+    amt_groups = len(ip_acg_name_list)
+
+    if not amt_groups <= amt_groups_per_directory_max:
+        error_code = "IPACGMaxAmtGroupsPerDirectoryException"
+        error_map = {
+            "IPACGMaxAmtGroupsPerDirectoryException": {
+                "msg": f"You specified [{amt_groups}] groups; "
+                    f"more than the [{amt_groups_per_directory_max}] AWS allows. "
+                    f"{STD_INSTR_SETTINGS}",
+                "crash": True
+            }
+        }        
+        process_error(error_map, error_code, MSG_GENERIC)
 
 
 def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
@@ -22,33 +55,31 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     group_name_length_max = settings.validation.ip_acg_name_length_max
 
     if not ip_acg.name:
-        msg_generic = "IP ACG properties validation failed."
-        code = "IPACGNAmeNoneException"
+        error_code = "IPACGNAmeNoneException"
         error_map = {
             "IPACGNAmeNoneException": {
-                "msg": f"{msg_generic} One IP ACG group in settings.yaml "
+                "msg": "One IP ACG group in settings.yaml "
                     "seems to have no name. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code, MSG_GENERIC)
 
     len_ip_acg_name = len(str(ip_acg.name))
     
     if not len_ip_acg_name <= group_name_length_max:
-        msg_generic = "IP ACG properties validation failed."
-        code = "IPACGNameLengthException"
+        error_code = "IPACGNameLengthException"
         error_map = {
             "IPACGNameLengthException": {
-                "msg": f"{msg_generic} The IP ACG group name contains "
+                "msg": "The IP ACG group name contains "
                     f"[{len_ip_acg_name}] characters; "
                     f"more than the [{group_name_length_max}] characters AWS allows. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code, MSG_GENERIC)
 
 
 def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
@@ -64,16 +95,15 @@ def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
     duplicates = [k for k, v in Counter(ip_acg_name_list).items() if v > 1]
         
     if len(duplicates) > 0:
-        msg_generic = "IP ACG properties validation failed."
-        code = "IPACGNameDuplicateException"
+        error_code = "IPACGNameDuplicateException"
         error_map = {
             "IPACGNameDuplicateException": {
-                "msg": f"{msg_generic} Duplicate IP ACG name found: "
+                "msg": "Duplicate IP ACG name found: "
                     f"{duplicates}. {STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code, MSG_GENERIC)
     
 
 def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
@@ -89,26 +119,24 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
         extra={"depth": 4}
     )
     if not ip_acg.desc:
-        msg_generic = "IP ACG properties validation failed."
-        code = "IPACGDescriptionNoneException"
+        error_code = "IPACGDescriptionNoneException"
         error_map = {
             "IPACGDescriptionNoneException": {
-                "msg": f"{msg_generic} IP ACG group [{ip_acg.name}] "
+                "msg": "IP ACG group [{ip_acg.name}] "
                     "seems to have no description. "
                     f"{STD_INSTR_DEBUG} {STD_INSTR_SETTINGS}",
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code, MSG_GENERIC)
 
     len_ip_acg_desc = len(ip_acg.desc)
 
     if not len_ip_acg_desc <= desc_length_max:
-        msg_generic = "IP ACG properties validation failed."
-        code = "IPACGDescriptionLengthException"
+        error_code = "IPACGDescriptionLengthException"
         error_map = {
             "IPACGDescriptionLengthException": {
-                "msg": f"{msg_generic} The description "
+                "msg": "The description "
                     f"of IP ACG [{ip_acg.name}] contains "
                     f"[{len_ip_acg_desc}] characters; "
                     f"more than the [{desc_length_max}] characters AWS allows. "
@@ -116,12 +144,12 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code, MSG_GENERIC)
 
 
 def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkInstruction:
     """
-    xx
+    Integrate all IP ACG validations.
     """
     logger.debug(
         "Start: validate IP ACG properties of settings.yaml...",
@@ -135,6 +163,7 @@ def val_ip_acgs(work_instruction: WorkInstruction, settings: Settings) -> WorkIn
             extra={"depth": 3}
         )   
         ip_acg_name_list.append(ip_acg.name)
+        val_amt_groups_per_directory_allowed(ip_acg_name_list, settings)
         val_ip_acg_name_unique(ip_acg_name_list)     
         val_ip_acg_name_length_allowed(ip_acg, settings)
         val_ip_acg_description_length_allowed(ip_acg, settings)
@@ -161,15 +190,14 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
         f"Inventory [ip_acgs] length: [{len(inventory.ip_acgs)}]...", extra={"depth": 1}
     )
     if not matches == len(inventory.ip_acgs):
-        msg_generic = "IP ACG properties validation failed."
-        code = "IPACGIdMatchException"
+        error_code = "IPACGIdMatchException"
         error_map = {
             "IPACGIdMatchException": {
-                "msg": f"{msg_generic} Could not match "
+                "msg": "Could not match "
                     "all current IP ACGs from AWS with IP ACGs specified "
                     "in settings.yaml. Please make sure your settings.yaml is "
                     "in sync with the actual situation in AWS.",
                 "crash": True
             }
         }        
-        process_error(error_map, code)
+        process_error(error_map, error_code, MSG_GENERIC)
