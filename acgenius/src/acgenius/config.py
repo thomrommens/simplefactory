@@ -78,6 +78,12 @@ class DepthFormatter(logging.Formatter):
         super().__init__(fmt, datefmt, style)
 
     def format(self, record: logging.LogRecord) -> str:
+        """
+        Format the log message with indentation based on the depth attribute.
+
+        :param record: actual log record
+        :return: formatted log message
+        """
         pipes = " |" * getattr(record, "depth", 0)
         record.msg = f"{pipes}{' ' if pipes else ''}{record.msg}"
         return super().format(record)

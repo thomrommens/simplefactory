@@ -15,7 +15,7 @@ def get_directories() -> Optional[list[dict]]:
     """
     Get directories from AWS WorkSpaces.
 
-    :returns: list of directories
+    :return: list of directories, if any
     """
     logger.debug("Call [describe_workspace_directories]...", extra={"depth": 2})
 
@@ -45,6 +45,9 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
     There might currently be no IP ACG in a directory.
     Then, for that directory, the key `ipGroupIds`
     is not present in the response.
+
+    :param directories_inventory: retrieved directories
+    :return: list of directories, if any
     """
     logger.debug(
         "Select relevant directory info from retrieved directories...",
@@ -70,7 +73,8 @@ def show_directories() -> list[Directory]:
     """
     Get and display the current, processed directories in AWS WorkSpaces.
 
-    :returns: List of Directory objects containing directory information
+    :return: List of Directory objects containing directory information
+    
     """
     logger.info("Current directories (before execution of action):", extra={"depth": 1})
 

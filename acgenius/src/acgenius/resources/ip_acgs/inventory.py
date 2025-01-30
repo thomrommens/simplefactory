@@ -22,7 +22,7 @@ def get_ip_acgs() -> list[IP_ACG]:
     Retrieve IP Access Control Groups from AWS Workspaces.
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_ip_groups.html
 
-    :return: List of IP_ACG objects containing the IP ACGs found in AWS
+    :return: List of IP_ACGs found in AWS
     """
     logger.debug("Call [describe_ip_groups]...", extra={"depth": 2})
 
@@ -58,6 +58,8 @@ def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     """
     Select relevant IP ACG info from retrieved IP ACGs, and sort by name.
 
+    :param ip_acgs_inventory: retrieved IP ACGs
+    :return: List of IP_ACGs found in AWS, with information filtered and sorted by name
     """
     logger.debug(
         "Select relevant IP ACG info from retrieved IP ACGs, and sort by name...",
@@ -87,6 +89,7 @@ def show_ip_acgs() -> Optional[list[IP_ACG]]:
     """
     Get and display the current IP ACGs in AWS WorkSpaces.
 
+    :return: List of IP_ACGs found in AWS, with information filtered and sorted by name
     """
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 

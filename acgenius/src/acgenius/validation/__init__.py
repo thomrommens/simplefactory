@@ -10,6 +10,9 @@ logger = logging.getLogger("acgenius")
 def val_work_instruction(settings: Settings) -> WorkInstruction:
     """
     Validate work instruction: IP ACGs and their rules.
+
+    :param settings: all settings required for the validation
+    :return: WorkInstruction object containing IP ACGs and their rules
     """
     logger.debug("Start: validate settings.yaml...", extra={"depth": 1})
 

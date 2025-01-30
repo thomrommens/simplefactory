@@ -21,6 +21,8 @@ logger = logging.getLogger("acgenius")
 def get_settings() -> dict:
     """
     Get settings from settings.yaml.
+
+    :return: settings from settings.yaml
     """
     logger.debug("Get settings from settings.yaml...", extra={"depth": 2})
 
@@ -51,6 +53,8 @@ def val_settings_main_structure(settings: dict) -> None:
     """
     Validate if expected 'main' keys of settings.yaml have at least an empty value
     in the expected type.
+
+    :param settings: all settings required for the validation
     """
     logger.debug(
         "Validate if expected 'main' keys of settings.yaml "
@@ -84,6 +88,8 @@ def val_settings_ip_acg_structure(settings: dict) -> None:
     """
     Validate if keys expected in settings["ip_acgs"] of settings.yaml
     are present.
+
+    :param settings: all settings required for the validation
     """
     logger.debug("Validate settings['ip_acgs'] of settings.yaml...", extra={"depth": 2})
     ip_acg_keys = ["name", "desc", "origin", "rules"]
@@ -120,6 +126,9 @@ def get_validation_baseline(settings: Settings) -> Validation:
     """
     Get validation baseline: settings to validate user input against,
     from settings.yaml.
+
+    :param settings: all settings required for the validation
+    :return: Validation object containing validation rules
     """
     logger.debug("Get validation baseline from settings.yaml...", extra={"depth": 2})
 
@@ -144,6 +153,9 @@ def get_work_instruction(settings: Settings) -> WorkInstruction:
     """
     Parse retrieved settings to a WorkInstruction.
     Make sure IP ACGs are sorted by name.
+
+    :param settings: all settings required for the validation
+    :return: WorkInstruction object containing directories and IP ACGs
     """
     logger.debug("Get work instruction from settings...", extra={"depth": 2})
 
@@ -194,6 +206,8 @@ def get_work_instruction(settings: Settings) -> WorkInstruction:
 def parse_settings() -> Settings:
     """
     Integrate parsing of settings.
+
+    :return: Settings object containing validation and work instruction
     """
     logger.debug("Parse settings...", extra={"depth": 1})
 
@@ -226,6 +240,9 @@ def parse_settings() -> Settings:
 def split_ip_and_prefix(rule: Rule) -> tuple[str, int]:
     """
     Split IP address and prefix.
+
+    :param rule: Rule object containing IP address to split
+    :return: Tuple containing IP address and prefix
     """
     logger.debug("Split IP address and prefix...", extra={"depth": 5})
 
@@ -245,6 +262,9 @@ def split_ip_and_prefix(rule: Rule) -> tuple[str, int]:
 def remove_whitespaces(rule: Rule) -> Rule:
     """
     Remove whitespaces from IP address.
+
+    :param rule: Rule object containing IP address to remove whitespaces from, if any.
+    :return: Rule object containing IP address without whitespaces
     """
     logger.debug("Remove whitespaces if any...", extra={"depth": 5})
 

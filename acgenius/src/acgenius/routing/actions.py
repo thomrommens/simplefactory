@@ -20,6 +20,9 @@ logger = logging.getLogger("acgenius")
 def status(app_input: AppInput) -> None:
     """
     Display status of current situation for IP ACGs.
+
+    :param app_input: all input required for the action
+    (not required here, but required for the function signature)
     """
     logger.info("✅ Completed display of status.", extra={"depth": 1})
 
@@ -27,6 +30,8 @@ def status(app_input: AppInput) -> None:
 def create(app_input: AppInput) -> None:
     """
     Create new IP ACGs.
+
+    :param app_input: all input required for the action
     """
     logger.debug("Action: create IP ACGs...", extra={"depth": 1})
 
@@ -64,6 +69,7 @@ def update(app_input: AppInput) -> None:
     """
     Update rules of existing IP ACGs.
 
+    :param app_input: all input required for the action
     """
     logger.debug("Action: update IP ACGs...", extra={"depth": 1})
 
@@ -102,8 +108,9 @@ def update(app_input: AppInput) -> None:
 def delete(app_input: AppInput) -> None:
     """
     Delete specified IP ACGs.
-
     This 'delete' route operates independently of 'settings.yaml'.
+
+    :param app_input: all input required for the action
     """
     cli = app_input.cli
     inventory = app_input.inventory

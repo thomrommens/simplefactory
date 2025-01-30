@@ -21,13 +21,17 @@ from acgenius.routing.errors import get_error_code, process_error
 logger = logging.getLogger("acgenius")
 
 
-def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
+def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[IP_ACG]:
     """
     Create an IP ACG in AWS WorkSpaces.
-
-    Skip (not error out) at trying to create existing
-    :return: updated IP ACG
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/create_ip_group.html
+
+    Skip (not error out) at trying to create already existing IP ACG.
+
+    :param ip_acg: IP ACG
+    :param tags: base tags
+
+    :return: updated IP ACG
     """
     logger.debug(f"Create IP ACG [{ip_acg.name}]...", extra={"depth": 1})
     tags_extended = extend_tags(tags, ip_acg)
@@ -86,8 +90,10 @@ def create_ip_acg(ip_acg: IP_ACG, tags: dict) -> Optional[str]:
 def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
     """
     Associate IP ACG to directory in AWS WorkSpaces.
-
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/associate_ip_groups.html
+
+    :param ip_acgs: list of IP ACGs
+    :param directory: Directory
     """
     logger.debug(
         f"Associate IP ACG [{ip_acgs}] to directory [{directory.name}]",
@@ -144,8 +150,9 @@ def update_rules(ip_acg: IP_ACG) -> None:
     """
     Update rules of IP ACG in AWS WorkSpaces. 
     This replaces all rules in the target, with rules specified.
-
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.html
+
+    :param ip_acg: IP ACG
     """
     rules_formatted = format_rules(ip_acg)
 
@@ -202,8 +209,10 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
     """
     Disassociate IP ACGs from directory in AWS WorkSpaces. 
     If the IP ACG is not recognized, the AWS disassociation call silently passes.
-
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/disassociate_ip_groups.html
+
+    :param ip_acg_ids_to_delete: list of IP ACG ids to delete
+    :param directory: Directory
     """
     logger.debug(
         f"Disassociate IP ACGs [{ip_acg_ids_to_delete}] "
@@ -266,8 +275,9 @@ def delete_ip_acg(ip_acg_id: str) -> None:
     Delete an IP ACG in AWS WorkSpaces.
     Before an IP ACG can be deleted, it needs to be disassociated 
     from directories first.
-
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/delete_ip_group.html
+
+    :param ip_acg_id: IP ACG id
     """
     logger.debug(f"Delete IP ACG [{ip_acg_id}]...", extra={"depth": 1})
     try:

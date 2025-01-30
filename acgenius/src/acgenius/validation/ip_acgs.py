@@ -16,6 +16,9 @@ def val_amt_groups_per_directory_allowed(
     """
     Validate that the number of IP ACGs per directory
     does not exceed the maximum number of groups per directory allowed.
+
+    :param ip_acg_name_list: list of IP ACG names
+    :param settings: all settings required for the validation
     """
     amt_groups_per_directory_max = settings.validation.groups_per_directory_amt_max
 
@@ -43,6 +46,9 @@ def val_amt_groups_per_directory_allowed(
 def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
     """
     Validate that IP ACG name is not longer than the AWS imposed limit.
+
+    :param ip_acg: IP ACG
+    :param settings: all settings required for the validation
     """
     logger.debug(
         f"Validate that IP ACG name [{ip_acg.name}] "
@@ -83,6 +89,8 @@ def val_ip_acg_name_length_allowed(ip_acg: IP_ACG, settings: Settings) -> None:
 def val_ip_acg_name_unique(ip_acg_name_list: list) -> None:
     """
     Validate that the IP ACG name is unique in the list of all IP ACGs.
+
+    :param ip_acg_name_list: list of IP ACG names
     """
     logger.debug(
         "Validate that the IP ACG name is not a duplicate...", extra={"depth": 4}
@@ -107,6 +115,9 @@ def val_ip_acg_description_length_allowed(ip_acg: IP_ACG, settings: Settings) ->
     """
     Validate if IP ACG description has a value and is not longer than allowed
     description length.
+
+    :param ip_acg: IP ACG
+    :param settings: all settings required for the validation
     """
     desc_length_max = settings.validation.rules_desc_length_max
 
@@ -149,6 +160,10 @@ def val_ip_acgs(
 ) -> WorkInstruction:
     """
     Integrate all IP ACG validations (IP ACG level).
+
+    :param work_instruction: specification of operations to be executed.
+    :param settings: all settings required for the validation
+    :return: WorkInstruction object containing IP ACGs and their rules
     """
     logger.debug(
         "Start: validate IP ACG properties of settings.yaml...", extra={"depth": 2}
@@ -172,6 +187,11 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
     """
     Validate if all IP ACGs from the inventory could be matched by name,
     with all IP ACGs from the actual situation in AWS.
+
+    :param matches: number of IP ACGs matches from work instruction with inventory
+    :param inventory: retrieved inventory
+    :return: True if all IP ACGs from the inventory could be matched by name, 
+    False otherwise
     """
     logger.debug(
         "Validate if all IP ACGs from the inventory could be matched by name",

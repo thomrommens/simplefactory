@@ -21,11 +21,11 @@ def match_ip_acgs(
     the IP ACGs specified.
 
     Find the ids of the IP ACGs of 2 by looking them up in 1.
-    Update the input WorkInstruction with these ids.
+    Update the input WorkInstruction.
 
-    param inventory: Inventory object
-    param work_instruction: WorkInstruction object
-    :returns: WorkInstruction object with matched IP ACGs    
+    :param inventory: Inventory object
+    :param work_instruction: WorkInstruction object
+    :return: WorkInstruction object with matched IP ACGs    
     """
     logger.debug(
         "Try to match IP ACGs from work instruction with IP ACGs from inventory...",
@@ -66,6 +66,9 @@ def format_rules(ip_acg: IP_ACG) -> list[dict]:
     """
     Format rules to IP ACG to AWS request syntax format.
     Sort rules for user friendliness.
+
+    :param ip_acg: IP ACG
+    :return: List of rules formatted for AWS request syntax
     """
     logger.debug(f"Format rules for IP ACG [{ip_acg.name}]...", extra={"depth": 2})
     rules = [{"ipRule": rule.ip, "ruleDesc": rule.desc} for rule in ip_acg.rules]
@@ -76,6 +79,10 @@ def format_rules(ip_acg: IP_ACG) -> list[dict]:
 def extend_tags(tags: dict, ip_acg: IP_ACG) -> dict:
     """
     Add tags with dynamic values to 'static' tags.
+
+    :param tags: 'static' tags
+    :param ip_acg: IP ACG
+    :return: 'static' tags extended with dynamic values
     """
     logger.debug(f"Extend tags for IP ACG [{ip_acg.name}]...", extra={"depth": 2})
     timestamp = datetime.now().isoformat()
@@ -89,6 +96,9 @@ def extend_tags(tags: dict, ip_acg: IP_ACG) -> dict:
 def format_tags(tags: dict) -> list[dict]:
     """
     Format tags to AWS request syntax format.
+
+    :param tags: input tags
+    :return: List of tags formatted for AWS request syntax
     """
     logger.debug("Format tags...", extra={"depth": 2})
     return [{"Key": k, "Value": v} for k, v in tags.items()]

@@ -12,6 +12,9 @@ logger = logging.getLogger("acgenius")
 def get_error_code(e: Exception) -> str:
     """
     Get error code in exception style.
+
+    :param e: Exception
+    :return: error code
     """
     exception_type = type(e).__name__
 
@@ -24,7 +27,10 @@ def get_error_code(e: Exception) -> str:
 
 def set_app_response(e: Optional[Exception] = None, crash: bool = True) -> None:
     """
-    Formulate response to an error; soft landing instead of displaying hard error.
+    Formulate response to an error; soft landing instead of displaying hard error.  
+
+    :param e: Exception
+    :param crash: whether to crash the app
     """
     if e:
         if crash:
@@ -44,6 +50,11 @@ def process_error(
 ) -> None:
     """
     Integrate steps for app to process an error: set up message and take action.
+
+    :param error_map: error map
+    :param error_code: error code
+    :param msg_generic: generic message applicable to scenario(s)
+    :param e: Exception
     """
     crash = error_map.get(error_code, {}).get("crash", True)
     msg_specific = error_map.get(error_code, {}).get("msg", EXC_UNEXPECTED_GENERIC)
