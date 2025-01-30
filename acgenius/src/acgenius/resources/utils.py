@@ -16,7 +16,7 @@ def specify_report(item: Union[Directory, IP_ACG]) -> dict:
     xx
     """
     logger.debug("Set report specs...", extra={"depth": 2})
-    
+
     if isinstance(item, IP_ACG):
         return {
             "description": item.desc,
@@ -25,14 +25,11 @@ def specify_report(item: Union[Directory, IP_ACG]) -> dict:
         return {
             "ip_acgs_associated": item.ip_acgs,
             "type": item.type,
-            "state": item.state
+            "state": item.state,
         }
 
 
-def create_report(
-        subject: Union[list[Directory], list[IP_ACG]],
-        origin: str
-    ) -> None:
+def create_report(subject: Union[list[Directory], list[IP_ACG]], origin: str) -> None:
     """
     Report a ...
     Rules is nested within IP_ACG, so no separate argument.
@@ -43,7 +40,6 @@ def create_report(
     fmt = "psql" if origin == "work_instruction" else "fancy_grid"
 
     if subject:
-
         i = 0
         for item in subject:
             i += 1
@@ -57,7 +53,6 @@ def create_report(
             subject_table = f"{tabulate(df, headers='keys', tablefmt=fmt)}"
 
             if isinstance(item, IP_ACG):
-                
                 rules_formatted = format_rules(item)
                 rules_table = [["rule", "description"]]
 

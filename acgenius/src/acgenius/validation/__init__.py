@@ -14,14 +14,11 @@ def val_work_instruction(settings: Settings) -> WorkInstruction:
     :param settings: settings from settings.yaml
     """
     logger.debug("Start: validate settings.yaml...", extra={"depth": 1})
-       
+
     work_instruction_rules_validated = val_rules(settings.work_instruction, settings)
     work_instruction_ip_acgs_validated = val_ip_acgs(
         work_instruction_rules_validated, settings
     )
-    
-    logger.debug(
-        "Finish: validate settings.yaml.",
-        extra={"depth": 1}
-    )
+
+    logger.debug("Finish: validate settings.yaml.", extra={"depth": 1})
     return work_instruction_ip_acgs_validated

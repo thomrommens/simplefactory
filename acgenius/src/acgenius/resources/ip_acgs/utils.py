@@ -1,18 +1,17 @@
-from datetime import datetime
-from dataclasses import asdict
 import json
 import logging
+from dataclasses import asdict
+from datetime import datetime
 
-from acgenius.validation.ip_acgs import val_ip_acgs_match_inventory
 from acgenius.resources.models import IP_ACG, Inventory, WorkInstruction
+from acgenius.validation.ip_acgs import val_ip_acgs_match_inventory
 
 logger = logging.getLogger("acgenius")
 
 
 def match_ip_acgs(
-        inventory: Inventory, 
-        work_instruction: WorkInstruction
-    ) -> WorkInstruction:
+    inventory: Inventory, work_instruction: WorkInstruction
+) -> WorkInstruction:
     """
     1 - Get the current IP ACGs from the inventory.
     2 - Get the to-be-updated IP ACGs from the work instruction.
@@ -23,18 +22,16 @@ def match_ip_acgs(
     Update the input WorkInstruction with these ids.
     """
     logger.debug(
-        "Try to match IP ACGs from work instruction with IP ACGs from inventory...", 
-        extra={"depth": 5}
+        "Try to match IP ACGs from work instruction with IP ACGs from inventory...",
+        extra={"depth": 5},
     )
     logger.debug(
-        "Current inventory:\n"
-        f"{json.dumps(asdict(work_instruction), indent=4)}", 
-        extra={"depth": 1}
+        f"Current inventory:\n{json.dumps(asdict(work_instruction), indent=4)}",
+        extra={"depth": 1},
     )
     logger.debug(
-        "Current work instruction:\n"
-        f"{json.dumps(asdict(work_instruction), indent=4)}", 
-        extra={"depth": 1}
+        f"Current work instruction:\n{json.dumps(asdict(work_instruction), indent=4)}",
+        extra={"depth": 1},
     )
 
     matches = 0
@@ -44,17 +41,16 @@ def match_ip_acgs(
                 logger.debug(
                     f"Matching IP ACG names: [{work_instruction_ip_acg.name}] with "
                     f"[{inventory_ip_acg.name}]...",
-                    extra={"depth": 2}
+                    extra={"depth": 2},
                 )
                 matches += 1
                 work_instruction_ip_acg.id = inventory_ip_acg.id
 
     val_ip_acgs_match_inventory(matches, inventory)
-    
+
     logger.debug(
-        "Updated work instruction:\n"
-        f"{json.dumps(asdict(work_instruction), indent=4)}", 
-        extra={"depth": 1}
+        f"Updated work instruction:\n{json.dumps(asdict(work_instruction), indent=4)}",
+        extra={"depth": 1},
     )
 
     return work_instruction
@@ -65,18 +61,9 @@ def format_rules(ip_acg: IP_ACG) -> list[dict]:
     Fit rules in request syntax format.
     Sort rules for user friendliness.
     """
-    logger.debug(
-        f"Format rules for IP ACG [{ip_acg.name}]...", 
-        extra={"depth": 2}
-    )
-    rules = [
-        {"ipRule": rule.ip, "ruleDesc": rule.desc}
-        for rule in ip_acg.rules
-    ]
-    rules_sorted = sorted(
-        rules,
-        key=lambda rules: rules["ipRule"]
-    )
+    logger.debug(f"Format rules for IP ACG [{ip_acg.name}]...", extra={"depth": 2})
+    rules = [{"ipRule": rule.ip, "ruleDesc": rule.desc} for rule in ip_acg.rules]
+    rules_sorted = sorted(rules, key=lambda rules: rules["ipRule"])
     return rules_sorted
 
 
@@ -84,13 +71,10 @@ def extend_tags(tags: dict, ip_acg: IP_ACG) -> dict:
     """
     xx
     """
-    logger.debug(
-        f"Extend tags for IP ACG [{ip_acg.name}]...", 
-        extra={"depth": 2}
-    )
+    logger.debug(f"Extend tags for IP ACG [{ip_acg.name}]...", extra={"depth": 2})
     timestamp = datetime.now().isoformat()
 
-    tags["IPACGName"] = ip_acg.name    
+    tags["IPACGName"] = ip_acg.name
     tags["Created"] = timestamp
 
     return tags

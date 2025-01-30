@@ -12,18 +12,15 @@ from acgenius.resources.models import AppInput
 
 @click.command()
 @click.argument(
-    "action", 
-    type=click.Choice(
-        ["status", "create", "update", "delete"], 
-        case_sensitive=False
-    )
+    "action",
+    type=click.Choice(["status", "create", "update", "delete"], case_sensitive=False),
 )
 @click.argument(
-    "ip_acg_ids_to_delete", 
-    nargs=-1, 
+    "ip_acg_ids_to_delete",
+    nargs=-1,
     required=False,
 )
-@click.option("--dryrun",is_flag=True, default=False, help=click_help["dryrun"])
+@click.option("--dryrun", is_flag=True, default=False, help=click_help["dryrun"])
 @click.option("--debug", is_flag=True, default=False, help=click_help["debug"])
 def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool) -> None:
     """
@@ -46,19 +43,19 @@ def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool) ->
     app_input = AppInput(
         cli={
             "action": action,
-            "dryrun": dryrun, 
-            "ip_acg_ids_to_delete": ip_acg_ids_to_delete
+            "dryrun": dryrun,
+            "ip_acg_ids_to_delete": ip_acg_ids_to_delete,
         },
         settings=settings,
-        inventory=inventory
+        inventory=inventory,
     )
-    
+
     run_selected_route(app_input)
 
-    logger.info(HR) 
+    logger.info(HR)
     logger.info("FINISH APP: ACGENIUS.")
-    logger.info(HR) 
-    
+    logger.info(HR)
+
 
 if __name__ == "__main__":
     main()

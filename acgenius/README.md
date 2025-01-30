@@ -103,3 +103,7 @@ run tests
 
 ruff check
 ruff check {specify folder / file}
+
+ruff format
+ruff format {YOUR_PROJECT_FOLDER}\simplefactory\acgenius\src\acgenius\resources
+ruff format {YOUR_PROJECT_FOLDER}\simplefactory\acgenius\src\acgenius\resources\directories\inventory.py

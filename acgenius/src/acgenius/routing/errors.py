@@ -27,7 +27,7 @@ def set_app_response(e: Optional[Exception] = None, crash: bool = True) -> None:
     Standard response (preventing full stack trace)
     """
     if e:
-        if crash:        
+        if crash:
             logger.error(f"Full error: {e}", extra={"depth": 1})
             logger.info(f"{EXIT_APP}", extra={"depth": 1})
             sys.exit(1)
@@ -40,11 +40,8 @@ def set_app_response(e: Optional[Exception] = None, crash: bool = True) -> None:
 
 
 def process_error(
-        error_map: dict, 
-        error_code: str, 
-        msg_generic: str,
-        e: Optional[Exception] = None
-    ) -> None:
+    error_map: dict, error_code: str, msg_generic: str, e: Optional[Exception] = None
+) -> None:
     """
     e for AWS calls; not for own custom exceptions
     """
@@ -54,4 +51,3 @@ def process_error(
 
     logger.info(f"{msg}", extra={"depth": 1})
     set_app_response(e, crash)
-

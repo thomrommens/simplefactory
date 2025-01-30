@@ -5,6 +5,7 @@ from typing import Optional
 @dataclass
 class Rule:
     """Rule = IP address + prefix"""
+
     ip: str
     desc: str
 
@@ -13,7 +14,7 @@ class Rule:
 class IP_ACG:
     """
     Represent an IP Access Control Group for AWS WorkSpaces.
-    
+
     Attributes:
         name: Name of the IP ACG
         desc: Description of the IP ACG
@@ -21,6 +22,7 @@ class IP_ACG:
         id: Optional AWS resource ID of the IP ACG
         origin: Optional source/origin of the IP ACG configuration
     """
+
     name: str
     desc: str
     rules: list[Rule]
@@ -32,7 +34,7 @@ class IP_ACG:
 class Directory:
     """
     Represent an AWS Directory Service directory.
-    
+
     Attributes:
         id: AWS resource ID of the directory
         name: Name of the directory
@@ -40,6 +42,7 @@ class Directory:
         type: Optional directory type (e.g. Simple AD, AD Connector)
         state: Optional current state of the directory
     """
+
     id: str
     name: str
     ip_acgs: Optional[list[IP_ACG]] = None
@@ -51,16 +54,17 @@ class Directory:
 class Validation:
     """
     Represent validation rules and constraints for IP ACG configuration.
-    
+
     Attributes:
         invalid_rules: List of Rule objects that failed validation
         prefix_default: Default CIDR prefix length to use
         prefix_min: Minimum allowed CIDR prefix length
     """
+
     invalid_rules: list[Rule]
     rules_amt_max: int
     rules_desc_length_max: int
-    prefix_default: str 
+    prefix_default: str
     prefix_min: str
     ip_acg_name_length_max: int
     groups_per_directory_amt_max: int
@@ -70,12 +74,13 @@ class Validation:
 class WorkInstruction:
     """
     Represent desired configuration state for directories and IP ACGs.
-    
+
     Attributes:
         directories: List of Directory objects to configure
         ip_acgs: List of IP_ACG objects to configure
         tags: Dictionary of tags to apply to resources
     """
+
     directories: list[Directory]
     ip_acgs: list[IP_ACG]
     tags: dict
@@ -85,11 +90,12 @@ class WorkInstruction:
 class Inventory:
     """
     Represent current state of directories and IP ACGs in AWS.
-    
+
     Attributes:
         directories: List of existing Directory objects
         ip_acgs: List of existing IP_ACG objects
     """
+
     directories: list[Directory]
     ip_acgs: list[IP_ACG]
 
@@ -98,11 +104,12 @@ class Inventory:
 class Settings:
     """
     Represent application settings and configuration.
-    
+
     Attributes:
         validation: Validation rules and constraints
         work_instruction: Optional WorkInstruction for desired state
     """
+
     validation: Validation
     work_instruction: Optional[WorkInstruction] = None
 
@@ -111,12 +118,13 @@ class Settings:
 class AppInput:
     """
     Represent all inputs needed to run the application.
-    
+
     Attributes:
         cli: Dictionary of command line arguments
         settings: Settings object with validation and work instructions
         inventory: Inventory object with current AWS state
     """
+
     cli: dict
     settings: Settings
     inventory: Inventory

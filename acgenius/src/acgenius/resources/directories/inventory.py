@@ -19,24 +19,21 @@ def get_directories() -> Optional[list[dict]]:
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_workspace_directories.html
     """
     logger.debug("Call [describe_workspace_directories]...", extra={"depth": 2})
-    
+
     try:
         response = workspaces.describe_workspace_directories()
         logger.debug(
             "Response of [describe_workspace_directories]: "
-            f"{json.dumps(response, indent=4)}", 
-            extra={"depth": 2}
+            f"{json.dumps(response, indent=4)}",
+            extra={"depth": 2},
         )
         if response["Directories"]:
             return response["Directories"]
-        
+
     except (ClientError, Exception) as e:
         msg_generic = "Could not get directories from AWS."
         error_map = {
-            "InvalidParameterValuesException": {
-                "msg": EXC_INVALID_PARAM,
-                "crash": True
-            }
+            "InvalidParameterValuesException": {"msg": EXC_INVALID_PARAM, "crash": True}
         }
         error_code = get_error_code(e)
         process_error(error_map, error_code, msg_generic, e)
@@ -49,10 +46,10 @@ def sel_directories(directories_inventory: dict) -> list[Directory]:
     is not present in the response.
     """
     logger.debug(
-        "Select relevant directory info from retrieved directories...", 
-        extra={"depth": 2}
+        "Select relevant directory info from retrieved directories...",
+        extra={"depth": 2},
     )
-    
+
     directories = []
 
     for directory in directories_inventory:
@@ -77,11 +74,11 @@ def show_directories() -> list[Directory]:
 
     :returns: List of Directory objects containing directory information
     """
-    logger.info("Current directories (before execution of action):", extra={"depth": 1})  
+    logger.info("Current directories (before execution of action):", extra={"depth": 1})
 
     directories_inventory = get_directories()
     directories_inventory_sel = sel_directories(directories_inventory)
-    
+
     create_report(subject=directories_inventory_sel, origin="inventory")
 
     return directories_inventory_sel

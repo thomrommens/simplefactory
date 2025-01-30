@@ -4,10 +4,10 @@ import logging
 from typing import Optional
 
 from acgenius.config import (
-    EXC_ACCESS_DENIED, 
+    EXC_ACCESS_DENIED,
     EXC_INVALID_PARAM,
-    STD_INSTR_README, 
-    workspaces
+    STD_INSTR_README,
+    workspaces,
 )
 from acgenius.resources.models import IP_ACG, Rule
 from acgenius.resources.utils import create_report
@@ -30,8 +30,8 @@ def get_ip_acgs() -> list[IP_ACG]:
         response = workspaces.describe_ip_groups()
 
         logger.debug(
-            f"Response of [describe_ip_groups]: {json.dumps(response, indent=4)}", 
-            extra={"depth": 2}
+            f"Response of [describe_ip_groups]: {json.dumps(response, indent=4)}",
+            extra={"depth": 2},
         )
         if response.get("Result"):
             return response["Result"]
@@ -43,12 +43,12 @@ def get_ip_acgs() -> list[IP_ACG]:
         error_map = {
             "InvalidParameterValuesException": {
                 "msg": EXC_INVALID_PARAM,
-                "crash": True
+                "crash": True,
             },
             "AccessDeniedException": {
                 "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
-                "crash": True
-            }
+                "crash": True,
+            },
         }
         error_code = get_error_code(e)
         process_error(error_map, error_code, msg_generic, e)
@@ -59,25 +59,21 @@ def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     Make sure ip_acgs are sorted by name.
     """
     logger.debug(
-        "Select relevant IP ACG info from retrieved IP ACGs, and sort by name...", 
-        extra={"depth": 2}
+        "Select relevant IP ACG info from retrieved IP ACGs, and sort by name...",
+        extra={"depth": 2},
     )
-    
+
     ip_acgs_sel = []
 
     unsorted_ip_acgs = [
-        IP_ACG(            
+        IP_ACG(
             id=ip_acg.get("groupId"),
             name=ip_acg.get("groupName"),
             desc=ip_acg.get("groupDesc"),
             rules=[
-                Rule(
-                    ip=rule.get("ipRule"),
-                    desc=rule.get("ruleDesc")
-                )
-                for rule 
-                in ip_acg.get("userRules", {})
-            ]
+                Rule(ip=rule.get("ipRule"), desc=rule.get("ruleDesc"))
+                for rule in ip_acg.get("userRules", {})
+            ],
         )
         for ip_acg in ip_acgs_inventory
     ]
@@ -101,7 +97,7 @@ def show_ip_acgs() -> Optional[list[IP_ACG]]:
     ip_acgs_received = get_ip_acgs()
 
     if ip_acgs_received:
-        ip_acgs = sel_ip_acgs(ip_acgs_received)    
+        ip_acgs = sel_ip_acgs(ip_acgs_received)
         create_report(subject=ip_acgs, origin="inventory")
 
         return ip_acgs
