@@ -174,7 +174,7 @@ def val_amt_rules_allowed(rule_list: list, settings: Settings) -> Optional[bool]
 
     :param rule_list: List of rules to validate
     :param settings: all settings required for the validation
-    :return: None if number of rules is larger than 0 and does not exceed AWS maximum, 
+    :return: None if number of rules is larger than 0 and does not exceed AWS maximum,
     False otherwise
     """
     amt_rules_max = settings.validation.rules_amt_max

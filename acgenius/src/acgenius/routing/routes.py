@@ -12,7 +12,7 @@ logger = logging.getLogger("acgenius")
 
 
 def run_common_route() -> tuple[Settings, Inventory]:
-    """ 
+    """
     Run route for all actions.
     Whatever action is picked, inventory and settings are always retrieved.
 

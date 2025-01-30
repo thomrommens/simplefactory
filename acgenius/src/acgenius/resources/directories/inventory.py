@@ -74,7 +74,7 @@ def show_directories() -> list[Directory]:
     Get and display the current, processed directories in AWS WorkSpaces.
 
     :return: List of Directory objects containing directory information
-    
+
     """
     logger.info("Current directories (before execution of action):", extra={"depth": 1})
 

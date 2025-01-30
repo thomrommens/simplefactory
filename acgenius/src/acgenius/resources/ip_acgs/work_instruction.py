@@ -148,7 +148,7 @@ def associate_ip_acg(ip_acgs: list[IP_ACG], directory: Directory) -> None:
 
 def update_rules(ip_acg: IP_ACG) -> None:
     """
-    Update rules of IP ACG in AWS WorkSpaces. 
+    Update rules of IP ACG in AWS WorkSpaces.
     This replaces all rules in the target, with rules specified.
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/update_rules_of_ip_group.html
 
@@ -207,7 +207,7 @@ def update_rules(ip_acg: IP_ACG) -> None:
 
 def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> None:
     """
-    Disassociate IP ACGs from directory in AWS WorkSpaces. 
+    Disassociate IP ACGs from directory in AWS WorkSpaces.
     If the IP ACG is not recognized, the AWS disassociation call silently passes.
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/disassociate_ip_groups.html
 
@@ -273,7 +273,7 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
 def delete_ip_acg(ip_acg_id: str) -> None:
     """
     Delete an IP ACG in AWS WorkSpaces.
-    Before an IP ACG can be deleted, it needs to be disassociated 
+    Before an IP ACG can be deleted, it needs to be disassociated
     from directories first.
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/delete_ip_group.html
 

@@ -23,7 +23,7 @@ from acgenius.routing.routes import run_common_route, run_selected_route
 def main(action: str, ip_acg_ids_to_delete: tuple, dryrun: bool, debug: bool) -> None:
     """
     Integrate app.
-    
+
     :param action: action requested: status|create|update|delete
     :param ip_acg_ids_to_delete: list of IP ACG IDs to delete.
     :param dryrun: dry run mode enabled.

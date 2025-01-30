@@ -27,7 +27,7 @@ def get_error_code(e: Exception) -> str:
 
 def set_app_response(e: Optional[Exception] = None, crash: bool = True) -> None:
     """
-    Formulate response to an error; soft landing instead of displaying hard error.  
+    Formulate response to an error; soft landing instead of displaying hard error.
 
     :param e: Exception
     :param crash: whether to crash the app

@@ -190,7 +190,7 @@ def val_ip_acgs_match_inventory(matches: int, inventory: Inventory) -> bool:
 
     :param matches: number of IP ACGs matches from work instruction with inventory
     :param inventory: retrieved inventory
-    :return: True if all IP ACGs from the inventory could be matched by name, 
+    :return: True if all IP ACGs from the inventory could be matched by name,
     False otherwise
     """
     logger.debug(

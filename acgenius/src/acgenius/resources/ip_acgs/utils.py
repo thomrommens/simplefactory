@@ -25,7 +25,7 @@ def match_ip_acgs(
 
     :param inventory: Inventory object
     :param work_instruction: WorkInstruction object
-    :return: WorkInstruction object with matched IP ACGs    
+    :return: WorkInstruction object with matched IP ACGs
     """
     logger.debug(
         "Try to match IP ACGs from work instruction with IP ACGs from inventory...",
