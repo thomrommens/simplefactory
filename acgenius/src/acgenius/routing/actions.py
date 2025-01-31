@@ -44,7 +44,7 @@ def create(app_input: AppInput) -> None:
     if not cli["dryrun"]:
         tags = work_instruction.tags
 
-        if val_directories_specified(work_instruction):  # TODO: test
+        if val_directories_specified(work_instruction):
             directories = work_instruction.directories
         else:
             directories = inventory.directories

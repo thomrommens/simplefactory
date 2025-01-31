@@ -237,11 +237,12 @@ def parse_settings() -> Settings:
     return Settings(validation=validation_baseline, work_instruction=work_instruction)
 
 
-def split_ip_and_prefix(rule: Rule) -> tuple[str, int]:
+def split_ip_and_prefix(rule: Rule, settings: Settings) -> tuple[str, int]:
     """
     Split IP address and prefix.
 
     :param rule: Rule object containing IP address to split
+    :param settings: all settings required for the validation
     :return: Tuple containing IP address and prefix
     """
     logger.debug("Split IP address and prefix...", extra={"depth": 5})
@@ -251,15 +252,18 @@ def split_ip_and_prefix(rule: Rule) -> tuple[str, int]:
     if fwd_slash != -1:
         ip = rule.ip[:fwd_slash]
         prefix = int(rule.ip[fwd_slash + 1 :])
+        logger.debug(f"Prefix present, using user input: {prefix}", extra={"depth": 6})
 
     else:
         ip = rule.ip
-        prefix = 32  # TODO replace with dynamic value
+        prefix = settings.validation.prefix_default
+        logger.debug(f"Prefix absent, using default: {prefix}", extra={"depth": 6})
 
     return ip, prefix
 
 
 def remove_whitespaces(rule: Rule) -> Rule:
+
     """
     Remove whitespaces from IP address.
 

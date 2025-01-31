@@ -1,6 +1,3 @@
-# TODO: update docstrings
-# TODO: update README.md
-
 import click
 
 from acgenius.config import HR, click_help, setup_logger

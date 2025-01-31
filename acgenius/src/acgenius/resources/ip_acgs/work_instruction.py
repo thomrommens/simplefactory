@@ -241,7 +241,7 @@ def disassociate_ip_acg(ip_acg_ids_to_delete: list, directory: Directory) -> Non
         )
         error_map = {
             "ParamValidationError": {"msg": EXC_INVALID_PARAM, "crash": True},
-            "ValidationException": {  # TODO: check if this error is caught
+            "ValidationException": {
                 "msg": (
                     "Are you sure you specified "
                     "a valid IP ACG id? "
