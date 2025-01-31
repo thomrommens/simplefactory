@@ -231,7 +231,7 @@ def val_rules(work_instruction: WorkInstruction, settings: Settings) -> WorkInst
             rule.ip = remove_whitespaces(rule)
             val_ip_linebreaks_absent(rule)
 
-            ip, prefix = split_ip_and_prefix(rule)
+            ip, prefix = split_ip_and_prefix(rule, settings)
             rule_list.append(f"{ip}/{prefix}")
 
             val_ip_format_correct(ip)

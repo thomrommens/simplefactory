@@ -202,16 +202,24 @@ def test_parse_settings(valid_settings, monkeypatch):
     assert isinstance(result.validation, Validation)
     assert isinstance(result.work_instruction, WorkInstruction)
 
-@pytest.mark.parametrize("rule,expected_ip,expected_prefix", [
-    # IP with prefix
-    (Rule(ip="192.168.1.1/24", desc="test"), "192.168.1.1", 24),
-    # IP without prefix
-    (Rule(ip="192.168.1.1", desc="test"), "192.168.1.1", 32),
-])
-def test_split_ip_and_prefix(rule, expected_ip, expected_prefix):
-    ip, prefix = split_ip_and_prefix(rule)
-    assert ip == expected_ip
-    assert prefix == expected_prefix
+
+def test_split_ip_and_prefix_with_prefix(valid_settings):
+    # Test IP address with explicit prefix
+    rule = Rule(ip="192.168.1.0/24", desc="Test rule")
+    ip, prefix = split_ip_and_prefix(rule, parse_settings())
+    
+    assert ip == "192.168.1.0"
+    assert prefix == 24
+
+
+def test_split_ip_and_prefix_without_prefix(valid_settings):
+    # Test IP address without prefix (should use default)
+    rule = Rule(ip="192.168.1.1", desc="Test rule")
+    ip, prefix = split_ip_and_prefix(rule, parse_settings())
+    
+    assert ip == "192.168.1.1"
+    assert prefix == valid_settings["user_input_validation"]["ip_address"]["prefix"]["default"]
+
 
 @pytest.mark.parametrize("input_ip,expected_ip", [
     # No whitespace
