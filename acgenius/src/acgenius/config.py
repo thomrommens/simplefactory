@@ -5,10 +5,7 @@ from pathlib import Path
 
 
 SETTINGS_FILE = "settings.yaml"
-SETTINGS_FILE_PATH = os.path.join(
-    Path().resolve().parent, 
-    SETTINGS_FILE
-)
+SETTINGS_FILE_PATH = os.path.join(Path().resolve().parent, SETTINGS_FILE)
 
 STD_INSTR_SETTINGS = "Please revise settings.yaml."
 STD_INSTR_README = "See README.md for more info."
@@ -16,7 +13,7 @@ STD_INSTR_DEBUG = "Enable app debug mode (--debug) for more detail."
 
 EXC_INVALID_PARAM = (
     "Please check if you have any empty values, or invalid characters "
-    "in names, descriptions, or tags."  
+    "in names, descriptions, or tags."
 )
 EXC_ACCESS_DENIED = (
     "It seems you do not have all permissions. Please check your IAM role."
@@ -52,8 +49,7 @@ click_help = {
         "and does not actually apply anything in AWS."
     ),
     "debug": (
-        "Enable debug mode? "
-        "This will show more detailed information in the logs."
+        "Enable debug mode? This will show more detailed information in the logs."
     ),
 }
 
@@ -77,10 +73,17 @@ class DepthFormatter(logging.Formatter):
         [2023-01-01 12:00:01] [INFO] | Processing item 1
         [2023-01-01 12:00:02] [INFO] | | Validating item 1
     """
+
     def __init__(self, fmt: str = None, datefmt: str = None, style: str = "%") -> None:
         super().__init__(fmt, datefmt, style)
 
     def format(self, record: logging.LogRecord) -> str:
+        """
+        Format the log message with indentation based on the depth attribute.
+
+        :param record: actual log record
+        :return: formatted log message
+        """
         pipes = " |" * getattr(record, "depth", 0)
         record.msg = f"{pipes}{' ' if pipes else ''}{record.msg}"
         return super().format(record)
@@ -93,12 +96,6 @@ def setup_logger(name: str, debug: bool) -> logging.Logger:
     :param name: Name of the logger to create
     :param debug: Whether to enable debug logging level
     :return: Configured logger instance with appropriate handler and formatter
-    
-    The logger is configured with:
-    - Log level set to DEBUG if debug=True, otherwise INFO
-    - StreamHandler for console output
-    - Custom DepthFormatter for hierarchical formatting
-    - Handler only added if logger doesn't already have handlers
     """
     logger = logging.getLogger(name)
 

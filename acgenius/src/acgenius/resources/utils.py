@@ -5,18 +5,20 @@ import pandas as pd
 from tabulate import tabulate
 
 from acgenius.resources.ip_acgs.utils import format_rules
-from acgenius.resources.models import Directory, IP_ACG
-
+from acgenius.resources.models import IP_ACG, Directory
 
 logger = logging.getLogger("acgenius")
 
 
 def specify_report(item: Union[Directory, IP_ACG]) -> dict:
     """
-    xx
+    Specify report for a given item (in order to add to generic report downstream).
+
+    :param item: Directory or IP_ACG
+    :return: dictionary with report specification (addition)
     """
-    logger.debug(f"Set report specs...", extra={"depth": 2})
-    
+    logger.debug("Set report specs...", extra={"depth": 2})
+
     if isinstance(item, IP_ACG):
         return {
             "description": item.desc,
@@ -25,25 +27,23 @@ def specify_report(item: Union[Directory, IP_ACG]) -> dict:
         return {
             "ip_acgs_associated": item.ip_acgs,
             "type": item.type,
-            "state": item.state
+            "state": item.state,
         }
 
 
-def create_report(
-        subject: Union[list[Directory], list[IP_ACG]],
-        origin: str
-    ) -> None:
+def create_report(subject: Union[list[Directory], list[IP_ACG]], origin: str) -> None:
     """
-    Report a ...
-    Rules is nested within IP_ACG, so no separate argument.
+    Create a report for a given subject.
+
+    :param subject: list of Directories or IP_ACGs
+    :param origin: origin of the report
     """
-    logger.debug(f"Create report...", extra={"depth": 1})
+    logger.debug("Create report...", extra={"depth": 1})
 
     data = []
     fmt = "psql" if origin == "work_instruction" else "fancy_grid"
 
     if subject:
-
         i = 0
         for item in subject:
             i += 1
@@ -57,7 +57,6 @@ def create_report(
             subject_table = f"{tabulate(df, headers='keys', tablefmt=fmt)}"
 
             if isinstance(item, IP_ACG):
-                
                 rules_formatted = format_rules(item)
                 rules_table = [["rule", "description"]]
 
@@ -75,4 +74,4 @@ def create_report(
                 print(f"\n{subject_table}\n")
 
     else:
-        logger.warning(f"No item found for report.", extra={"depth": 1})
+        logger.warning("No item found for report.", extra={"depth": 1})

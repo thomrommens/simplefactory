@@ -1,18 +1,18 @@
-from botocore.exceptions import ClientError
 import json
 import logging
 from typing import Optional
 
+from botocore.exceptions import ClientError
+
 from acgenius.config import (
-    EXC_ACCESS_DENIED, 
+    EXC_ACCESS_DENIED,
     EXC_INVALID_PARAM,
-    STD_INSTR_README, 
-    workspaces
+    STD_INSTR_README,
+    workspaces,
 )
 from acgenius.resources.models import IP_ACG, Rule
 from acgenius.resources.utils import create_report
 from acgenius.routing.errors import get_error_code, process_error
-
 
 logger = logging.getLogger("acgenius")
 
@@ -22,16 +22,16 @@ def get_ip_acgs() -> list[IP_ACG]:
     Retrieve IP Access Control Groups from AWS Workspaces.
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces/client/describe_ip_groups.html
 
-    :return: List of IP_ACG objects containing the IP ACGs found in AWS
+    :return: List of IP_ACGs found in AWS
     """
-    logger.debug(f"Call [describe_ip_groups]...", extra={"depth": 2})
+    logger.debug("Call [describe_ip_groups]...", extra={"depth": 2})
 
     try:
         response = workspaces.describe_ip_groups()
 
         logger.debug(
-            f"Response of [describe_ip_groups]: {json.dumps(response, indent=4)}", 
-            extra={"depth": 2}
+            f"Response of [describe_ip_groups]: {json.dumps(response, indent=4)}",
+            extra={"depth": 2},
         )
         if response.get("Result"):
             return response["Result"]
@@ -43,12 +43,12 @@ def get_ip_acgs() -> list[IP_ACG]:
         error_map = {
             "InvalidParameterValuesException": {
                 "msg": EXC_INVALID_PARAM,
-                "crash": True
+                "crash": True,
             },
             "AccessDeniedException": {
                 "msg": f"{EXC_ACCESS_DENIED} {STD_INSTR_README}",
-                "crash": True
-            }
+                "crash": True,
+            },
         }
         error_code = get_error_code(e)
         process_error(error_map, error_code, msg_generic, e)
@@ -56,28 +56,27 @@ def get_ip_acgs() -> list[IP_ACG]:
 
 def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
     """
-    Make sure ip_acgs are sorted by name.
+    Select relevant IP ACG info from retrieved IP ACGs, and sort by name.
+
+    :param ip_acgs_inventory: retrieved IP ACGs
+    :return: List of IP_ACGs found in AWS, with information filtered and sorted by name
     """
     logger.debug(
-        f"Select relevant IP ACG info from retrieved IP ACGs, and sort by name...", 
-        extra={"depth": 2}
+        "Select relevant IP ACG info from retrieved IP ACGs, and sort by name...",
+        extra={"depth": 2},
     )
-    
+
     ip_acgs_sel = []
 
     unsorted_ip_acgs = [
-        IP_ACG(            
+        IP_ACG(
             id=ip_acg.get("groupId"),
             name=ip_acg.get("groupName"),
             desc=ip_acg.get("groupDesc"),
             rules=[
-                Rule(
-                    ip=rule.get("ipRule"),
-                    desc=rule.get("ruleDesc")
-                )
-                for rule 
-                in ip_acg.get("userRules", {})
-            ]
+                Rule(ip=rule.get("ipRule"), desc=rule.get("ruleDesc"))
+                for rule in ip_acg.get("userRules", {})
+            ],
         )
         for ip_acg in ip_acgs_inventory
     ]
@@ -88,20 +87,16 @@ def sel_ip_acgs(ip_acgs_inventory: Optional[list[IP_ACG]]) -> list[IP_ACG]:
 
 def show_ip_acgs() -> Optional[list[IP_ACG]]:
     """
-    Show the current IP Access Control Groups in AWS.
+    Get and display the current IP ACGs in AWS WorkSpaces.
 
-    Retrieve IP ACGs from AWS, process them into internal format, and display a report.
-    Log the raw and processed IP ACGs at debug level.
-
-    :returns: List of IP_ACG objects if any exist in AWS, None otherwise
-    :raises: Any exceptions from get_ip_acgs() or sel_ip_acgs() are propagated
+    :return: List of IP_ACGs found in AWS, with information filtered and sorted by name
     """
     logger.info("Current IP ACGs (before execution of action):", extra={"depth": 1})
 
     ip_acgs_received = get_ip_acgs()
 
     if ip_acgs_received:
-        ip_acgs = sel_ip_acgs(ip_acgs_received)    
+        ip_acgs = sel_ip_acgs(ip_acgs_received)
         create_report(subject=ip_acgs, origin="inventory")
 
         return ip_acgs
