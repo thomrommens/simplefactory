@@ -1,0 +1,10 @@
+{
+    "length": 50,
+    "use_uppercase": true,
+    "use_lowercase": true,
+    "use_numbers": true,
+    "use_special_chars": true,
+    "special_chars": "@#$%^&*-_+=[]{}|\\:;?/`~\"()",
+    "similar_chars": "il1Lo0O",
+    "exclude_similar_chars": true
+} 

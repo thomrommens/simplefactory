@@ -1,0 +1,7 @@
+In this folder 'alea', create a simple command line interface to generate a random password.
+When I call the module, it should generate a password, as specified in a config file accompanied in the repo. 
+The password should be shown, and copied to the clipboard immediately, for example with pyperclip.
+The config file lets me specify the number of positions of the password, and which special characters are allowed, e.g., @#$%^&\*-\_+=\[\]{}|\\:',?/\`~"();.
+Use as few dependencies as possible.
+Include unit tests.
+Include a README, specifying usage.
